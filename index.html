@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <meta charset="utf-8">
-<meta name="theme-color" content="#29466B">
+<meta name="theme-color" content="#061B42">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <style>
@@ -868,6 +868,271 @@ html.mode-auth,html.mode-auth body{background:var(--deep)}
   .filters .seg button{font-size:14px;padding:8px 4px}
   h2{font-size:17px}
 }
+/* ═══════════ Habillage royal : bleu nuit profond et bleu royal (maquette de référence) ═══════════
+   Système commun : variables ci-dessous, réutilisées par toutes les rubriques. */
+:root{
+  --deep:#061B42; --deep2:#0A2A63; --navy-grad:linear-gradient(180deg,#061B42 0%,#071F4D 60%,#08245A 100%);
+  --band-grad:linear-gradient(105deg,#061B42 0%,#0A2A6B 55%,#0B3DB0 100%);
+  --acc:#0047D9; --acc-l:#125BFF; --acc2:#123B82; --accbg:#E8EFFE; --accline:#C7D7FB;
+  --btn-grad:linear-gradient(180deg,#1D63FF 0%,#0047D9 100%);
+  --bg:#F1F5FB; --card:#FFFFFF; --soft:#F6F9FD; --soft2:#EDF2FA;
+  --line:#DCE5F2; --line2:#C3D1E6;
+  --ink:#0B1736; --ink2:#526582; --ink3:#56688A;
+  --red:#C81E1E; --redbg:#FDECEC; --redline:#F5C2C2;
+  --amb:#B45309; --ambbg:#FFF1E0; --ambline:#F8D3A6;
+  --grn:#15803D; --grnbg:#E6F6EC; --grnline:#B5E2C5;
+  --blu:#0047D9; --blubg:#E8EFFE;
+  --st-todo:#0047D9; --st-cours:#F08C1A; --st-fin:#16A34A;
+  --r:14px; --r-s:10px;
+  --sh:0 1px 2px rgba(11,23,54,.05),0 6px 18px rgba(11,23,54,.06);
+  --sh-h:0 2px 4px rgba(11,23,54,.06),0 12px 28px rgba(11,23,54,.10);
+  --focus:0 0 0 3px rgba(0,71,217,.22);
+  --lat:248px; --lat-r:78px;
+}
+html{background:var(--deep)}
+body{background:var(--bg);color:var(--ink)}
+h1,.ph h1,.dtitle,.auth h1{font-weight:700;letter-spacing:-.02em}
+h2,.dr-h b,.sv-g h2,.mc-h b,.cp-mo b,.cp-who b,.pg h2,h2.etage{font-weight:650}
+:focus-visible{outline:2px solid var(--acc-l);outline-offset:2px}
+
+/* ───── Boutons ───── */
+.btn{border-radius:var(--r-s);font-weight:600;border-color:var(--line);transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.btn:hover{background:#F4F7FD;border-color:var(--line2)}
+.btn.pri,.ph .btn.pri{background:var(--btn-grad);border:1px solid #0040C4;color:#fff;box-shadow:0 1px 2px rgba(0,40,140,.25),0 6px 16px rgba(0,71,217,.28),inset 0 1px 0 rgba(255,255,255,.18)}
+.btn.pri:hover,.ph .btn.pri:hover{background:linear-gradient(180deg,#2A6DFF 0%,#0A50E8 100%);transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,40,140,.25),0 10px 22px rgba(0,71,217,.32)}
+.btn.pri:active{transform:none}
+.ph .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);color:#fff}
+.ph .btn:hover{background:rgba(255,255,255,.18)}
+.lk,a{color:var(--acc)}
+.btn.ok{background:var(--grnbg);border-color:var(--grnline);color:var(--grn)}
+.btn.ko{border-color:var(--redline);color:var(--red)}
+
+/* ───── Bandeau de page ───── */
+.ph{background:var(--band-grad);box-shadow:0 0 0 100vmax var(--deep);clip-path:inset(0 -100vmax);color:#fff}
+.ph h1{color:#fff;font-size:28px}
+.ph-g{color:rgba(255,255,255,.78)}
+
+/* ───── Cartes ───── */
+.tc,.cg-c,.pc,.mc,.stat,.salle,.day,.ml,.grid,.refuse,.sv-c,.cp-k div,.cp-l,.rl-c,.ps-c,.mtab,.pg-c{border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);background:var(--card)}
+.tc,.cg-c,.sv-c,.rl-c,.ps-c,.stat,.mc{transition:box-shadow .18s,transform .18s,border-color .18s}
+.tc:hover,.cg-c:hover,.sv-c:hover,.rl-c:hover,.stat:hover{box-shadow:var(--sh-h);transform:translateY(-1px);border-color:var(--line2)}
+.cp-k .ca{background:var(--band-grad);border-color:transparent}
+.empty{border-color:var(--line2);color:var(--ink2)}
+
+/* ───── Statuts : bleu à faire, orange en cours, vert terminé, rouge urgent ───── */
+.tc.st-todo::before{background:var(--st-todo)} .tc.st-cours::before{background:var(--st-cours)} .tc.st-fin::before{background:var(--st-fin)} .tc.late::before{background:var(--red)}
+.p-todo{background:var(--accbg);color:var(--acc)}
+.p-cours,.p-att{background:var(--ambbg);color:var(--amb)}
+.p-fin{background:var(--grnbg);color:var(--grn)}
+.p-late,.p-urg,.p-haute{background:var(--redbg);color:var(--red)}
+.pill{font-weight:600}
+.tc.urg{background:#FFF5F5;border-color:#F3B4B4;box-shadow:0 0 0 1px #F3B4B4,var(--sh)}
+.tc.urg .tt{color:#9B1C1C}
+.urg-b,.urg-d,.tc.urg .p-haute{background:#D92626}
+.sbtn.c{border-color:var(--ambline);color:var(--amb)} .sbtn.c.on{background:var(--st-cours);border-color:var(--st-cours);color:#fff}
+.sbtn.f{border-color:var(--grnline);color:var(--grn)} .sbtn.f.on{background:var(--st-fin);border-color:var(--st-fin);color:#fff}
+.stat b{font-size:28px;font-weight:700;color:var(--ink)}
+.stat small{font-weight:600;color:var(--ink2)}
+.stats.st3 .stat:nth-child(2){background:#FFF6EB;border-color:#F8DDBB} .stats.st3 .stat:nth-child(2) small,.stats.st3 .stat:nth-child(2) b{color:#C2410C}
+.stats.st3 .stat:nth-child(3){background:#ECF9F1;border-color:#C2E8D0} .stats.st3 .stat:nth-child(3) small,.stats.st3 .stat:nth-child(3) b{color:#15803D}
+.stat.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.stat.on b{color:inherit}
+.auj,.ajd{background:linear-gradient(180deg,#F2F6FF,#E8EFFE);border:1px solid var(--accline)}
+.auj-t,.ajd-t,.ajd-v{color:var(--acc)}
+
+/* ───── Contrôles ───── */
+.seg{background:#E6ECF6;border:0;padding:4px;border-radius:12px}
+.seg button{color:var(--ink2);font-weight:600;border-radius:9px}
+.seg button.on{background:var(--btn-grad);color:#fff;box-shadow:0 2px 8px rgba(0,71,217,.28)}
+.chip.on,.pch.on,.cp-pr button.on{background:var(--btn-grad);border-color:#0040C4;color:#fff;box-shadow:0 2px 8px rgba(0,71,217,.25)}
+.chip,.pch,.cp-pr button{font-weight:600}
+.filters select,.filters input,.mq,.fld input[type=text],.fld input[type=email],.fld input[type=password],.fld input[type=date],.fld input[type=time],.fld input[type=url],.fld select,.fld textarea,.cp-sel select{border:1px solid var(--line2);border-radius:var(--r-s);background:#fff;color:var(--ink)}
+.filters input:focus,.filters select:focus,.mq:focus,.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--acc);box-shadow:var(--focus);outline:0}
+.hint{color:var(--ink3)}
+.meta{color:var(--ink2)}
+
+/* ───── Interrupteurs (autorisations et réglages) ───── */
+.perm{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--line)}
+.perm:last-child{border-bottom:0}
+.perm>span{order:1;flex:1;display:flex;gap:12px;align-items:flex-start;font-weight:600;color:var(--ink);font-size:14.5px}
+.perm>span small{display:block;font-weight:400;color:var(--ink2);font-size:12.5px;margin-top:1px}
+.perm .pt{display:block}
+.perm .pi{width:20px;height:20px;color:var(--acc);flex:none;margin-top:1px}
+.perm input[type=checkbox]{order:2;-webkit-appearance:none;appearance:none;width:44px;height:26px;border-radius:999px;background:#CBD5E4;position:relative;flex:none;cursor:pointer;margin:0;transition:background .18s;border:0}
+.perm input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(11,23,54,.3);transition:transform .18s}
+.perm input[type=checkbox]:checked{background:var(--acc)}
+.perm input[type=checkbox]:checked::after{transform:translateX(18px)}
+.perm input[type=checkbox]:focus-visible{box-shadow:var(--focus);outline:0}
+.perm input[type=checkbox]:disabled{cursor:not-allowed;opacity:.55}
+.pg-c{padding:0 16px;margin:0 0 14px;overflow:hidden}
+.pg-ch{display:flex;align-items:center;gap:10px;margin:0 -16px;padding:13px 16px;background:linear-gradient(180deg,#F4F7FE,#EDF2FC);border-bottom:1px solid var(--line)}
+.pg-ch b{font-family:var(--f-titre);font-size:15.5px;font-weight:650;color:var(--ink)}
+.pg-ch .ic{width:20px;height:20px;color:var(--acc)}
+
+/* ───── Fenêtres (panneau latéral et boîtes) ───── */
+.ov{background:rgba(6,27,66,.45)}
+.dr{box-shadow:-20px 0 60px rgba(6,27,66,.28)}
+@media (min-width:761px){.dr{border-radius:18px 0 0 18px;width:min(580px,100%)}}
+.dr-h{padding:18px 22px}
+.dr-h b{font-size:19px;font-weight:700}
+.dr-b{background:#FAFCFF}
+.dr-f{background:#fff}
+.x{background:var(--soft2);border-radius:10px}
+.rf-n{display:flex;align-items:center;gap:8px;color:var(--ink2);margin:0 0 12px;font-size:14px}
+.rf-n .ic{width:18px;height:18px;color:var(--acc)}
+.rf-tabs{display:flex;gap:6px;background:#E6ECF6;padding:4px;border-radius:12px;margin:0 0 16px}
+.rf-tabs button{flex:1;border:0;background:none;border-radius:9px;padding:9px 10px;font-weight:600;color:var(--ink2);cursor:pointer;font-size:14px}
+.rf-tabs button.on{background:var(--deep);color:#fff;box-shadow:0 2px 8px rgba(6,27,66,.25)}
+.rm{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.rm:last-child{border-bottom:0}
+.rm .bd{flex:1;min-width:0} .rm b{display:block;font-weight:600} .rm small{color:var(--ink2);font-size:12.5px}
+.modal{background:rgba(6,27,66,.5)}
+.toast{background:var(--deep)}
+
+/* ───── Badges ───── */
+.bd-s{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.bd-s.vert{background:#DCF5E5;color:#15803D} .bd-s.ora{background:var(--ambbg);color:var(--amb)} .bd-s.gris{background:#E9EEF5;color:#56688A}
+.bd-r{display:inline-block;font-size:12.5px;font-weight:600;padding:4px 11px;border-radius:8px;background:#EAF0FA;color:var(--ink);white-space:nowrap}
+.cnt{background:#EF3B3B}
+
+/* ───── Personnel ───── */
+.ps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:0 0 16px}
+.ps-c{display:flex;align-items:center;gap:14px;padding:16px 18px}
+.ps-c.on{background:linear-gradient(180deg,#EEF3FF,#E2EBFF);border-color:var(--accline)}
+.ps-i{width:44px;height:44px;padding:10px;border-radius:12px;background:var(--accbg);color:var(--acc);flex:none}
+.ps-c.on .ps-i{background:#fff}
+.ps-c b{display:block;font-size:28px;font-weight:700;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.ps-c small{display:block;color:var(--ink2);font-size:13px;font-weight:500;margin-top:4px}
+.ps-f{align-items:center}
+.ps-q{flex:1;position:relative;display:flex}
+.ps-q .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink3)}
+.ps-q input{flex:1;padding-left:40px!important;min-height:46px!important;border-radius:12px!important;box-shadow:var(--sh)}
+.ps-arch{padding:0 6px}
+.rl{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.rl-c{padding:15px 16px;gap:12px}
+.rl-t{justify-content:flex-start;align-items:center;gap:12px}
+.rl-t>span{display:flex;flex-direction:column}
+.rl-t b{font-size:15.5px;font-weight:700}
+.rl-t small{font-size:13px;color:var(--ink2)}
+.rl-i{width:42px;height:42px;padding:10px;border-radius:50%;background:var(--accbg);color:var(--acc);flex:none}
+.rl-i.or{background:#FFF1E0;color:#D97706}
+.rl-o span{font-weight:600}
+.rl-o .on{background:var(--accbg);color:var(--acc)}
+.rl-o .off{background:#F1F4F9;color:#8A99B2}
+.mt-h{display:flex;align-items:center;margin:22px 0 10px}.mt-h h2{margin:0}
+.mtab{overflow:hidden;padding:0}
+.mt-t,.mt-r{display:grid;grid-template-columns:minmax(220px,2.3fr) minmax(120px,1.1fr) minmax(150px,1.2fr) 90px 70px;align-items:center;gap:12px;padding:10px 18px}
+.mt-t{background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--ink2)}
+.mt-g{padding:9px 18px;background:#F3F6FC;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--acc2);letter-spacing:.01em}
+.mtab .pc.mt-r{border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;background:#fff;cursor:pointer;transform:none}
+.mtab .pc.mt-r:hover{background:#F6F9FF;box-shadow:none}
+.mtab .pc.mt-r.arch{background:#FAFBFD;opacity:.75}
+.mt-n{display:flex;align-items:center;gap:12px;min-width:0}
+.mt-n .bd{display:flex;flex-direction:column;min-width:0}
+.mt-n .nm{font-weight:700;color:var(--ink)}
+.mt-n .mt{font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;box-shadow:none;background:none;border-radius:0}
+.mt-ac{display:flex;gap:6px}
+.mt-a{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#F1F4F9;color:#A3B0C5}
+.mt-a .ic{width:16px;height:16px}
+.mt-a.on{background:var(--accbg);color:var(--acc)}
+.mt-id{display:flex;align-items:center;justify-content:flex-end;gap:6px;color:var(--ink3);font-size:12px;font-variant-numeric:tabular-nums}
+.mt-id .ic{width:18px;height:18px;color:var(--ink2)}
+.av{background:var(--accbg);color:var(--acc);font-weight:700}
+@media (max-width:1100px){.ps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .ps{gap:10px}.ps-c{padding:12px;gap:10px}.ps-i{width:36px;height:36px;padding:8px}.ps-c b{font-size:22px}.ps-c small{font-size:12px}
+  .mt-t{display:none}
+  .mt-r{grid-template-columns:1fr auto;grid-template-areas:"n st" "ro ac";gap:8px 10px;padding:12px 14px}
+  .mt-n{grid-area:n}.mt-st{grid-area:st;justify-self:end}.mt-ro{grid-area:ro}.mt-ac{grid-area:ac;justify-self:end}.mt-id{display:none}
+}
+
+/* ───── Comptabilité et tableaux ───── */
+.cp-t thead th,.cp-t th,.pl th,.mt-t{background:#F3F6FC}
+.cp-t tfoot td{background:var(--deep)}
+.cp-j .bar i{background:var(--btn-grad)}
+.sv-c.imp{border-left:4px solid #D92626}
+.sv-rl span.f{background:var(--accbg);color:var(--acc)}
+
+/* ───── Téléphone : en-tête bleu royal, navigation du bas ───── */
+@media (max-width:760px){
+  header{background:#0A2F8F;box-shadow:none}
+  .ph{background:linear-gradient(160deg,#0A2F8F 0%,#0B3FC4 100%);box-shadow:0 0 0 100vmax #0A2F8F;padding:6px 0 22px}
+  .ph h1{font-size:25px}
+  .ph .btn.pri{background:linear-gradient(180deg,#2A6DFF 0%,#125BFF 100%);border-color:rgba(255,255,255,.25);box-shadow:0 8px 20px rgba(0,20,90,.35)}
+  .bnav{background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(11,23,54,.06);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .bnav button{color:var(--ink2);font-weight:600;border-radius:14px;padding:6px 0 7px;margin:0 2px}
+  .bnav button svg{width:24px;height:24px;padding:0;border-radius:0;background:none!important;margin-bottom:2px}
+  .bnav button.on{background:var(--btn-grad);color:#fff;box-shadow:0 6px 16px rgba(0,71,217,.32)}
+  .bnav .cnt{box-shadow:0 0 0 2px #fff}
+  .stats.st3 .stat b{font-size:26px}
+  .replier{display:none}
+}
+html{scroll-padding-top:20px}
+
+/* ───── Ordinateur : barre latérale bleu nuit, rétractable ───── */
+.replier{display:none}
+@media (min-width:761px){
+  header{position:fixed;top:0;left:0;bottom:0;width:var(--lat);z-index:30;background:var(--navy-grad);-webkit-backdrop-filter:none;backdrop-filter:none;border:0;box-shadow:4px 0 24px rgba(6,27,66,.18);padding-top:env(safe-area-inset-top);transition:width .2s}
+  header .hd{height:100%;max-width:none;margin:0;flex-direction:column;align-items:stretch;gap:0;padding:18px 14px 14px}
+  header .logo{padding:4px 8px 18px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);font-size:17px}
+  header .logo i{width:36px;height:36px;border-radius:10px;background:#fff;color:var(--deep);flex:none}
+  .tabs{display:flex!important;flex-direction:column;gap:3px;margin:6px 0 0;overflow-y:auto;flex:1}
+  .tab{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:11px 13px!important;border-radius:11px;color:rgba(255,255,255,.78);font-weight:600;font-size:15px;white-space:nowrap}
+  .tab .ti{width:21px;height:21px;flex:none;opacity:.95}
+  .tab .tl{flex:1}
+  .tab:hover{background:rgba(255,255,255,.07);color:#fff}
+  .tab.on{background:var(--btn-grad);color:#fff;box-shadow:0 6px 18px rgba(0,71,217,.45),inset 0 1px 0 rgba(255,255,255,.15)}
+  .tab .cnt{margin-left:auto;box-shadow:none;background:#EF3B3B;min-width:22px;height:22px;line-height:22px;border-radius:11px;font-size:12px}
+  header .sp{display:none}
+  /* profil en bas */
+  .who{display:flex!important;align-items:center;gap:10px;order:10;margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);white-space:normal;text-align:left;color:#fff}
+  .av-w{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--btn-grad);color:#fff;font-weight:700;font-size:13.5px;flex:none}
+  .who-t{flex:1;min-width:0;display:flex;flex-direction:column}
+  .who-t b{color:#fff;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .who-t small{color:rgba(255,255,255,.62);font-size:12.5px}
+  .who .out{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;color:rgba(255,255,255,.75);text-decoration:none;padding:0;flex:none}
+  .who .out:hover{background:rgba(255,255,255,.1);color:#fff}
+  .who .out svg{width:18px;height:18px} .who .out span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .replier{display:grid;order:11;place-items:center;align-self:flex-end;margin-top:8px;width:34px;height:34px;border:0;border-radius:9px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);cursor:pointer;transition:transform .2s}
+  .replier:hover{background:rgba(255,255,255,.12);color:#fff}
+  .replier svg{width:18px;height:18px}
+  /* cloche et avatar : en haut à droite, sur le bandeau */
+  .bell{position:fixed;top:calc(16px + env(safe-area-inset-top));right:76px;z-index:25;width:42px;height:42px;border-radius:50%;background:rgba(6,27,66,.55);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(6,27,66,.25)}
+  .bell:hover{background:rgba(6,27,66,.75)}
+  .bell .cnt{box-shadow:0 0 0 2px #0A2A6B}
+  .me-m,.hd:has(#tabRel:not(.hidden)) .me-m{display:block!important;position:fixed;top:calc(16px + env(safe-area-inset-top));right:24px;z-index:25}
+  .av-m{width:42px;height:42px;background:var(--btn-grad);border:2px solid rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(6,27,66,.3);font-size:14px}
+  .hd:has(#tabRel:not(.hidden)) .who{display:flex!important}
+  body{padding-left:var(--lat);transition:padding-left .2s}
+  main{max-width:none;padding:0 32px 32px}
+  .ph{box-shadow:none;clip-path:none;margin:0 -32px 24px;padding:30px 150px 30px 32px}
+  .nvadr{margin-left:32px;margin-right:32px}
+  /* menu réduit : les icônes seules */
+  html.lat-r header{width:var(--lat-r)}
+  html.lat-r body{padding-left:var(--lat-r)}
+  html.lat-r header .logo span,html.lat-r .tab .tl,html.lat-r .who-t,html.lat-r .who .out{display:none}
+  html.lat-r header .logo{justify-content:center;padding-left:0;padding-right:0}
+  html.lat-r .tab{justify-content:center;padding:12px 0!important;position:relative}
+  html.lat-r .tab .cnt{position:absolute;top:3px;right:6px;min-width:18px;height:18px;line-height:18px;font-size:11px}
+  html.lat-r .who{justify-content:center;padding:8px 0;background:none;border:0}
+  html.lat-r .replier{align-self:center;transform:rotate(180deg)}
+}
+@media (min-width:761px) and (max-width:1099px){
+  header{width:var(--lat-r)} body{padding-left:var(--lat-r)}
+  header .logo span,.tab .tl,.who-t,.who .out,.replier{display:none!important}
+  header .logo{justify-content:center;padding-left:0;padding-right:0}
+  .tab{justify-content:center;padding:12px 0!important;position:relative}
+  .tab .cnt{position:absolute;top:3px;right:6px;min-width:18px;height:18px;line-height:18px;font-size:11px}
+  .who{justify-content:center;padding:8px 0;background:none;border:0}
+  main{padding:0 24px 28px}
+  .ph{margin:0 -24px 22px;padding:28px 140px 28px 24px}
+}
+/* connexion : sur le bleu nuit */
+html.mode-auth,html.mode-auth body{background:var(--band-grad)!important}
+html.mode-auth body{padding-left:0}
+html.mode-auth header{display:none}
+.auth .brand i{color:var(--deep)}
+.auth .btn.pri{background:var(--btn-grad)}
 </style>
 </head>
 <body>
@@ -876,19 +1141,20 @@ html.mode-auth,html.mode-auth body{background:var(--deep)}
   <div class="hd">
     <div class="logo"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/></svg></i><span id="appName">Cabinet</span></div>
     <nav class="tabs" id="tabs">
-      <button class="tab on" data-v="taches">Tâches<span class="cnt hidden" id="c1"></span></button>
-      <button class="tab" data-v="planning">Planning</button>
-      <button class="tab" data-v="conges">Congés<span class="cnt hidden" id="c2"></span></button>
-      <button class="tab" data-v="materiel">Matériel<span class="cnt hidden" id="c3"></span></button>
-      <button class="tab hidden" data-v="compta" id="tabCpt">Comptabilité</button>
-      <button class="tab hidden" data-v="impayes" id="tabImp">Impayés</button>
-      <button class="tab hidden" data-v="relances" id="tabRel">Relances</button>
-      <button class="tab hidden" data-v="personnel" id="tabPers">Personnel</button>
+      <button class="tab on" data-v="taches" title="Tâches"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg><span class="tl">Tâches</span><span class="cnt hidden" id="c1"></span></button>
+      <button class="tab" data-v="planning" title="Planning"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="tl">Planning</span></button>
+      <button class="tab" data-v="conges" title="Congés"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a7 7 0 0 1 7 7H5a7 7 0 0 1 7-7Z"/><path d="M12 10v10M8 20h8"/></svg><span class="tl">Congés</span><span class="cnt hidden" id="c2"></span></button>
+      <button class="tab" data-v="materiel" title="Matériel"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg><span class="tl">Matériel</span><span class="cnt hidden" id="c3"></span></button>
+      <button class="tab hidden" data-v="compta" id="tabCpt" title="Comptabilité"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Comptabilité</span></button>
+      <button class="tab hidden" data-v="impayes" id="tabImp" title="Impayés"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.3V18"/></svg><span class="tl">Impayés</span></button>
+      <button class="tab hidden" data-v="relances" id="tabRel" title="Relances"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3 14.5 21l-4-7.5L3 9.5z"/></svg><span class="tl">Relances</span></button>
+      <button class="tab hidden" data-v="personnel" id="tabPers" title="Personnel"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg><span class="tl">Personnel</span></button>
     </nav>
     <span class="sp"></span>
     <button class="bell hidden" id="bell" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg><span class="cnt hidden" id="bellN"></span></button>
     <div class="who" id="who"></div>
     <div class="me-m" id="meM"></div>
+    <button class="replier" id="replier" aria-label="Réduire le menu" title="Réduire le menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
   </div>
 </header>
 <main id="main"><div class="load"><div class="spin"></div>Chargement…</div></main>
@@ -1058,11 +1324,14 @@ function appliquerDemarrage(d) {
     S.semaine = lundi(S.today);
     $('header').classList.remove('hidden'); $('#bnav').classList.remove('hidden'); document.documentElement.classList.remove('mode-auth');
     $('#appName').textContent = S.cfg.nomApp;
-    $('#who').innerHTML = '<b>' + esc(S.me.nom) + '</b>' + esc(S.me.role) + ' · <button class="out" id="out1">Se déconnecter</button>';
+    $('#who').innerHTML = '<span class="av-w" aria-hidden="true">' + esc(initiales(S.me)) + '</span><span class="who-t"><b>' + esc(S.me.nom) + '</b><small>' + esc(S.me.role) + '</small></span><button class="out" id="out1" title="Se déconnecter" aria-label="Se déconnecter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4"/></svg><span>Se déconnecter</span></button>';
     $('#meM').innerHTML = '<span class="av-m" title="Mon compte">' + esc(initiales(S.me)) + '</span>';
     $('#meM').setAttribute('aria-label', 'Mon compte : ' + S.me.nom);
     $('#out1').onclick = seDeconnecter;
     $('#meM').onclick = monCompte;
+    (function () { var r = false; try { r = localStorage.getItem('cabinet_menu') === 'r'; } catch (e) { }
+      document.documentElement.classList.toggle('lat-r', r);
+      $('#replier').onclick = function () { var v = !document.documentElement.classList.contains('lat-r'); document.documentElement.classList.toggle('lat-r', v); try { localStorage.setItem('cabinet_menu', v ? 'r' : ''); } catch (e) { } }; })();
     $('#who b').style.cursor = 'pointer'; $('#who b').onclick = monCompte;
     $('#bell').classList.remove('hidden'); $('#bell').onclick = ouvrirNotifications;
     majCloche();
@@ -2394,31 +2663,63 @@ function rafraichirUsers() {
 }
 function initiales2(p) { return ((p.prenom || '').charAt(0) + (p.nom || '').charAt(0) || (p.prenom || '?').slice(0, 2)).toUpperCase(); }
 
+var ICO = {
+  taches: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/>',
+  planning: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  conges: '<path d="M12 3a7 7 0 0 1 7 7H5a7 7 0 0 1 7-7Z"/><path d="M12 10v10M8 20h8"/>',
+  materiel: '<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>',
+  compta: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  groupe: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/>',
+  dent: '<path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/>',
+  couronne: '<path d="m3 8 4.5 4L12 5l4.5 7L21 8l-2 11H5z"/>',
+  roue: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  bouclier: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.5 7.5 9.5 4.3-1 7.5-4.9 7.5-9.5V6z"/>',
+  grille: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
+  personne: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  pile: '<path d="m12 3 9 4.5-9 4.5-9-4.5z"/><path d="m3 12 9 4.5 9-4.5M3 16.5 12 21l9-4.5"/>',
+  loupe: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
+  points: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>'
+};
+function ico(k, cls) { return '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICO[k] || '') + '</svg>'; }
+var ONGLET_ICO = { ongletTaches: 'taches', ongletPlanning: 'planning', ongletConges: 'conges', ongletMateriel: 'materiel', ongletCompta: 'compta' };
+var ROLE_ICO = { 'Secrétaire': 'groupe', 'Assistante dentaire': 'dent', 'Assistante responsable': 'couronne', 'Chirurgien-dentiste': 'dent', 'Administrateur': 'roue' };
+
 function rendrePersonnel() {
   var P = S.pers, q = (S.persQ || '').toLowerCase();
   var vis = P.personnes.filter(function (p) {
     if (p.archive && !S.persArch) return false;
-    return !q || (p.nomAffiche + ' ' + p.email + ' ' + p.fonction).toLowerCase().indexOf(q) >= 0;
+    return !q || (p.nomAffiche + ' ' + p.email + ' ' + p.fonction + ' ' + p.role).toLowerCase().indexOf(q) >= 0;
   });
-  var nbArch = P.personnes.filter(function (p) { return p.archive; }).length;
-  var h = '<div class="ph"><div class="ph-t"><h1>Personnel</h1><p class="ph-g">Les membres du cabinet, leur accès à l’application et leurs droits. Touchez un nom pour le modifier.</p></div><div class="ph-a"><button class="btn pri" id="pAdd">+ Ajouter un membre</button></div></div>' +
-    '<div class="filters"><input id="pQ" type="search" placeholder="Rechercher un nom ou une adresse" value="' + esc(S.persQ || '') + '">' +
-    (nbArch ? '<label class="chk2" style="padding:0 6px"><input type="checkbox" id="pArch"' + (S.persArch ? ' checked' : '') + '> Afficher les archivés (' + nbArch + ')</label>' : '') + '</div>';
+  var presents = P.personnes.filter(function (p) { return !p.archive; });
+  var actifs = presents.filter(function (p) { return p.actif; }).length;
+  var dent = presents.filter(function (p) { return p.fonction === 'Chirurgien-dentiste'; }).length;
+  var nbArch = P.personnes.length - presents.length;
+  var h = '<div class="ph"><div class="ph-t"><h1>Personnel</h1><p class="ph-g">Gérez les membres du cabinet, leurs rôles et leurs accès. Touchez un nom pour le modifier.</p></div><div class="ph-a"><button class="btn pri" id="pAdd">+ Ajouter un membre</button></div></div>';
+  h += '<div class="ps">' +
+    '<div class="ps-c on">' + ico('groupe', 'ps-i') + '<span><b>' + actifs + '</b><small>Membres actifs</small></span></div>' +
+    '<div class="ps-c">' + ico('pile', 'ps-i') + '<span><b>' + P.roles.length + '</b><small>Rôles</small></span></div>' +
+    '<div class="ps-c">' + ico('dent', 'ps-i') + '<span><b>' + dent + '</b><small>Chirurgiens-dentistes</small></span></div>' +
+    '<div class="ps-c">' + ico('personne', 'ps-i') + '<span><b>' + (presents.length - dent) + '</b><small>Autres collaborateurs</small></span></div></div>';
+  h += '<div class="filters ps-f"><span class="ps-q">' + ico('loupe') + '<input id="pQ" type="search" placeholder="Rechercher un nom, un rôle ou une adresse e-mail…" value="' + esc(S.persQ || '') + '"></span>' +
+    (nbArch ? '<label class="chk2 ps-arch"><input type="checkbox" id="pArch"' + (S.persArch ? ' checked' : '') + '> Afficher les archivés (' + nbArch + ')</label>' : '') + '</div>';
   if (P.onglets && !q) h += blocRoles(P);
-  var ordre = P.fonctions.concat(['']);
+  var ordre = P.fonctions.concat(['']), corps = '';
   ordre.forEach(function (f) {
     var l = vis.filter(function (p) { return f ? p.fonction === f : P.fonctions.indexOf(p.fonction) < 0; });
     if (!l.length) return;
     var titre = f === 'Secrétaire' ? 'Secrétaires' : f === 'Assistante dentaire' ? 'Assistantes dentaires' : f === 'Chirurgien-dentiste' ? 'Chirurgiens-dentistes' : f || 'Sans fonction';
     l.sort(function (a, b) { return a.nomAffiche.localeCompare(b.nomAffiche, 'fr'); });
-    h += '<div class="pg"><h2>' + esc(titre) + ' · ' + l.length + '</h2>' + l.map(function (p) {
-      var etat = p.archive ? '<span class="tag">Archivé</span>' : !p.actif ? '<span class="tag t-warn">Inactif</span>' : '';
-      return '<div class="pc' + (p.archive ? ' arch' : '') + '" data-id="' + esc(p.id) + '" role="button" tabindex="0"><span class="av" aria-hidden="true">' + esc(initiales2(p)) + '</span><div class="bd">' +
-        '<div class="nm">' + esc(p.nomAffiche) + ' ' + etat + '</div><div class="mt">' + esc(p.role) + ' · ' + (p.email ? esc(p.email) + ' · ' + esc(p.compte) : '<i>pas d’adresse e-mail</i>') + '</div></div>' +
-        '<span class="meta" style="font-variant-numeric:tabular-nums">' + esc(p.id.toUpperCase()) + '</span></div>';
-    }).join('') + '</div>';
+    corps += '<div class="mt-g">' + esc(titre) + ' · ' + l.length + '</div>' + l.map(function (p) {
+      var st = p.archive ? '<span class="bd-s gris">Archivé</span>' : !p.actif ? '<span class="bd-s ora">Inactif</span>' : '<span class="bd-s vert">Actif</span>';
+      var acc = P.onglets ? P.onglets.filter(function (o) { return o.cle !== 'ongletCompta' || p.fonction === 'Chirurgien-dentiste'; }).map(function (o) { var on = !!(p.permissions || {})[o.cle]; return '<span class="mt-a' + (on ? ' on' : '') + '" title="' + esc(o.libelle) + (on ? '' : ' : non') + '">' + ico(ONGLET_ICO[o.cle]) + '</span>'; }).join('') : '';
+      return '<div class="pc mt-r' + (p.archive ? ' arch' : '') + '" data-id="' + esc(p.id) + '" role="button" tabindex="0">' +
+        '<span class="mt-n"><span class="av" aria-hidden="true">' + esc(initiales2(p)) + '</span><span class="bd"><span class="nm">' + esc(p.nomAffiche) + '</span><span class="mt">' + (p.email ? esc(p.email) + ' · ' + esc(p.compte) : '<i>pas d’adresse e-mail</i>') + '</span></span></span>' +
+        '<span class="mt-ro"><span class="bd-r">' + esc(p.role) + '</span></span><span class="mt-ac">' + acc + '</span><span class="mt-st">' + st + '</span>' +
+        '<span class="mt-id">' + esc(p.id.toUpperCase()) + ico('points') + '</span></div>';
+    }).join('');
   });
-  if (!vis.length) h += '<div class="empty">Aucun membre ne correspond.</div>';
+  h += '<div class="mt-h"><h2>Membres (' + vis.length + ')</h2></div>';
+  h += vis.length ? '<div class="mtab"><div class="mt-t"><span>Nom</span><span>Rôle</span><span>Accès</span><span>Statut</span><span></span></div>' + corps + '</div>' : '<div class="empty">Aucun membre ne correspond.</div>';
   $('#main').innerHTML = h;
   $('#pAdd').onclick = function () { fichePersonne(null); };
   if (S.pers.peutAcces) $$('.rl-c').forEach(function (c) { c.onclick = function () { ficheRole(c.getAttribute('data-r')); }; });
@@ -2435,14 +2736,16 @@ var ROLES_PLURIEL = { 'Secrétaire': 'Secrétaires', 'Assistante dentaire': 'Ass
 /** Ce que chaque rôle voit dans l'application : un résumé par rôle, modifiable d'un geste. */
 function blocRoles(P) {
   var roles = ROLES_ORDRE.filter(function (r) { return P.roles.indexOf(r) >= 0; });
-  return '<div class="pg"><h2>Accès par rôle</h2><p class="hint" style="margin:-2px 0 10px">' + (P.peutAcces ? 'Ce que voit chaque catégorie de personnel. Touchez un rôle pour choisir ses onglets et ses droits ; cela s’applique à toutes les personnes de ce rôle. Vous seul pouvez modifier les accès.' : 'Ce que voit chaque catégorie de personnel. Seul Dr Maxime Berdugo peut modifier les accès.') + '</p><div class="rl' + (P.peutAcces ? '' : ' ro') + '">' +
+  return '<div class="pg"><h2>Accès par rôle</h2><p class="hint" style="margin:-4px 0 12px">' + (P.peutAcces ? 'Définissez les droits par catégorie. Touchez un rôle pour voir ou modifier ses accès ; cela s’applique à toutes les personnes de ce rôle. Vous seul pouvez modifier les accès.' : 'Ce que voit chaque catégorie de personnel. Seul Dr Maxime Berdugo peut modifier les accès.') + '</p><div class="rl' + (P.peutAcces ? '' : ' ro') + '">' +
     roles.map(function (r) {
       var l = P.permissionsRole[r] || [], nb = P.personnes.filter(function (p) { return p.role === r && !p.archive; }).length;
-      return '<button class="rl-c" data-r="' + esc(r) + '"' + (P.peutAcces ? '' : ' disabled') + '><span class="rl-t"><b>' + esc(ROLES_PLURIEL[r] || r) + '</b><small>' + nb + ' personne' + (nb > 1 ? 's' : '') + '</small></span><span class="rl-o">' +
+      return '<button class="rl-c" data-r="' + esc(r) + '"' + (P.peutAcces ? '' : ' disabled') + '><span class="rl-t">' + ico(ROLE_ICO[r] || 'groupe', 'rl-i' + (r === 'Assistante responsable' ? ' or' : '')) + '<span><b>' + esc(ROLES_PLURIEL[r] || r) + '</b><small>' + nb + ' personne' + (nb > 1 ? 's' : '') + '</small></span></span><span class="rl-o">' +
         P.onglets.filter(function (o) { return o.cle !== 'ongletCompta' || r === 'Chirurgien-dentiste' || r === 'Administrateur'; }).map(function (o) { var on = l.indexOf(o.cle) >= 0; return '<span class="' + (on ? 'on' : 'off') + '">' + (on ? '✓ ' : '') + esc(o.libelle) + '</span>'; }).join('') +
         '</span></button>';
     }).join('') + '</div></div>';
 }
+/** Bloc d'autorisations : un titre et une liste d'interrupteurs. */
+function blocPerm(icone, titre, lignes) { return '<div class="pg-c"><div class="pg-ch">' + ico(icone) + '<b>' + titre + '</b></div>' + lignes + '</div>'; }
 function ficheRole(role) {
   var P = S.pers, l = P.permissionsRole[role] || [], perms = {};
   P.permissions.forEach(function (x) { perms[x.cle] = l.indexOf(x.cle) >= 0; });
@@ -2450,19 +2753,20 @@ function ficheRole(role) {
   var nb = P.personnes.filter(function (p) { return p.role === role && !p.archive; });
   var perso = nb.filter(function (p) { return p.permissionsPerso && Object.keys(p.permissionsPerso).length; });
   var autres = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') !== 0; });
-  var corps = '<p class="meta" style="margin-top:0">' + nb.length + ' personne' + (nb.length > 1 ? 's' : '') + ' : ' + esc(nb.map(function (p) { return p.prenom; }).join(', ') || '—') + '</p>' +
-    '<div class="sec" style="margin-top:8px">Onglets visibles</div>' +
-    P.onglets.map(function (o) {
+  var acces = blocPerm('grille', 'Modules de l’application', P.onglets.map(function (o) {
       var bloque = o.cle === 'ongletCompta' && !praticien;
-      return '<label class="perm' + (bloque ? ' dis' : '') + '"><input type="checkbox" data-k="' + esc(o.cle) + '"' + (perms[o.cle] && !bloque ? ' checked' : '') + (bloque ? ' disabled' : '') + '><span>' + esc(o.libelle) +
-        '<small>' + (bloque ? 'Réservé aux praticiens : le secrétariat et les assistantes ne voient jamais les chiffres.' : esc(o.detail.charAt(0).toUpperCase() + o.detail.slice(1))) + '</small></span></label>';
-    }).join('') +
-    '<div class="sec">Droits supplémentaires</div>' +
-    autres.map(function (x) { return '<label class="perm"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (role === 'Administrateur' && x.cle === 'gererPersonnel' ? ' disabled' : '') + '><span>' + esc(x.libelle) + '</span></label>'; }).join('') +
-    (perso.length ? '<p class="hint">Réglages personnels conservés pour : ' + esc(perso.map(function (p) { return p.prenom; }).join(', ')) + ' (modifiables dans leur fiche).</p>' : '') +
-    '<div class="err" id="rErr"></div>';
+      return '<label class="perm' + (bloque ? ' dis' : '') + '"><input type="checkbox" data-k="' + esc(o.cle) + '"' + (perms[o.cle] && !bloque ? ' checked' : '') + (bloque ? ' disabled' : '') + '><span>' + ico(ONGLET_ICO[o.cle], 'pi') + '<span class="pt">' + esc(o.libelle) +
+        '<small>' + (bloque ? 'Réservé aux praticiens : le secrétariat et les assistantes ne voient jamais les chiffres.' : esc(o.detail.charAt(0).toUpperCase() + o.detail.slice(1))) + '</small></span></span></label>';
+    }).join('')) +
+    blocPerm('bouclier', 'Droits supplémentaires', autres.map(function (x) { return '<label class="perm"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (role === 'Administrateur' && x.cle === 'gererPersonnel' ? ' disabled' : '') + '><span><span class="pt">' + esc(x.libelle) + '</span></span></label>'; }).join('')) +
+    (perso.length ? '<p class="hint">Réglages personnels conservés pour : ' + esc(perso.map(function (p) { return p.prenom; }).join(', ')) + ' (modifiables dans leur fiche).</p>' : '');
+  var membres = '<div class="pg-c">' + (nb.length ? nb.map(function (p) { return '<div class="rm"><span class="av">' + esc(initiales2(p)) + '</span><span class="bd"><b>' + esc(p.nomAffiche) + '</b><small>' + esc(p.email || 'pas d’adresse e-mail') + '</small></span>' + (p.permissionsPerso && Object.keys(p.permissionsPerso).length ? '<span class="bd-s ora">Personnalisé</span>' : '') + '</div>'; }).join('') : '<div class="cp-vide">Personne pour l’instant.</div>') + '</div>';
+  var corps = '<p class="rf-n">' + ico('groupe') + nb.length + ' personne' + (nb.length > 1 ? 's' : '') + (nb.length ? ' : ' + esc(nb.map(function (p) { return p.prenom; }).join(', ')) : '') + '</p>' +
+    '<div class="rf-tabs"><button class="on" data-rt="a">Accès et droits</button><button data-rt="m">Membres (' + nb.length + ')</button></div>' +
+    '<div id="rfA">' + acces + '</div><div id="rfM" class="hidden">' + membres + '</div><div class="err" id="rErr"></div>';
   tiroir(esc(ROLES_PLURIEL[role] || role) + ' : accès', corps, '<button class="btn" id="rAnn">Annuler</button><span class="sp"></span><button class="btn pri" id="rOk">Enregistrer</button>');
   $$('#drb .perm input').forEach(function (c) { c.onchange = function () { perms[c.getAttribute('data-k')] = c.checked; }; });
+  $$('[data-rt]').forEach(function (b) { b.onclick = function () { $$('[data-rt]').forEach(function (x) { x.classList.toggle('on', x === b); }); $('#rfA').classList.toggle('hidden', b.getAttribute('data-rt') !== 'a'); $('#rfM').classList.toggle('hidden', b.getAttribute('data-rt') !== 'm'); }; });
   $('#rAnn').onclick = fermer;
   $('#rOk').onclick = function () {
     var b = this; b.disabled = true;
@@ -2498,11 +2802,11 @@ function fichePersonne(p) {
   var dessinerPerms = function () {
     var d = defauts($('#pRo').value);
     var ligne = function (x) {
-      return '<label class="perm' + (P.peutAcces ? '' : ' dis') + '"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (P.peutAcces ? '' : ' disabled') + '><span>' + esc(x.libelle) +
-        '<small>' + (d[x.cle] ? 'Inclus dans le rôle' : 'Non inclus dans le rôle') + (perms[x.cle] !== !!d[x.cle] ? ' · personnalisé' : '') + '</small></span></label>';
+      return '<label class="perm' + (P.peutAcces ? '' : ' dis') + '"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (P.peutAcces ? '' : ' disabled') + '><span>' + (ONGLET_ICO[x.cle] ? ico(ONGLET_ICO[x.cle], 'pi') : '') + '<span class="pt">' + esc(x.libelle) +
+        '<small>' + (d[x.cle] ? 'Inclus dans le rôle' : 'Non inclus dans le rôle') + (perms[x.cle] !== !!d[x.cle] ? ' · personnalisé' : '') + '</small></span></span></label>';
     };
     var og = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') === 0; }), dr = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') !== 0; });
-    $('#pPerms').innerHTML = (og.length ? '<div class="meta" style="margin:2px 0 2px;font-weight:600">Onglets visibles</div>' + og.map(ligne).join('') + '<div class="meta" style="margin:14px 0 2px;font-weight:600">Droits</div>' : '') + dr.map(ligne).join('');
+    $('#pPerms').innerHTML = (og.length ? blocPerm('grille', 'Modules de l’application', og.map(ligne).join('')) : '') + blocPerm('bouclier', 'Droits', dr.map(ligne).join(''));
     $$('#pPerms input').forEach(function (c) { c.onchange = function () { perms[c.getAttribute('data-k')] = c.checked; dessinerPerms(); }; });
   };
   dessinerPerms();
