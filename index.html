@@ -2454,6 +2454,7 @@ var CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentCol
 function sansAcc(x) { return String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 
 document.addEventListener('visibilitychange', function () { if (K && S.me && S.vue === 'materiel' && document.visibilityState === 'visible') chargerMateriel(true); });
+document.addEventListener('visibilitychange', function () { if (K && S.me && (S.vue === 'impayes' || S.vue === 'relances') && document.visibilityState === 'visible' && S.sv.data && !S.sv.data.erreur) chargerSuivi(true); });
 function chargerMateriel(silence) {
   return api('getMateriel').then(function (r) { appliquerMat(r); }).catch(function (e) { if (!silence) echec(e); });
 }
@@ -2857,7 +2858,7 @@ function ouvrirSuivi(v) {
 function chargerSuivi(discret) {
   var pid = S.sv.pid; S.sv.attente = pid;
   if (!discret) { S.sv.data = null; rendreSuivi(S.vue); }
-  api('getSuiviCompta', pid).then(function (r) {
+  api('getSuiviCompta', pid, true).then(function (r) {
     if (S.sv.attente !== pid) return;
     S.sv.data = r; S.sv.dataPid = pid;
     if (S.vue === 'impayes' || S.vue === 'relances') rendreSuivi(S.vue);
@@ -2889,9 +2890,9 @@ function rendreSuivi(v) {
       if (!l.length) { h += plus ? '' : '<div class="empty">' + (imp ? 'Aucun impayé. ' : 'Aucune relance de devis. ') + '<div class="hint" style="margin-top:6px">' + esc(imp ? p.majImp : p.majRel) + '</div></div>'; return; }
       h += l.map(function (x, i) {
         var der = x.journal && x.journal[0] ? '<div class="j">Modifié par ' + esc(x.journal[0].nom) + ' le ' + esc(dHeure(x.journal[0].date)) + '</div>' : '';
-        if (imp) return '<button class="sv-c imp" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>Soin du ' + esc(joursFr(x.jour) || x.date) + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' + der + '</span><span class="m r">' + esc(x.reste) + '</span></button>';
+        if (imp) return '<button class="sv-c imp" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>' + (joursFr(x.jour) || x.date ? 'Soin du ' + esc(joursFr(x.jour) || x.date) : 'Date du soin non renseignée') + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' + der + '</span><span class="m r">' + esc(x.reste) + '</span></button>';
         var n = [x.r1, x.r2, x.r3].filter(String).length;
-        return '<button class="sv-c" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>Soin du ' + esc(joursFr(x.jour) || x.date) + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' +
+        return '<button class="sv-c" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>' + (joursFr(x.jour) || x.date ? 'Soin du ' + esc(joursFr(x.jour) || x.date) : 'Date du soin non renseignée') + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' +
           '<span class="sv-rl">' + (n ? '' : '<span class="a">À relancer</span>') + [x.r1, x.r2, x.r3].map(function (r, k) { return '<span class="' + (r ? 'f' : '') + '">Relance ' + (k + 1) + (r ? ' · ' + esc(joursFr(r).slice(0, 5)) : '') + '</span>'; }).join('') + '</span>' +
           (x.notes ? '<small style="margin-top:6px">« ' + esc(x.notes) + ' »</small>' : '') + der + '</span><span class="m">' + esc(x.montant || '') + '</span></button>';
       }).join('');
@@ -2920,7 +2921,7 @@ function histSuivi(l) {
 }
 function ficheSuivi(imp, pid, cle) {
   var x = ligneSuivi(imp, pid, cle), p = x.p, l = x.l; if (!l) return;
-  var info = '<div class="sv-d"><div><span>Praticien</span><span>' + esc(p.nom) + '</span></div><div><span>Date du soin</span><span>' + esc(joursFr(l.jour) || l.date) + '</span></div>' +
+  var info = '<div class="sv-d"><div><span>Praticien</span><span>' + esc(p.nom) + '</span></div><div><span>Date du soin</span><span>' + (esc(joursFr(l.jour) || l.date) || 'non renseignée') + '</span></div>' +
     (imp ? '<div><span>Reste dû</span><span style="color:var(--red)">' + esc(l.reste) + '</span></div>' : '') + (l.remarque && !imp ? '<div><span>Remarque</span><span>' + esc(l.remarque) + '</span></div>' : '') + '</div>';
   if (imp) {
     tiroir(esc(l.patient), info +
