@@ -2996,7 +2996,7 @@ function rendreSuivi(v) {
   var h = '<div class="ph"><div class="ph-t"><h1>' + (imp ? 'Impayés' : 'Relances de devis') + '</h1><p class="ph-g">' + (imp
     ? 'Les patients qui doivent encore un montant, d’après les journées remplies dans Google Sheets. Touchez un patient pour noter un règlement ou corriger le reste dû.'
     : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div>' +
-    '<div class="ph-a"><button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter un devis') + '</button></div></div>';
+    '<div class="ph-a"><button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter une relance') + '</button></div></div>';
   h += segCompta(v);
   if (tous) h += '<div class="cp-pr"><button data-sp="*" class="' + (S.sv.pid === '*' ? 'on' : '') + '">Tous</button>' + tous.map(function (p) { return '<button data-sp="' + esc(p.id) + '" class="' + (S.sv.pid === p.id || (S.sv.pid === '' && p.id === S.me.id) ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
   if (!d) h += '<div class="load"><div class="spin"></div>Lecture des fichiers…</div>';
@@ -3049,7 +3049,7 @@ function formAjoutSuivi(imp) {
   var choix = tous ? tous : [{ id: S.me.id, prenom: S.me.prenom || 'Moi', nom: S.me.nom }];
   var def = S.sv.pid && S.sv.pid !== '*' ? S.sv.pid : (choix.some(function (p) { return p.id === S.me.id; }) ? S.me.id : choix[0].id);
   var sel = choix.length > 1 ? '<div class="fld"><label for="ajP">Praticien</label><select id="ajP">' + choix.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === def ? ' selected' : '') + '>' + esc(p.nom || p.prenom) + '</option>'; }).join('') + '</select></div>' : '';
-  tiroir(imp ? 'Ajouter un impayé' : 'Ajouter un devis à relancer',
+  tiroir(imp ? 'Ajouter un impayé' : 'Ajouter une relance',
     sel +
     '<div class="fld"><label for="ajD">Date du soin</label><input type="date" id="ajD" max="' + esc(auj) + '" value=""></div>' +
     '<div class="fld"><label for="ajN">Patient</label><input type="text" id="ajN" autocomplete="off" placeholder="Nom du patient"></div>' +
@@ -3078,7 +3078,7 @@ function formAjoutSuivi(imp) {
         var dedans = S.sv.data.praticiens.some(function (p) { return r.praticiens.some(function (n) { return n.id === p.id; }); });
         if (dedans) appliquerSuivi(r);
       }
-      toast(imp ? 'Impayé ajouté' : 'Devis ajouté');
+      toast(imp ? 'Impayé ajouté' : 'Relance ajoutée');
     }).catch(function (e) { b.disabled = false; b.textContent = 'Ajouter'; $('#ajE').textContent = msgErr(e); });
   };
 }
