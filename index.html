@@ -556,7 +556,7 @@ h2{font-size:18px;margin:28px 0 12px}
 .stat b,.cnt,.sv-sum b,.sv-c .m,.cp-k b,.cp-j .t,.cp-t,.cp-i .h span,.ml-r .q,.stp span,.mi-h,.af-h,.pl,.sv-d,.cp-mo b{font-variant-numeric:tabular-nums}
 
 /* ───── En-tête : blanc, discret ───── */
-header{background:rgba(255,255,255,.94);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);color:var(--ink)}
+header{background:linear-gradient(var(--acc) env(safe-area-inset-top,0px),rgba(255,255,255,.94) env(safe-area-inset-top,0px));-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);color:var(--ink)}
 .hd{padding:10px 24px;gap:14px}
 .logo{color:var(--ink);font-size:16px;white-space:nowrap}
 .logo i{width:32px;height:32px;border-radius:9px;background:var(--acc);color:#fff}
@@ -683,6 +683,8 @@ a{color:var(--acc)}
 /* ───── Panneau latéral, fenêtres, notifications ───── */
 .ov{background:rgba(15,23,42,.36);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
 .dr{box-shadow:-16px 0 48px rgba(15,23,42,.14);padding-top:env(safe-area-inset-top)}
+/* anciennes installations sur iPhone (barre d'état transparente) : la zone de l'heure reste bleu nuit pour rester lisible */
+.dr{background:linear-gradient(var(--acc) env(safe-area-inset-top,0px),var(--card) env(safe-area-inset-top,0px))}
 @media (min-width:761px){.dr{border-radius:16px 0 0 16px}}
 .dr-h{padding:16px 20px;border-bottom:1px solid var(--line)}
 .dr-h b{font-size:18px}
@@ -821,6 +823,7 @@ html.mode-auth,html.mode-auth body{background:var(--bg)}
   .filters .seg button{font-size:14px;padding:8px 4px}
   h2{font-size:17px}
 }
+html.mode-auth body{background:linear-gradient(var(--acc) env(safe-area-inset-top,0px),var(--bg) env(safe-area-inset-top,0px)) no-repeat var(--bg)}
 </style>
 </head>
 <body>
