@@ -819,6 +819,19 @@ html.mode-auth,html.mode-auth body{background:var(--deep)}
 .auth .btn.pri{padding:13px 14px;font-size:15.5px;border-radius:11px}
 .auth .ok-msg{background:var(--grnbg);color:var(--grn)}
 
+/* ───── Accès par rôle (Personnel) ───── */
+.rl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.rl-c{display:flex;flex-direction:column;gap:8px;align-items:stretch;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh);cursor:pointer;font:inherit;color:inherit}
+.rl-c:hover{border-color:var(--line2);box-shadow:var(--sh-h)}
+.rl-t{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rl-t b{font-weight:600;font-size:15px}
+.rl-t small{color:var(--ink3);font-size:12.5px}
+.rl-o{display:flex;flex-wrap:wrap;gap:5px}
+.rl-o span{font-size:12px;font-weight:500;border-radius:999px;padding:2px 9px}
+.rl-o .on{background:var(--accbg);color:var(--acc)}
+.rl-o .off{background:var(--soft2);color:#94A3B8;text-decoration:line-through}
+.perm.dis{opacity:.6}
+
 /* ───── Téléphone ───── */
 @media (max-width:760px){
   .stats.st3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px;padding:0}
@@ -1029,8 +1042,9 @@ function appliquerDemarrage(d) {
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
     ['#tabCpt', '#bnCpt', '#tabImp', '#tabRel'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
+    ['taches', 'planning', 'conges', 'materiel'].forEach(function (o) { $$('#tabs [data-v="' + o + '"], #bnav [data-v="' + o + '"]').forEach(function (b) { b.classList.toggle('hidden', !ongletOuvert(o)); }); });
     S.f.portee = 'tout';
-    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 || (['compta', 'impayes', 'relances'].indexOf(PARAMS.v) >= 0 && S.cfg.compta) ? PARAMS.v : 'taches';
+    var v = PARAMS.v && ongletOuvert(PARAMS.v) ? PARAMS.v : premierOnglet();
     aller(v);
     if (PARAMS.t) ouvrirTache(PARAMS.t);
     PARAMS.t = ''; PARAMS.v = '';
@@ -1426,7 +1440,16 @@ function ecranNouveauMdp(message) {
   setTimeout(function () { if ($('#mC')) $('#mC').focus(); }, 50);
 }
 
+/** Onglets ouverts à la personne (réglés par rôle dans « Personnel »). */
+function ongletOuvert(v) {
+  var o = (S.cfg && S.cfg.onglets) || { taches: true, planning: true, conges: true, materiel: true };
+  if (v === 'personnel') return !!(S.cfg && S.cfg.gererPersonnel);
+  if (/^(compta|impayes|relances)$/.test(v)) return !!(S.cfg && S.cfg.compta);
+  return o[v] !== false;
+}
+function premierOnglet() { return ['taches', 'planning', 'conges', 'materiel', 'compta', 'personnel'].filter(ongletOuvert)[0] || 'taches'; }
 function aller(v) {
+  if (!ongletOuvert(v)) v = premierOnglet();
   S.vue = v;
   $$('[data-v]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
   window.scrollTo(0, 0);
@@ -2354,6 +2377,7 @@ function rendrePersonnel() {
   var h = '<div class="ph"><div class="ph-t"><h1>Personnel</h1><p class="ph-g">Les membres du cabinet, leur accès à l’application et leurs droits. Touchez un nom pour le modifier.</p></div><div class="ph-a"><button class="btn pri" id="pAdd">+ Ajouter un membre</button></div></div>' +
     '<div class="filters"><input id="pQ" type="search" placeholder="Rechercher un nom ou une adresse" value="' + esc(S.persQ || '') + '">' +
     (nbArch ? '<label class="chk2" style="padding:0 6px"><input type="checkbox" id="pArch"' + (S.persArch ? ' checked' : '') + '> Afficher les archivés (' + nbArch + ')</label>' : '') + '</div>';
+  if (P.onglets && !q) h += blocRoles(P);
   var ordre = P.fonctions.concat(['']);
   ordre.forEach(function (f) {
     var l = vis.filter(function (p) { return f ? p.fonction === f : P.fonctions.indexOf(p.fonction) < 0; });
@@ -2370,6 +2394,7 @@ function rendrePersonnel() {
   if (!vis.length) h += '<div class="empty">Aucun membre ne correspond.</div>';
   $('#main').innerHTML = h;
   $('#pAdd').onclick = function () { fichePersonne(null); };
+  $$('.rl-c').forEach(function (c) { c.onclick = function () { ficheRole(c.getAttribute('data-r')); }; });
   $('#pQ').oninput = function () { S.persQ = this.value; var pos = this.selectionStart; rendrePersonnel(); var n = $('#pQ'); n.focus(); n.setSelectionRange(pos, pos); };
   if ($('#pArch')) $('#pArch').onchange = function () { S.persArch = this.checked; rendrePersonnel(); };
   $$('.pc').forEach(function (c) {
@@ -2378,6 +2403,46 @@ function rendrePersonnel() {
   });
 }
 
+var ROLES_ORDRE = ['Secrétaire', 'Assistante dentaire', 'Assistante responsable', 'Chirurgien-dentiste', 'Administrateur'];
+var ROLES_PLURIEL = { 'Secrétaire': 'Secrétaires', 'Assistante dentaire': 'Assistantes dentaires', 'Assistante responsable': 'Assistante responsable', 'Chirurgien-dentiste': 'Chirurgiens-dentistes', 'Administrateur': 'Administrateurs' };
+/** Ce que chaque rôle voit dans l'application : un résumé par rôle, modifiable d'un geste. */
+function blocRoles(P) {
+  var roles = ROLES_ORDRE.filter(function (r) { return P.roles.indexOf(r) >= 0; });
+  return '<div class="pg"><h2>Accès par rôle</h2><p class="hint" style="margin:-2px 0 10px">Ce que voit chaque catégorie de personnel. Touchez un rôle pour choisir ses onglets et ses droits ; cela s’applique à toutes les personnes de ce rôle.</p><div class="rl">' +
+    roles.map(function (r) {
+      var l = P.permissionsRole[r] || [], nb = P.personnes.filter(function (p) { return p.role === r && !p.archive; }).length;
+      return '<button class="rl-c" data-r="' + esc(r) + '"><span class="rl-t"><b>' + esc(ROLES_PLURIEL[r] || r) + '</b><small>' + nb + ' personne' + (nb > 1 ? 's' : '') + '</small></span><span class="rl-o">' +
+        P.onglets.filter(function (o) { return o.cle !== 'ongletCompta' || r === 'Chirurgien-dentiste' || r === 'Administrateur'; }).map(function (o) { var on = l.indexOf(o.cle) >= 0; return '<span class="' + (on ? 'on' : 'off') + '">' + (on ? '✓ ' : '') + esc(o.libelle) + '</span>'; }).join('') +
+        '</span></button>';
+    }).join('') + '</div></div>';
+}
+function ficheRole(role) {
+  var P = S.pers, l = P.permissionsRole[role] || [], perms = {};
+  P.permissions.forEach(function (x) { perms[x.cle] = l.indexOf(x.cle) >= 0; });
+  var praticien = role === 'Chirurgien-dentiste' || role === 'Administrateur';
+  var nb = P.personnes.filter(function (p) { return p.role === role && !p.archive; });
+  var perso = nb.filter(function (p) { return p.permissionsPerso && Object.keys(p.permissionsPerso).length; });
+  var autres = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') !== 0; });
+  var corps = '<p class="meta" style="margin-top:0">' + nb.length + ' personne' + (nb.length > 1 ? 's' : '') + ' : ' + esc(nb.map(function (p) { return p.prenom; }).join(', ') || '—') + '</p>' +
+    '<div class="sec" style="margin-top:8px">Onglets visibles</div>' +
+    P.onglets.map(function (o) {
+      var bloque = o.cle === 'ongletCompta' && !praticien;
+      return '<label class="perm' + (bloque ? ' dis' : '') + '"><input type="checkbox" data-k="' + esc(o.cle) + '"' + (perms[o.cle] && !bloque ? ' checked' : '') + (bloque ? ' disabled' : '') + '><span>' + esc(o.libelle) +
+        '<small>' + (bloque ? 'Réservé aux praticiens : le secrétariat et les assistantes ne voient jamais les chiffres.' : esc(o.detail.charAt(0).toUpperCase() + o.detail.slice(1))) + '</small></span></label>';
+    }).join('') +
+    '<div class="sec">Droits supplémentaires</div>' +
+    autres.map(function (x) { return '<label class="perm"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (role === 'Administrateur' && x.cle === 'gererPersonnel' ? ' disabled' : '') + '><span>' + esc(x.libelle) + '</span></label>'; }).join('') +
+    (perso.length ? '<p class="hint">Réglages personnels conservés pour : ' + esc(perso.map(function (p) { return p.prenom; }).join(', ')) + ' (modifiables dans leur fiche).</p>' : '') +
+    '<div class="err" id="rErr"></div>';
+  tiroir(esc(ROLES_PLURIEL[role] || role) + ' : accès', corps, '<button class="btn" id="rAnn">Annuler</button><span class="sp"></span><button class="btn pri" id="rOk">Enregistrer</button>');
+  $$('#drb .perm input').forEach(function (c) { c.onchange = function () { perms[c.getAttribute('data-k')] = c.checked; }; });
+  $('#rAnn').onclick = fermer;
+  $('#rOk').onclick = function () {
+    var b = this; b.disabled = true;
+    apiSensible('enregistrerRole', role, perms).then(function (r) { S.pers = r; fermer(); rendrePersonnel(); toast('Accès des ' + (ROLES_PLURIEL[role] || role).toLowerCase() + ' enregistrés'); })
+      .catch(function (e) { b.disabled = false; $('#rErr').textContent = msgErr(e); });
+  };
+}
 function fichePersonne(p) {
   var P = S.pers, nouveau = !p;
   p = p || { id: '', prenom: '', nom: '', fonction: '', role: '', email: '', actif: true, archive: false, permissions: {}, compte: '' };
@@ -2405,10 +2470,12 @@ function fichePersonne(p) {
   tiroir(nouveau ? 'Nouveau membre' : esc(p.nomAffiche), corps, pied);
   var dessinerPerms = function () {
     var d = defauts($('#pRo').value);
-    $('#pPerms').innerHTML = P.permissions.map(function (x) {
+    var ligne = function (x) {
       return '<label class="perm"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + '><span>' + esc(x.libelle) +
         '<small>' + (d[x.cle] ? 'Inclus dans le rôle' : 'Non inclus dans le rôle') + (perms[x.cle] !== !!d[x.cle] ? ' · personnalisé' : '') + '</small></span></label>';
-    }).join('');
+    };
+    var og = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') === 0; }), dr = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') !== 0; });
+    $('#pPerms').innerHTML = (og.length ? '<div class="meta" style="margin:2px 0 2px;font-weight:600">Onglets visibles</div>' + og.map(ligne).join('') + '<div class="meta" style="margin:14px 0 2px;font-weight:600">Droits</div>' : '') + dr.map(ligne).join('');
     $$('#pPerms input').forEach(function (c) { c.onchange = function () { perms[c.getAttribute('data-k')] = c.checked; dessinerPerms(); }; });
   };
   dessinerPerms();
