@@ -354,6 +354,42 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .cg-c .trc{border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
 .cg-c details{margin-top:6px;font-size:12.5px;color:var(--ink2)}
 .cg-c summary{cursor:pointer;color:var(--acc);font-weight:600}
+/* Matériel */
+.mq{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 13px;font-size:16px;background:var(--card);margin-bottom:12px}
+.mq:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.mc-h{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:14px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.mc-h b{font-size:15.5px;flex:1}
+.mc-h .nb{color:var(--ink3);font-size:13px}
+.mc-h .chev{width:18px;height:18px;color:var(--ink3);transition:transform .15s}
+.mc.open .mc-h .chev{transform:rotate(90deg)}
+.mc-b{border-top:1px solid var(--line)}
+.ma-r{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.ma-r:last-child{border-bottom:0}
+.ma-r.moi{background:var(--accbg)}
+.ma-t{flex:1;min-width:0}
+.ma-t b{display:block;font-weight:600;font-size:14.5px}
+.ma-t small{display:block;color:var(--ink3);font-size:12.5px}
+.ma-o{color:var(--amb);font-size:12.5px;margin-top:2px}
+.ma-k{color:var(--blu);font-size:12.5px;margin-top:2px}
+.ma-e{font-size:12.5px;margin-top:2px}
+.stp{display:flex;align-items:center;border:1px solid var(--line2);border-radius:10px;overflow:hidden;flex:none;background:var(--card)}
+.stp button{width:38px;height:38px;border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--acc)}
+.stp button:disabled{color:var(--line2);cursor:default}
+.stp span{min-width:28px;text-align:center;font-weight:700;font-size:15px}
+.stp.on{border-color:var(--acc)}
+.mg{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin:16px 0 6px}
+.ml{border:1px solid var(--line);border-radius:var(--r);background:var(--card);margin-bottom:12px}
+.ml-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg);border-radius:var(--r) var(--r) 0 0}
+.ml-h b{flex:1}
+.ml-r{display:flex;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.ml-r:last-child{border-bottom:0}
+.ml-r .q{font-weight:700;min-width:38px;text-align:right}
+.ml-r .w{color:var(--ink3);font-size:12.5px}
+.ml-a{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line)}
+.mbar{position:sticky;bottom:calc(var(--nav) + 8px);margin-top:12px;z-index:5}
+@media (min-width:821px){.mbar{bottom:12px}}
+.mbar .btn{width:100%;justify-content:center;padding:12px;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 
 /* Divers */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.2);pointer-events:none}
@@ -395,6 +431,7 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
       <button class="tab on" data-v="taches">Tâches<span class="cnt hidden" id="c1"></span></button>
       <button class="tab" data-v="planning">Planning</button>
       <button class="tab" data-v="conges">Congés<span class="cnt hidden" id="c2"></span></button>
+      <button class="tab" data-v="materiel">Matériel<span class="cnt hidden" id="c3"></span></button>
       <button class="tab hidden" data-v="personnel" id="tabPers">Personnel</button>
     </nav>
     <span class="sp"></span>
@@ -408,6 +445,7 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
   <button data-v="taches" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>Tâches<span class="cnt hidden" id="c1m"></span></button>
   <button data-v="planning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Planning</button>
   <button data-v="conges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 0 1 7 7H5a7 7 0 0 1 7-7Z"/><path d="M12 10v10M8 20h8"/></svg>Congés<span class="cnt hidden" id="c2m"></span></button>
+  <button data-v="materiel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg>Matériel<span class="cnt hidden" id="c3m"></span></button>
   <button data-v="personnel" class="hidden" id="bnPers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg>Personnel</button>
 </nav>
 <div id="drawer"></div>
@@ -558,7 +596,7 @@ function appliquerDemarrage(d) {
   {
     var init = d.init;
     S.me = init.me; S.users = init.users; S.cfg = init.config; S.today = init.aujourdhui;
-    S.taches = d.taches; S.charge = true; S.vT = d.vTaches; S.conges = d.conges; S.auj = d.auj;
+    S.taches = d.taches; S.charge = true; S.vT = d.vTaches; S.conges = d.conges; S.auj = d.auj; S.matAttente = d.matAttente || 0;
     S.notifs = d.notifs; S.notifVues = {}; d.notifs.liste.forEach(function (n) { S.notifVues[n.id] = 1; });
     S.semaine = lundi(S.today);
     $('header').classList.remove('hidden'); $('#bnav').classList.remove('hidden');
@@ -573,7 +611,7 @@ function appliquerDemarrage(d) {
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
     S.f.portee = 'tout';
-    var v = PARAMS.v === 'planning' || PARAMS.v === 'conges' ? PARAMS.v : 'taches';
+    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 ? PARAMS.v : 'taches';
     aller(v);
     if (PARAMS.t) ouvrirTache(PARAMS.t);
     PARAMS.t = ''; PARAMS.v = '';
@@ -962,6 +1000,7 @@ function aller(v) {
   if (v === 'planning') ouvrirPlanning();
   if (v === 'conges') { rendreConges(); rafraichirConges(); }
   if (v === 'personnel') chargerPersonnel();
+  if (v === 'materiel') { rendreMateriel(); chargerMateriel(); }
 }
 
 function majCompteurs() {
@@ -969,6 +1008,9 @@ function majCompteurs() {
   ['#c1', '#c1m'].forEach(function (s) { var e = $(s); e.textContent = nonLues; e.classList.toggle('hidden', !nonLues); });
   var cg = S.conges && S.conges.peutValider ? S.conges.aValider.length : 0;
   ['#c2', '#c2m'].forEach(function (s) { var e = $(s); e.textContent = cg; e.classList.toggle('hidden', !cg); });
+  // matériel : pour les personnes qui passent les commandes, nombre d'articles à commander
+  var mt = S.cfg && S.cfg.gererMateriel ? (S.mat ? lignesAttente().length : S.matAttente || 0) : 0;
+  ['#c3', '#c3m'].forEach(function (s) { var e = $(s); if (!e) return; e.textContent = mt; e.classList.toggle('hidden', !mt); });
 }
 
 // ───────── Tâches : liste ─────────
@@ -1227,7 +1269,7 @@ function tiroir(titre, corps, pied) {
   $('#ov').onclick = fermer; $('#xx').onclick = fermer;
   document.body.style.overflow = 'hidden';
 }
-function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; }
+function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; S.matTiroir = null; S.matListeOuverte = false; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#drawer').innerHTML) fermer(); });
 
 // ───────── Tâche : détail ─────────
@@ -2080,6 +2122,297 @@ function formConge() {
     var b = this; b.disabled = true;
     api('demanderConge', d).then(function (r) { S.conges = r; fermer(); majCompteurs(); rendreConges(); toast('Demande envoyée'); })
       .catch(function (e) { b.disabled = false; $('#gErr').textContent = msgErr(e); });
+  };
+}
+
+// ───────── Matériel (consommables) ─────────
+// Catalogue par catégorie ; chacun choisit la quantité ; tout le monde voit ce qui est déjà demandé ou commandé.
+S.matOuvert = {}; S.matQ = ''; S.matPend = {}; S.matMinut = {};
+var CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+function sansAcc(x) { return String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+document.addEventListener('visibilitychange', function () { if (K && S.me && S.vue === 'materiel' && document.visibilityState === 'visible') chargerMateriel(true); });
+function chargerMateriel(silence) {
+  return api('getMateriel').then(function (r) { appliquerMat(r); }).catch(function (e) { if (!silence) echec(e); });
+}
+/** Nouvelle réponse du serveur : on garde les quantités que l'utilisateur est en train de modifier. */
+function appliquerMat(r) {
+  S.mat = r; majCompteurs();
+  if (S.vue === 'materiel') rendreMateriel(true);
+  if ($('#drawer').innerHTML && S.matTiroir) S.matTiroir();
+}
+function demandesArticle(id) { return S.mat.enCours.filter(function (d) { return d.article === id; }); }
+function maQte(id) {
+  if (id in S.matPend) return S.matPend[id];
+  var d = S.mat.enCours.filter(function (x) { return x.article === id && x.email === S.me.id && x.statut === 'En attente'; })[0];
+  return d ? d.quantite : 0;
+}
+function lignesAttente() {
+  if (!S.mat) return [];
+  var vu = {};
+  return S.mat.enCours.filter(function (d) { if (d.statut !== 'En attente') return false; var k = d.article || 'l:' + sansAcc(d.libre); if (vu[k]) return false; vu[k] = 1; return true; });
+}
+
+function rangeeArticle(a) {
+  var q = maQte(a.id), dem = demandesArticle(a.id);
+  var autres = dem.filter(function (d) { return d.statut === 'En attente' && d.email !== S.me.id; });
+  var cmd = dem.filter(function (d) { return d.statut === 'Commandée'; });
+  var totalCmd = cmd.reduce(function (n, d) { return n + d.quantite; }, 0);
+  var det = [a.reference ? 'Réf. ' + a.reference : '', a.conditionnement].filter(String).join(' · ');
+  return '<div class="ma-r' + (q ? ' moi' : '') + '" data-a="' + esc(a.id) + '"><div class="ma-t"><b>' + esc(a.nom) + '</b>' + (det ? '<small>' + esc(det) + '</small>' : '') +
+    (autres.length ? '<div class="ma-o">Déjà demandé : ' + autres.map(function (d) { return esc(d.nom) + ' ×' + d.quantite; }).join(', ') + '</div>' : '') +
+    (cmd.length ? '<div class="ma-k">Commandé' + (cmd[0].commandeLe ? ' le ' + esc(dCourt(cmd[0].commandeLe)) : '') + ' ×' + totalCmd + ' · en attente de livraison</div>' : '') +
+    (S.mat.gestion ? '<div class="ma-e"><button class="lk" data-ed="' + esc(a.id) + '">Modifier</button></div>' : '') +
+    '</div><div class="stp' + (q ? ' on' : '') + '"><button data-m="-1" aria-label="Moins"' + (q ? '' : ' disabled') + '>−</button><span>' + q + '</span><button data-m="1" aria-label="Plus">+</button></div></div>';
+}
+
+function rendreMateriel(garder) {
+  var y = garder ? window.scrollY : 0;
+  var nAtt = lignesAttente().length;
+  var h = '<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Matériel</h1><span class="sp"></span>' +
+    (S.mat && S.mat.gestion ? '<button class="btn sm" id="mGer">Catalogue</button>' : '') + '</div>';
+  if (!S.mat) { $('#main').innerHTML = h + '<div class="load"><div class="spin"></div></div>'; return; }
+  var cat = S.mat.catalogue;
+  h += '<input class="mq" id="mQ" type="search" placeholder="Rechercher un article ou une référence" value="' + esc(S.matQ) + '" autocomplete="off">';
+  if (!cat.length) {
+    h += '<div class="empty">Le catalogue est vide pour l’instant.' + (S.mat.gestion ? '<div style="margin-top:12px"><button class="btn pri" id="mAj1">+ Ajouter un article</button></div>' : '') + '</div>';
+  } else if (S.matQ.trim()) {
+    var mots = sansAcc(S.matQ).split(/\s+/).filter(String);
+    var res = cat.filter(function (a) { var t = sansAcc(a.nom + ' ' + a.reference + ' ' + a.categorie + ' ' + a.fournisseur); return mots.every(function (m) { return t.indexOf(m) >= 0; }); });
+    h += res.length ? '<div class="mc open"><div class="mc-b" style="border-top:0">' + res.slice(0, 150).map(function (a) { return rangeeArticle(a); }).join('') + '</div></div>' +
+      (res.length > 150 ? '<div class="hint">' + res.length + ' résultats : précisez la recherche.</div>' : '')
+      : '<div class="empty">Aucun article ne correspond.</div>';
+  } else {
+    var cats = [], parCat = {};
+    cat.forEach(function (a) { if (!parCat[a.categorie]) { parCat[a.categorie] = []; cats.push(a.categorie); } parCat[a.categorie].push(a); });
+    h += cats.map(function (c) {
+      var l = parCat[c], ouvert = !!S.matOuvert[c];
+      var nDem = l.filter(function (a) { return demandesArticle(a.id).some(function (d) { return d.statut === 'En attente'; }); }).length;
+      var nMoi = l.filter(function (a) { return maQte(a.id) > 0; }).length;
+      return '<div class="mc' + (ouvert ? ' open' : '') + '" data-c="' + esc(c) + '"><button class="mc-h">' + '<b>' + esc(c) + '</b>' +
+        (nMoi ? '<span class="pill p-fin">' + nMoi + ' pour moi</span>' : '') + (nDem ? '<span class="pill p-att">' + nDem + ' demandé' + (nDem > 1 ? 's' : '') + '</span>' : '') +
+        '<span class="nb">' + l.length + '</span>' + CHEV + '</button>' +
+        (ouvert ? '<div class="mc-b">' + l.map(rangeeArticle).join('') + '</div>' : '') + '</div>';
+    }).join('');
+  }
+  h += '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="lk" id="mLib">+ Demander un article qui n’est pas dans la liste</button></div>';
+  h += '<div class="mbar"><button class="btn pri" id="mLst">Liste de commande' + (nAtt ? ' · ' + nAtt + ' article' + (nAtt > 1 ? 's' : '') + ' à commander' : '') + '</button></div>';
+  var focus = document.activeElement && document.activeElement.id === 'mQ', pos = focus ? $('#mQ').selectionStart : 0;
+  $('#main').innerHTML = h;
+  if (focus) { $('#mQ').focus(); try { $('#mQ').setSelectionRange(pos, pos); } catch (e) { } }
+  if (garder) window.scrollTo(0, y);
+  brancherMateriel();
+}
+
+function brancherMateriel() {
+  var q = $('#mQ');
+  if (q) q.oninput = function () { S.matQ = q.value; clearTimeout(S.matRech); S.matRech = setTimeout(function () { rendreMateriel(); }, 150); };
+  $$('.mc-h').forEach(function (b) {
+    b.onclick = function () { var c = b.parentNode.getAttribute('data-c'); S.matOuvert[c] = !S.matOuvert[c]; rendreMateriel(true); };
+  });
+  $$('.ma-r [data-m]').forEach(function (b) {
+    b.onclick = function () {
+      var r = b.closest('.ma-r'), id = r.getAttribute('data-a');
+      var q = Math.max(0, Math.min(999, maQte(id) + Number(b.getAttribute('data-m'))));
+      changerQte(id, q, r);
+    };
+  });
+  $$('[data-ed]').forEach(function (b) { b.onclick = function () { formArticle(S.mat.catalogue.filter(function (a) { return a.id === b.getAttribute('data-ed'); })[0]); }; });
+  if ($('#mGer')) $('#mGer').onclick = gererCatalogue;
+  if ($('#mAj1')) $('#mAj1').onclick = function () { formArticle(null); };
+  $('#mLib').onclick = formHorsCatalogue;
+  $('#mLst').onclick = listeCommande;
+}
+
+/** Changement de quantité : affiché tout de suite, enregistré 0,6 s après le dernier appui. */
+function changerQte(id, q, rangee) {
+  S.matPend[id] = q;
+  if (rangee) {
+    var a = S.mat.catalogue.filter(function (x) { return x.id === id; })[0];
+    var tmp = document.createElement('div'); tmp.innerHTML = rangeeArticle(a);
+    rangee.replaceWith(tmp.firstChild); brancherMateriel();
+  }
+  clearTimeout(S.matMinut[id]);
+  S.matMinut[id] = setTimeout(function () {
+    var envoye = S.matPend[id];
+    api('majDemandeMateriel', id, envoye).then(function (r) {
+      if (S.matPend[id] === envoye) delete S.matPend[id];
+      appliquerMat(r);
+    }).catch(function (e) { delete S.matPend[id]; echec(e); chargerMateriel(true); });
+  }, 600);
+}
+
+function formHorsCatalogue() {
+  S.matTiroir = null;
+  tiroir('Article hors catalogue', '<div class="fld"><label for="hT">Article</label><input type="text" id="hT" placeholder="Nom, marque, référence si possible"></div>' +
+    '<div class="fld"><label for="hQ">Quantité</label><input type="text" id="hQ" inputmode="numeric" value="1" style="max-width:120px"></div>' +
+    '<div class="fld"><label for="hN">Précision</label><input type="text" id="hN" placeholder="Facultatif (taille, couleur…)"></div><div class="err" id="hE"></div>',
+    '<button class="btn" id="hA">Annuler</button><span class="sp"></span><button class="btn pri" id="hO">Ajouter à la liste</button>');
+  $('#hA').onclick = fermer;
+  $('#hO').onclick = function () {
+    var b = this; b.disabled = true;
+    api('demanderHorsCatalogue', $('#hT').value, $('#hQ').value, $('#hN').value).then(function (r) { fermer(); appliquerMat(r); toast('Ajouté à la liste de commande'); })
+      .catch(function (e) { b.disabled = false; $('#hE').textContent = msgErr(e); });
+  };
+  setTimeout(function () { $('#hT').focus(); }, 50);
+}
+
+/** Liste de commande : ce qui est demandé (par fournisseur, avec qui et combien) et ce qui est commandé. */
+function listeCommande() {
+  S.matTiroir = listeCommande;
+  var m = S.mat, att = m.enCours.filter(function (d) { return d.statut === 'En attente'; });
+  var cmd = m.enCours.filter(function (d) { return d.statut === 'Commandée'; });
+  var groupes = {}, ordre = [];
+  att.forEach(function (d) { var f = d.fournisseur || ''; if (!groupes[f]) { groupes[f] = []; ordre.push(f); } groupes[f].push(d); });
+  ordre.sort(function (a, b) { return !a ? 1 : !b ? -1 : a.localeCompare(b, 'fr'); });
+  var lignes = function (l) {
+    var par = {}, ord = [];
+    l.forEach(function (d) { var k = d.article || 'l:' + sansAcc(d.libre); if (!par[k]) { par[k] = { d: d, q: 0, qui: [] }; ord.push(k); } par[k].q += d.quantite; par[k].qui.push(d); });
+    return ord.map(function (k) { return par[k]; }).sort(function (a, b) { return a.d.categorie.localeCompare(b.d.categorie, 'fr') || a.d.nomArticle.localeCompare(b.d.nomArticle, 'fr'); });
+  };
+  var corps = '';
+  if (!att.length) corps += '<div class="empty" style="padding:18px">Rien à commander pour l’instant.</div>';
+  ordre.forEach(function (f) {
+    var fo = (m.fournisseurs || []).filter(function (x) { return x.nom.toLowerCase() === f.toLowerCase(); })[0];
+    var ls = lignes(groupes[f]);
+    corps += '<div class="ml"><div class="ml-h"><b>' + esc(f || 'Fournisseur à préciser') + '</b><span class="meta">' + ls.length + ' article' + (ls.length > 1 ? 's' : '') + '</span></div>' +
+      ls.map(function (x) {
+        var d = x.d, det = [d.reference ? 'Réf. ' + d.reference : '', d.conditionnement].filter(String).join(' · ');
+        var miens = x.qui.filter(function (y) { return y.email === S.me.id; });
+        var annulables = d.article ? miens : x.qui.filter(function (y) { return y.email === S.me.id || m.gestion; });
+        return '<div class="ml-r"><span class="q">×' + x.q + '</span><div style="flex:1;min-width:0"><b style="font-weight:600">' + esc(d.nomArticle) + '</b>' + (det ? '<div class="w">' + esc(det) + '</div>' : '') +
+          '<div class="w">' + x.qui.map(function (y) { return esc(y.email === S.me.id ? 'Moi' : y.nom) + ' ×' + y.quantite + (y.note ? ' (' + esc(y.note) + ')' : '') + ' · ' + esc(dCourt(y.date)); }).join(' ; ') + '</div>' +
+          (annulables.length ? '<div>' + annulables.map(function (y) { return '<button class="lk" style="font-size:12.5px" data-ret="' + esc(y.id) + '" data-art="' + esc(y.article) + '">Retirer' + (y.email === S.me.id ? ' ma demande' : ' la demande de ' + esc(y.nom)) + '</button>'; }).join(' · ') + '</div>' : '') +
+          '</div></div>';
+      }).join('') +
+      (m.gestion ? '<div class="ml-a"><button class="btn sm" data-cop="' + esc(f) + '">Copier la liste</button>' +
+        (fo && fo.email ? '<button class="btn sm pri" data-env="' + esc(f) + '">Envoyer au fournisseur</button>' : '') +
+        '<button class="btn sm" data-cmd="' + esc(f) + '">Marquer commandée</button>' +
+        (f && !(fo && fo.email) ? '<div class="hint" style="flex-basis:100%;margin:0">Pour l’envoyer directement, ajoutez l’e-mail du fournisseur (Catalogue › Fournisseurs).</div>' : '') + '</div>' : '') + '</div>';
+  });
+  if (cmd.length) {
+    corps += '<div class="mg">Commandé, en attente de livraison</div>';
+    var parCmd = {}, oc = [];
+    cmd.forEach(function (d) { if (!parCmd[d.commande]) { parCmd[d.commande] = []; oc.push(d.commande); } parCmd[d.commande].push(d); });
+    oc.forEach(function (c) {
+      var l = parCmd[c], d0 = l[0];
+      corps += '<div class="ml"><div class="ml-h"><b>' + esc(d0.fournisseur || 'Fournisseur à préciser') + '</b><span class="meta">commandé le ' + esc(dHeure(d0.commandeLe)) + (d0.commandePar ? ' par ' + esc(d0.commandePar) : '') + '</span></div>' +
+        lignes(l).map(function (x) { return '<div class="ml-r"><span class="q">×' + x.q + '</span><div style="flex:1"><b style="font-weight:600">' + esc(x.d.nomArticle) + '</b><div class="w">' + x.qui.map(function (y) { return esc(y.email === S.me.id ? 'Moi' : y.nom) + ' ×' + y.quantite; }).join(' ; ') + '</div></div></div>'; }).join('') +
+        (m.gestion ? '<div class="ml-a"><button class="btn sm ok" data-rec="' + esc(c) + '">Livraison reçue</button></div>' : '') + '</div>';
+    });
+  }
+  if (m.gestion && m.commandes && m.commandes.some(function (c) { return c.statut === 'Reçue'; })) {
+    corps += '<details style="margin-top:6px"><summary class="sec" style="cursor:pointer;margin:10px 0">Commandes reçues</summary>' +
+      m.commandes.filter(function (c) { return c.statut === 'Reçue'; }).map(function (c) {
+        return '<div class="hrow" style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)"><b>' + esc(c.fournisseur || 'Fournisseur à préciser') + '</b> · commandée le ' + esc(dHeure(c.date)) + ' par ' + esc(c.par) +
+          (c.envoyeeA ? ' (envoyée à ' + esc(c.envoyeeA) + ')' : '') + ' · reçue le ' + esc(dHeure(c.recueLe)) + (c.recuePar ? ' par ' + esc(c.recuePar) : '') +
+          '<div class="w" style="color:var(--ink3)">' + c.lignes.map(function (l) { return esc(l.nom) + ' ×' + l.quantite; }).join(', ') + '</div></div>';
+      }).join('') + '</details>';
+  }
+  var garde = $('#drb') && S.matListeOuverte ? $('#drb').scrollTop : 0;
+  tiroir('Liste de commande', corps);
+  S.matListeOuverte = true; S.matTiroir = listeCommande;
+  if (garde) $('#drb').scrollTop = garde;
+  $$('[data-ret]').forEach(function (b) {
+    b.onclick = function () {
+      b.disabled = true;
+      var art = b.getAttribute('data-art');
+      (art && b.textContent.indexOf('ma demande') >= 0 ? api('majDemandeMateriel', art, 0) : api('annulerDemandeMateriel', b.getAttribute('data-ret')))
+        .then(function (r) { appliquerMat(r); toast('Demande retirée'); }).catch(function (e) { b.disabled = false; echec(e); });
+    };
+  });
+  $$('[data-cop]').forEach(function (b) { b.onclick = function () { copierTexte(texteCommande(b.getAttribute('data-cop'), lignes(groupes[b.getAttribute('data-cop')]))); }; });
+  $$('[data-cmd]').forEach(function (b) {
+    b.onclick = function () {
+      var f = b.getAttribute('data-cmd');
+      if (!confirm('Marquer comme commandés les ' + lignes(groupes[f]).length + ' article(s) de « ' + (f || 'Fournisseur à préciser') + ' » ? (à utiliser si vous avez commandé par téléphone ou sur le site du fournisseur)')) return;
+      b.disabled = true;
+      api('passerCommande', f, false, '').then(function (r) { appliquerMat(r); toast('Marqué comme commandé'); }).catch(function (e) { b.disabled = false; echec(e); });
+    };
+  });
+  $$('[data-env]').forEach(function (b) { b.onclick = function () { envoyerCommande(b.getAttribute('data-env'), lignes(groupes[b.getAttribute('data-env')])); }; });
+  $$('[data-rec]').forEach(function (b) {
+    b.onclick = function () { b.disabled = true; api('commandeRecue', b.getAttribute('data-rec')).then(function (r) { appliquerMat(r); toast('Livraison enregistrée'); }).catch(function (e) { b.disabled = false; echec(e); }); };
+  });
+}
+
+function texteCommande(f, ls) {
+  return 'Commande ' + (S.cfg.nomApp || '') + (f ? ' – ' + f : '') + '\n' + ls.map(function (x) {
+    var d = x.d; return '- ' + [d.reference ? 'Réf. ' + d.reference : '', d.nomArticle, d.conditionnement].filter(String).join(' · ') + ' : ' + x.q;
+  }).join('\n');
+}
+function copierTexte(t) {
+  var fin = function () { toast('Liste copiée'); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(fin, function () { secours(); });
+  else secours();
+  function secours() { var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); fin(); } catch (e) { toast('Copie impossible', true); } a.remove(); }
+}
+
+function envoyerCommande(f, ls) {
+  var fo = S.mat.fournisseurs.filter(function (x) { return x.nom.toLowerCase() === f.toLowerCase(); })[0];
+  $('#modal').innerHTML = '<div class="modal"><div class="box" style="width:min(460px,100%)"><h1 style="font-size:18px;margin:0 0 6px">Envoyer la commande</h1>' +
+    '<p class="hint" style="margin:0 0 10px">À <b>' + esc(fo.email) + '</b> (' + esc(f) + '), avec vous en copie. ' + ls.length + ' article(s).</p>' +
+    '<div class="fld"><label for="eM">Message (facultatif)</label><textarea id="eM" placeholder="Par exemple : livraison souhaitée avant jeudi"></textarea></div>' +
+    '<div class="err" id="eE"></div><div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" id="eA">Annuler</button><button class="btn pri" id="eO">Envoyer</button></div></div></div>';
+  $('#eA').onclick = function () { $('#modal').innerHTML = ''; };
+  $('#eO').onclick = function () {
+    var b = this; b.disabled = true;
+    api('passerCommande', f, true, $('#eM').value).then(function (r) { $('#modal').innerHTML = ''; appliquerMat(r); toast('Commande envoyée à ' + fo.email); })
+      .catch(function (e) { b.disabled = false; $('#eE').textContent = msgErr(e); });
+  };
+}
+
+/** Gestion du catalogue (personnes autorisées) : ajouter un article, fournisseurs. */
+function gererCatalogue() {
+  S.matTiroir = gererCatalogue;
+  var f = S.mat.fournisseurs || [];
+  var cats = {}; S.mat.catalogue.forEach(function (a) { cats[a.categorie] = (cats[a.categorie] || 0) + 1; });
+  tiroir('Catalogue', '<p class="hint" style="margin-top:0">' + S.mat.catalogue.length + ' article(s) dans ' + Object.keys(cats).length + ' catégorie(s). Pour modifier un article, touchez « Modifier » sous son nom dans la liste.</p>' +
+    '<button class="btn pri" id="gA">+ Ajouter un article</button>' +
+    '<div class="sec">Fournisseurs</div>' +
+    (f.length ? f.map(function (x, i) { return '<div class="ml-r" style="padding:8px 0"><div style="flex:1"><b style="font-weight:600">' + esc(x.nom) + '</b><div class="w">' + (x.email ? esc(x.email) : 'pas d’e-mail : la commande se copie ou se marque à la main') + '</div></div><button class="lk" data-fo="' + i + '">Modifier</button></div>'; }).join('') : '<p class="hint">Aucun fournisseur pour l’instant.</p>') +
+    '<div style="margin-top:10px"><button class="btn sm" id="gF">+ Ajouter un fournisseur</button></div>');
+  $('#gA').onclick = function () { formArticle(null); };
+  $('#gF').onclick = function () { formFournisseur(null); };
+  $$('[data-fo]').forEach(function (b) { b.onclick = function () { formFournisseur(f[Number(b.getAttribute('data-fo'))]); }; });
+}
+
+function formArticle(a) {
+  S.matTiroir = null;
+  var cats = [], fos = [];
+  S.mat.catalogue.forEach(function (x) { if (cats.indexOf(x.categorie) < 0) cats.push(x.categorie); if (x.fournisseur && fos.indexOf(x.fournisseur) < 0) fos.push(x.fournisseur); });
+  (S.mat.fournisseurs || []).forEach(function (x) { if (fos.indexOf(x.nom) < 0) fos.push(x.nom); });
+  var v = a || { categorie: '', nom: '', reference: '', fournisseur: '', conditionnement: '' };
+  tiroir(a ? 'Modifier l’article' : 'Nouvel article',
+    '<div class="fld"><label for="aC">Catégorie</label><input type="text" id="aC" list="lC" value="' + esc(v.categorie) + '" placeholder="Par exemple : Endodontie"><datalist id="lC">' + cats.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('') + '</datalist></div>' +
+    '<div class="fld"><label for="aN">Désignation</label><input type="text" id="aN" value="' + esc(v.nom) + '"></div>' +
+    '<div class="two"><div class="fld"><label for="aR">Référence</label><input type="text" id="aR" value="' + esc(v.reference) + '"></div>' +
+    '<div class="fld"><label for="aK">Conditionnement</label><input type="text" id="aK" value="' + esc(v.conditionnement) + '" placeholder="Boîte de 100…"></div></div>' +
+    '<div class="fld"><label for="aF">Fournisseur</label><input type="text" id="aF" list="lF" value="' + esc(v.fournisseur) + '"><datalist id="lF">' + fos.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('') + '</datalist></div>' +
+    (a ? '<label class="perm"><input type="checkbox" id="aX"><span>Retirer du catalogue<small>L’article n’apparaît plus ; l’historique des commandes est conservé.</small></span></label>' : '') +
+    '<div class="err" id="aE"></div>',
+    '<button class="btn" id="aA">Annuler</button><span class="sp"></span><button class="btn pri" id="aO">Enregistrer</button>');
+  $('#aA').onclick = fermer;
+  $('#aO').onclick = function () {
+    var b = this; b.disabled = true;
+    api('enregistrerArticle', { id: a ? a.id : '', categorie: $('#aC').value, nom: $('#aN').value, reference: $('#aR').value, conditionnement: $('#aK').value, fournisseur: $('#aF').value, actif: !(a && $('#aX').checked) })
+      .then(function (r) { fermer(); appliquerMat(r); toast('Article enregistré'); }).catch(function (e) { b.disabled = false; $('#aE').textContent = msgErr(e); });
+  };
+}
+
+function formFournisseur(x) {
+  S.matTiroir = null;
+  var v = x || { nom: '', email: '', note: '' };
+  tiroir(x ? 'Fournisseur' : 'Nouveau fournisseur',
+    '<div class="fld"><label for="fN">Nom</label><input type="text" id="fN" value="' + esc(v.nom) + '"' + (x ? ' readonly' : '') + '></div>' +
+    '<div class="fld"><label for="fM">E-mail pour les commandes</label><input type="email" id="fM" value="' + esc(v.email) + '" placeholder="commandes@fournisseur.fr"></div>' +
+    '<div class="fld"><label for="fT">Note</label><input type="text" id="fT" value="' + esc(v.note) + '" placeholder="N° client, contact…"></div><div class="err" id="fE"></div>',
+    '<button class="btn" id="fA">Annuler</button><span class="sp"></span><button class="btn pri" id="fO">Enregistrer</button>');
+  $('#fA').onclick = gererCatalogue;
+  $('#fO').onclick = function () {
+    var b = this; b.disabled = true;
+    api('enregistrerFournisseur', { nom: $('#fN').value, email: $('#fM').value, note: $('#fT').value })
+      .then(function (r) { S.mat = r; gererCatalogue(); toast('Fournisseur enregistré'); }).catch(function (e) { b.disabled = false; $('#fE').textContent = msgErr(e); });
   };
 }
 
