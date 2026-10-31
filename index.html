@@ -348,6 +348,12 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .cg-c .t{font-weight:600}
 .cg-c .m{color:var(--ink2);font-size:13px}
 .cg-c .r{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.trc{flex-basis:100%;font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:2px}
+.trc .no{color:var(--red);font-weight:600}
+.trc .ok{color:var(--grn)}
+.cg-c .trc{border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+.cg-c details{margin-top:6px;font-size:12.5px;color:var(--ink2)}
+.cg-c summary{cursor:pointer;color:var(--acc);font-weight:600}
 
 /* Divers */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.2);pointer-events:none}
@@ -1250,6 +1256,20 @@ function majLocale(t) {
   majCompteurs(); if (S.vue === 'taches') rendreListe();
 }
 
+var CANAL_TXT = { 'application': 'sur le téléphone', 'application (9 h)': 'sur le téléphone, à 9 h', 'téléphone': 'par Telegram', 'téléphone (9 h)': 'par Telegram, à 9 h',
+  'e-mail': 'par e-mail', 'e-mail (9 h)': 'par e-mail, à 9 h', 'différé': 'envoi prévu à 9 h', 'vue dans l’application': 'vue dans l’application avant 9 h' };
+/** Traçabilité d'une personne sur une tâche : notifiée, ouverte, en cours, terminée (jour et heure). */
+function traceTache(sv, createur) {
+  var l = [];
+  if (sv.notifieLe) l.push('Notifiée le ' + esc(dHeure(sv.notifieLe)) + (CANAL_TXT[sv.canal] || sv.canal ? ' (' + esc(CANAL_TXT[sv.canal] || sv.canal) + ')' : '') +
+    (sv.notifVueLe ? ' · notification vue le ' + esc(dHeure(sv.notifVueLe)) : ''));
+  if (sv.ouverteLe) l.push('<span class="ok">Ouverte le ' + esc(dHeure(sv.ouverteLe)) + '</span>' + (sv.nbOuvertures > 1 ? ' · ' + sv.nbOuvertures + ' ouvertures, dernière le ' + esc(dHeure(sv.derniereOuverture)) : ''));
+  else if (!createur) l.push('<span class="no">Pas encore ouverte</span>');
+  if (sv.enCoursLe) l.push('En cours le ' + esc(dHeure(sv.enCoursLe)) + (sv.enCoursPar ? ' (par ' + esc(sv.enCoursPar) + ')' : ''));
+  if (sv.termineeLe) l.push('<span class="ok">Terminée le ' + esc(dHeure(sv.termineeLe)) + '</span>' + (sv.termineePar ? ' (par ' + esc(sv.termineePar) + ')' : ''));
+  return l.length ? '<div class="trc">' + l.join('<br>') + '</div>' : '';
+}
+
 function afficherTache(t) {
   majLocale(t);
   var garde = S.detail === t.id && $('#drb') ? $('#drb').scrollTop : 0; // garder la position dans le panneau
@@ -1280,17 +1300,19 @@ function afficherTache(t) {
     '<div style="margin-top:8px"><label class="lk" style="cursor:pointer">+ Ajouter une photo ou un fichier<input type="file" id="pj" multiple accept="image/*,application/pdf" class="hidden"></label></div>' +
     '<div class="sec">Personnes concernées · ' + t.nbTerminees + '/' + t.participations.length + ' terminé' + (t.nbTerminees > 1 ? 's' : '') + (groupes.length ? ' · groupes : ' + esc(groupes.join(', ')) : '') + '</div><div id="parts">' +
     t.participations.map(function (p) {
-      var info = p.majLe && p.statut !== 'À faire' ? 'le ' + dHeure(p.majLe) + (p.majParNom ? ' par ' + p.majParNom : '') : (t.lus[p.id] ? 'lu le ' + dHeure(t.lus[p.id]) : (p.id === t.creePar ? '' : 'pas encore lu'));
-      return '<div class="pr"><span class="n">' + esc(p.id === moi ? 'Moi' : p.nom) + '</span><span class="pill ' + clsStatut(p.statut) + '">' + esc(p.statut) + '</span><span class="d">' + esc(info) + '</span>' +
-        (t.peutGerer && p.id !== moi ? boutonsStatut(t, p.id, true) : '') + '</div>';
+      var info = p.majLe && p.statut !== 'À faire' ? 'le ' + dHeure(p.majLe) + (p.majParNom ? ' par ' + p.majParNom : '') : (t.lus[p.id] ? 'ouverte le ' + dHeure(t.lus[p.id]) : (p.id === t.creePar ? '' : 'pas encore ouverte'));
+      var sv = t.suivi && t.suivi[p.id];
+      return '<div class="pr"><span class="n">' + esc(p.id === moi ? 'Moi' : p.nom) + '</span><span class="pill ' + clsStatut(p.statut) + '">' + esc(p.statut) + '</span>' +
+        (sv ? '' : '<span class="d">' + esc(info) + '</span>') +
+        (t.peutGerer && p.id !== moi ? boutonsStatut(t, p.id, true) : '') + (sv ? traceTache(sv, p.id === t.creePar) : '') + '</div>';
     }).join('') + '</div>' +
     (t.peutGerer && t.participations.some(function (p) { return p.id !== moi; }) ? '<div class="hint">Administrateur : vous pouvez changer le statut des autres personnes ; votre intervention est enregistrée dans l’historique.</div>' : '') +
     '<div class="sec">Commentaires</div>' +
     (enAttente ? '<div class="no-t">Chargement…</div>' : t.commentaires.length ? t.commentaires.map(function (c) { return '<div class="com"><b>' + esc(c.nom) + '</b> <small>' + esc(dHeure(c.date)) + '</small><p>' + esc(c.texte) + '</p></div>'; }).join('') : '<div class="no-t">Aucun commentaire.</div>') +
     '<div class="fld" style="margin-top:10px"><textarea id="com" placeholder="Écrire un commentaire…" style="min-height:64px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:9px 11px"></textarea>' +
     '<div style="text-align:right;margin-top:6px"><button class="btn sm pri" id="envCom">Envoyer</button></div></div>' +
-    '<details style="margin-top:10px"><summary class="sec" style="cursor:pointer;margin:0">Historique</summary><div class="hist">' +
-    (enAttente ? '<div>Chargement…</div>' : t.historique.map(function (h) { return '<div>' + esc(dHeure(h.date)) + ' — <b>' + esc(h.nom) + '</b> · ' + esc(h.action) + (h.detail ? ' : ' + esc(h.detail) : '') + '</div>'; }).join('')) + '</div></details>' +
+    '<details style="margin-top:10px"><summary class="sec" style="cursor:pointer;margin:0">Historique complet</summary><div class="hist">' +
+    (enAttente ? '<div>Chargement…</div>' : t.historique.map(function (h) { return '<div>' + esc(dHeure(h.date)) + ' — <b>' + esc(h.nom) + '</b> · ' + esc(h.action === 'Ouverture' ? 'a ouvert la tâche' : h.action) + (h.detail ? ' : ' + esc(h.detail) : '') + '</div>'; }).join('')) + '</div></details>' +
     (t.peutModifier ? '<div class="row" style="margin-top:22px"><button class="btn sm" id="mod">Modifier</button><span class="sp"></span><button class="btn sm ko" id="sup">Supprimer</button></div>' : '');
 
   var brouillon = $('#com') ? $('#com').value : '';
@@ -1962,6 +1984,32 @@ function pillConge(s) {
 }
 function periode(c) { return c.debut === c.fin ? 'Le ' + dLong(c.debut) : 'Du ' + dLong(c.debut) + ' au ' + dLong(c.fin); }
 
+/** Direction : qui a été prévenu, qui a vu, qui a décidé, quand ; et si la personne a vu la réponse. */
+function traceConge(x) {
+  if (!x.vues) return '';
+  var l = ['Demandée le ' + esc(dHeure(x.demandeLe))];
+  x.vues.forEach(function (v) {
+    var n = esc(v.moi ? 'Moi' : v.nom);
+    if (!v.vueLe && x.statut !== 'En attente') return; // demande déjà traitée : seules les vues réelles comptent
+    l.push(v.vueLe ? '<span class="ok">Vue par ' + n + ' le ' + esc(dHeure(v.vueLe)) + '</span>' + (v.derniere && v.derniere !== v.vueLe ? ' · revue le ' + esc(dHeure(v.derniere)) : '')
+      : '<span class="no">' + n + ' : pas encore vue</span>' + (v.notifieeLe ? ' · notifiée le ' + esc(dHeure(v.notifieeLe)) + ' (' + esc(v.canal) + ')' : ''));
+  });
+  if (x.traiteLe && x.statut !== 'En attente') l.push('<b>' + esc(x.statut) + '</b> par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)));
+  if (x.statut === 'Acceptée' || x.statut === 'Refusée') l.push(x.reponseVueLe ? '<span class="ok">Réponse vue par ' + esc(x.nom) + ' le ' + esc(dHeure(x.reponseVueLe)) + '</span>' : '<span class="no">Réponse pas encore vue par ' + esc(x.nom) + '</span>');
+  var j = (x.journal || []).map(function (e) { return '<div>' + esc(dHeure(e.date)) + ' — <b>' + esc(e.nom) + '</b> · ' + esc(e.action) + (e.detail ? ' : ' + esc(e.detail) : '') + '</div>'; }).join('');
+  return '<div class="trc">' + l.join('<br>') + '</div>' + (j ? '<details><summary>Historique complet</summary>' + j + '</details>' : '');
+}
+/** L'écran des congés est affiché : on signale ce qui a été vu (une seule fois par passage). */
+function signalerVuesConges() {
+  var c = S.conges; if (!c || document.visibilityState !== 'visible' || S.vue !== 'conges') return;
+  var ids = c.aValider.map(function (x) { return x.id; })
+    .concat(c.miens.filter(function (x) { return x.statut === 'Acceptée' || x.statut === 'Refusée'; }).map(function (x) { return x.id; }))
+    .filter(function (id) { return !(S.congesSignales || {})[id]; });
+  if (!ids.length) return;
+  S.congesSignales = S.congesSignales || {}; ids.forEach(function (id) { S.congesSignales[id] = 1; });
+  api('vuConges', ids).catch(function () { ids.forEach(function (id) { delete S.congesSignales[id]; }); });
+}
+
 function rendreConges() {
   var c = S.conges;
   var h = '<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Congés</h1><span class="sp"></span><button class="btn pri" id="cgNv">+ Demander un congé</button></div>';
@@ -1972,14 +2020,14 @@ function rendreConges() {
         return '<div class="cg-c" data-id="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + (x.fonction ? ' <span class="meta" style="font-weight:400">· ' + esc(x.fonction) + '</span>' : '') + '</div>' +
           '<div class="m" style="color:var(--ink);font-size:14px">' + esc(periode(x)) + (x.debut !== x.fin ? ' (inclus)' : '') + '</div>' +
           '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + '</div>' +
-          (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
+          (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') + traceConge(x) +
           '<div class="r"><button class="btn sm ok" data-d="Acceptée">Accepter</button><button class="btn sm ko" data-d="Refusée">Refuser</button>' +
           '<input type="text" class="hidden" placeholder="Motif du refus (envoyé à la personne)" style="flex:1;min-width:200px;border:1px solid var(--line2);border-radius:8px;padding:6px 10px"></div></div>';
       }).join('') : '<div class="empty">Aucune demande en attente.</div>');
   }
   h += '<h2>Mes demandes</h2>' + (c.miens.length ? c.miens.map(function (x) {
     return '<div class="cg-c"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-      '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.traitePar && x.statut !== 'Annulée' ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : 'refusée') + ' par ' + esc(x.traitePar) : '') + '</div>' +
+      '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) · demandée le ' + esc(dHeure(x.demandeLe)) + (x.traitePar && x.traiteLe ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : x.statut === 'Refusée' ? 'refusée' : 'annulée') + ' par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)) : '') + '</div>' +
       (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
       (x.reponse ? '<div class="m" style="margin-top:4px">Réponse : ' + esc(x.reponse) + '</div>' : '') +
       (x.statut === 'En attente' ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ma demande</button></div>' : '') + '</div>';
@@ -1987,12 +2035,13 @@ function rendreConges() {
   if (c.peutValider && c.equipe.length) {
     h += '<h2>Historique de l’équipe</h2>' + c.equipe.slice(0, 60).map(function (x) {
       return '<div class="cg-c"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-        '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.traitePar ? ' · ' + (x.statut === 'Annulée' ? 'annulé' : x.statut === 'Acceptée' ? 'accepté' : 'refusé') + ' par ' + esc(x.traitePar) : '') + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · ' + esc(x.reponse) : '') + '</div>' +
+        '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · réponse : ' + esc(x.reponse) : '') + '</div>' + traceConge(x) +
         (x.statut === 'Acceptée' && x.fin >= S.today ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ce congé</button></div>' : '') + '</div>';
     }).join('');
   }
   $('#main').innerHTML = h;
   $('#cgNv').onclick = formConge;
+  signalerVuesConges();
   $$('.cg-c[data-id]').forEach(function (card) {
     var id = card.getAttribute('data-id'), motif = $('input', card);
     $$('[data-d]', card).forEach(function (b) {
