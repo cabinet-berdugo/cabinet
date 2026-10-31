@@ -1555,7 +1555,7 @@ function rendreMoi() {
     if (assistante && p) {
       var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
       var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
-      hor = cg ? '<div class="meta"><b>Congé</b> ' + esc(cg.type || '') + '</div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
+      hor = cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
         '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
     }
     h += '<div class="day' + (j === S.today ? ' td' : '') + '"><div class="d"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></div><div class="c">' + hor +
@@ -1767,7 +1767,7 @@ function rendrePlanning() {
           p.jours.map(function (j, i) {
             var x = infoCase(p, pers.id, i), inner, cls = 'cell';
             var aff = avecQui(pers.id, j).map(function (a) { return '<div class="a">' + esc(a.dentisteNom) + (a.salleNom ? ' · ' + esc(a.salleNom) : '') + '</div>'; }).join('');
-            if (x.conge) { cls += ' cg'; inner = 'Congé<div class="a" style="color:var(--amb);font-weight:400">' + esc(x.conge.type || '') + '</div>' + (aff ? '<div class="s">Affectée malgré le congé :</div>' + aff : ''); }
+            if (x.conge) { cls += ' cg'; inner = 'Congé' + (aff ? '<div class="s">Affectée malgré le congé :</div>' + aff : ''); }
             else if (!x.c) inner = (ed ? '<span class="plus">+</span>' : '<span style="color:var(--ink3)">—</span>') + aff;
             else if (x.c.statut === 'Repos') { cls += ' rep'; inner = 'Repos' + (aff ? '<div class="s">Affectée malgré le repos :</div>' + aff : ''); }
             else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + aff +
@@ -1798,7 +1798,7 @@ function rendrePlanning() {
 function editerCase(email, i) {
   var p = S.planning, x = infoCase(p, email, i), c = x.c || { statut: 'Travail', debut: '09:00', fin: '18:00', avec: '', heuresSup: '', note: '' };
   var corps = '<p style="margin-top:0"><b>' + esc(nom(email)) + '</b> · ' + JOURS[i] + ' ' + dLong(p.jours[i]) + '</p>' +
-    (x.conge ? '<p class="pill p-att" style="display:inline-block;margin-bottom:12px">Congé accepté ce jour (' + esc(x.conge.type || '') + ')</p>' : '') +
+    (x.conge ? '<p class="pill p-att" style="display:inline-block;margin-bottom:12px">Congé accepté ce jour</p>' : '') +
     '<div class="fld"><label>Type</label><div class="seg" id="cSt"><button data-s="Travail"' + (c.statut !== 'Repos' ? ' class="on"' : '') + '>Travail</button><button data-s="Repos"' + (c.statut === 'Repos' ? ' class="on"' : '') + '>Repos</button></div></div>' +
     '<div id="cTr"><div class="two"><div class="fld"><label for="cD">Début</label><input type="time" id="cD" value="' + esc(c.debut || '09:00') + '" step="900"></div>' +
     '<div class="fld"><label for="cF">Fin</label><input type="time" id="cF" value="' + esc(c.fin || '18:00') + '" step="900"></div></div>' +
@@ -1945,7 +1945,7 @@ function fichePersonne(p) {
       (hst.affectations.length ? hst.affectations.slice(0, 15).map(function (a) {
         return '<div class="hrow">' + esc(dJour(a.date)) + ' · ' + hm(a.debut) + '–' + hm(a.fin) + ' · ' + esc(a.salleNom || 'salle à définir') + ' · ' + esc(a.dentisteNom) + (a.assistantes.length ? ' avec ' + esc(a.assistantes.join(', ')) : '') + '</div>';
       }).join('') : '<div class="no-t">Aucune affectation.</div>') +
-      (hst.conges.length ? '<div class="meta" style="margin:12px 0 6px"><b>Congés</b></div>' + hst.conges.map(function (c) { return '<div class="hrow">' + esc(periode(c)) + ' · ' + esc(c.type) + ' · ' + esc(c.statut) + '</div>'; }).join('') : '');
+      (hst.conges.length ? '<div class="meta" style="margin:12px 0 6px"><b>Congés</b></div>' + hst.conges.map(function (c) { return '<div class="hrow">' + esc(periode(c)) + ' · ' + esc(c.statut) + '</div>'; }).join('') : '');
     $('#pHist').innerHTML = h;
     $$('#pHist [data-t]').forEach(function (r) { r.onclick = function () { ouvrirTache(r.getAttribute('data-t')); }; });
   }).catch(function (e) { if ($('#pHist')) $('#pHist').innerHTML = '<div class="err">' + esc(msgErr(e)) + '</div>'; });
@@ -1969,8 +1969,9 @@ function rendreConges() {
   if (c.peutValider) {
     h += '<h2>À valider' + (c.aValider.length ? ' (' + c.aValider.length + ')' : '') + '</h2>' +
       (c.aValider.length ? c.aValider.map(function (x) {
-        return '<div class="cg-c" data-id="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</div>' +
-          '<div class="m">' + esc(x.type) + ' · ' + joursOuvrables(x.debut, x.fin) + ' jour(s) hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + '</div>' +
+        return '<div class="cg-c" data-id="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + (x.fonction ? ' <span class="meta" style="font-weight:400">· ' + esc(x.fonction) + '</span>' : '') + '</div>' +
+          '<div class="m" style="color:var(--ink);font-size:14px">' + esc(periode(x)) + (x.debut !== x.fin ? ' (inclus)' : '') + '</div>' +
+          '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + '</div>' +
           (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
           '<div class="r"><button class="btn sm ok" data-d="Acceptée">Accepter</button><button class="btn sm ko" data-d="Refusée">Refuser</button>' +
           '<input type="text" class="hidden" placeholder="Motif du refus (envoyé à la personne)" style="flex:1;min-width:200px;border:1px solid var(--line2);border-radius:8px;padding:6px 10px"></div></div>';
@@ -1978,14 +1979,15 @@ function rendreConges() {
   }
   h += '<h2>Mes demandes</h2>' + (c.miens.length ? c.miens.map(function (x) {
     return '<div class="cg-c"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-      '<div class="m">' + esc(x.type) + ' · ' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.traitePar && x.statut !== 'Annulée' ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : 'refusée') + ' par ' + esc(x.traitePar) : '') + '</div>' +
+      '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.traitePar && x.statut !== 'Annulée' ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : 'refusée') + ' par ' + esc(x.traitePar) : '') + '</div>' +
+      (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
       (x.reponse ? '<div class="m" style="margin-top:4px">Réponse : ' + esc(x.reponse) + '</div>' : '') +
       (x.statut === 'En attente' ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ma demande</button></div>' : '') + '</div>';
   }).join('') : '<div class="empty">Vous n’avez pas encore fait de demande.</div>');
   if (c.peutValider && c.equipe.length) {
     h += '<h2>Historique de l’équipe</h2>' + c.equipe.slice(0, 60).map(function (x) {
       return '<div class="cg-c"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-        '<div class="m">' + esc(x.type) + (x.traitePar ? ' · par ' + esc(x.traitePar) : '') + (x.reponse ? ' · ' + esc(x.reponse) : '') + '</div>' +
+        '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.traitePar ? ' · ' + (x.statut === 'Annulée' ? 'annulé' : x.statut === 'Acceptée' ? 'accepté' : 'refusé') + ' par ' + esc(x.traitePar) : '') + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · ' + esc(x.reponse) : '') + '</div>' +
         (x.statut === 'Acceptée' && x.fin >= S.today ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ce congé</button></div>' : '') + '</div>';
     }).join('');
   }
@@ -2011,9 +2013,7 @@ function rendreConges() {
 }
 
 function formConge() {
-  var types = S.cfg.typesConge.map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
-  var corps = '<div class="two"><div class="fld"><label for="gD">Du *</label><input type="date" id="gD"></div><div class="fld"><label for="gF">Au (inclus) *</label><input type="date" id="gF"></div></div>' +
-    '<div class="fld"><label for="gT">Type</label><select id="gT">' + types + '</select></div>' +
+  var corps = '<div class="two"><div class="fld"><label for="gD">Du</label><input type="date" id="gD"></div><div class="fld"><label for="gF">Au (inclus)</label><input type="date" id="gF"></div></div>' +
     '<div class="fld"><label for="gC">Commentaire</label><textarea id="gC" placeholder="Facultatif"></textarea></div>' +
     '<div class="hint" id="gN"></div><div class="err" id="gErr"></div>';
   tiroir('Demande de congé', corps, '<button class="btn" id="gAnn">Annuler</button><button class="btn pri" id="gOk">Envoyer la demande</button>');
@@ -2025,11 +2025,11 @@ function formConge() {
   $('#gD').onchange = calc; $('#gF').onchange = calc;
   $('#gAnn').onclick = fermer;
   $('#gOk').onclick = function () {
-    var d = { debut: $('#gD').value, fin: $('#gF').value, type: $('#gT').value, commentaire: $('#gC').value.trim() };
+    var d = { debut: $('#gD').value, fin: $('#gF').value, commentaire: $('#gC').value.trim() };
     if (!d.debut || !d.fin) { $('#gErr').textContent = 'Indiquez les deux dates.'; return; }
     if (d.fin < d.debut) { $('#gErr').textContent = 'La date de fin est avant la date de début.'; return; }
     var b = this; b.disabled = true;
-    api('demanderConge', d).then(function (r) { S.conges = r; fermer(); majCompteurs(); rendreConges(); toast('Demande envoyée à la direction'); })
+    api('demanderConge', d).then(function (r) { S.conges = r; fermer(); majCompteurs(); rendreConges(); toast('Demande envoyée'); })
       .catch(function (e) { b.disabled = false; $('#gErr').textContent = msgErr(e); });
   };
 }
