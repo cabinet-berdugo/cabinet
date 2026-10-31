@@ -412,6 +412,7 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .sv-c .m.r{color:var(--red)}
 .sv-c.imp{border-left:5px solid var(--red)}
 .sv-rl{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.sv-man{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:600;color:#7a5b00;background:#fff4d6;border-radius:999px;padding:2px 9px}
 .sv-rl span{font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;background:#eef3f3;color:var(--ink3)}
 .sv-rl span.f{background:var(--accbg);color:var(--acc2)}
 .sv-rl span.a{background:var(--ambbg);color:var(--amb)}
@@ -2870,7 +2871,8 @@ function rendreSuivi(v) {
   var imp = v === 'impayes', tous = S.cfg.compta && S.cfg.compta.tous, d = S.sv.data;
   var h = '<div class="ph"><div class="ph-t"><h1>' + (imp ? 'Impayés' : 'Relances de devis') + '</h1><p class="ph-g">' + (imp
     ? 'Les patients qui doivent encore un montant, d’après les journées remplies dans Google Sheets. Touchez un patient pour noter un règlement ou corriger le reste dû.'
-    : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div></div>';
+    : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div>' +
+    '<div class="ph-a"><button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter un devis') + '</button></div></div>';
   h += segCompta(v);
   if (tous) h += '<div class="cp-pr"><button data-sp="*" class="' + (S.sv.pid === '*' ? 'on' : '') + '">Tous</button>' + tous.map(function (p) { return '<button data-sp="' + esc(p.id) + '" class="' + (S.sv.pid === p.id || (S.sv.pid === '' && p.id === S.me.id) ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
   if (!d) h += '<div class="load"><div class="spin"></div>Lecture des fichiers…</div>';
@@ -2889,12 +2891,12 @@ function rendreSuivi(v) {
       if (!p.trouve) { h += '<div class="cp-l"><div class="cp-vide">Fichier « ' + esc(p.fichier) + ' » introuvable dans Google Drive.</div></div>'; return; }
       if (!l.length) { h += plus ? '' : '<div class="empty">' + (imp ? 'Aucun impayé. ' : 'Aucune relance de devis. ') + '<div class="hint" style="margin-top:6px">' + esc(imp ? p.majImp : p.majRel) + '</div></div>'; return; }
       h += l.map(function (x, i) {
-        var der = x.journal && x.journal[0] ? '<div class="j">Modifié par ' + esc(x.journal[0].nom) + ' le ' + esc(dHeure(x.journal[0].date)) + '</div>' : '';
-        if (imp) return '<button class="sv-c imp" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>' + (joursFr(x.jour) || x.date ? 'Soin du ' + esc(joursFr(x.jour) || x.date) : 'Date du soin non renseignée') + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' + der + '</span><span class="m r">' + esc(x.reste) + '</span></button>';
+        var der = x.journal && x.journal[0] ? '<div class="j">' + (/ajouté/i.test(x.journal[0].type) ? 'Ajouté par ' : 'Modifié par ') + esc(x.journal[0].nom) + ' le ' + esc(dHeure(x.journal[0].date)) + '</div>' : '';
+        if (imp) return '<button class="sv-c imp" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>' + (joursFr(x.jour) || x.date ? 'Soin du ' + esc(joursFr(x.jour) || x.date) : 'Date du soin non renseignée') + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' + (x.manuel ? '<span class="sv-man">Ajouté dans l’application</span>' : '') + der + '</span><span class="m r">' + esc(x.reste) + '</span></button>';
         var n = [x.r1, x.r2, x.r3].filter(String).length;
         return '<button class="sv-c" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>' + (joursFr(x.jour) || x.date ? 'Soin du ' + esc(joursFr(x.jour) || x.date) : 'Date du soin non renseignée') + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' +
           '<span class="sv-rl">' + (n ? '' : '<span class="a">À relancer</span>') + [x.r1, x.r2, x.r3].map(function (r, k) { return '<span class="' + (r ? 'f' : '') + '">Relance ' + (k + 1) + (r ? ' · ' + esc(joursFr(r).slice(0, 5)) : '') + '</span>'; }).join('') + '</span>' +
-          (x.notes ? '<small style="margin-top:6px">« ' + esc(x.notes) + ' »</small>' : '') + der + '</span><span class="m">' + esc(x.montant || '') + '</span></button>';
+          (x.notes ? '<small style="margin-top:6px">« ' + esc(x.notes) + ' »</small>' : '') + (x.manuel ? '<span class="sv-man">Ajouté dans l’application</span>' : '') + der + '</span><span class="m">' + esc(x.montant || '') + '</span></button>';
       }).join('');
     });
     var urls = ps.filter(function (p) { return p.url; });
@@ -2905,6 +2907,7 @@ function rendreSuivi(v) {
   brancherSegCompta();
   $$('[data-sp]').forEach(function (b) { b.onclick = function () { var x = b.getAttribute('data-sp'); S.sv.pid = x === S.me.id ? '' : x; chargerSuivi(); }; });
   if ($('#svR')) $('#svR').onclick = function () { chargerSuivi(); };
+  $('#svAj').onclick = function () { formAjoutSuivi(imp); };
   $$('.sv-c').forEach(function (b) { b.onclick = function () { ficheSuivi(imp, b.getAttribute('data-p'), b.getAttribute('data-k')); }; });
 }
 function ligneSuivi(imp, pid, cle) {
@@ -2916,6 +2919,45 @@ function appliquerSuivi(r) {
   r.praticiens.forEach(function (np) { S.sv.data.praticiens = S.sv.data.praticiens.map(function (p) { return p.id === np.id ? np : p; }); });
   S.sv.data.lu = r.lu; rendreSuivi(S.vue);
 }
+/** Ajouter un patient oublié (impayé ou devis à relancer) : écrit dans la journée du classeur du mois et dans « Impayés et relances ». */
+function formAjoutSuivi(imp) {
+  var tous = S.cfg.compta && S.cfg.compta.tous, auj = S.today;
+  var choix = tous ? tous : [{ id: S.me.id, prenom: S.me.prenom || 'Moi', nom: S.me.nom }];
+  var def = S.sv.pid && S.sv.pid !== '*' ? S.sv.pid : (choix.some(function (p) { return p.id === S.me.id; }) ? S.me.id : choix[0].id);
+  var sel = choix.length > 1 ? '<div class="fld"><label for="ajP">Praticien</label><select id="ajP">' + choix.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === def ? ' selected' : '') + '>' + esc(p.nom || p.prenom) + '</option>'; }).join('') + '</select></div>' : '';
+  tiroir(imp ? 'Ajouter un impayé' : 'Ajouter un devis à relancer',
+    sel +
+    '<div class="fld"><label for="ajD">Date du soin</label><input type="date" id="ajD" max="' + esc(auj) + '" value=""></div>' +
+    '<div class="fld"><label for="ajN">Patient</label><input type="text" id="ajN" autocomplete="off" placeholder="Nom du patient"></div>' +
+    (imp
+      ? '<div class="fld"><label for="ajR">Reste dû</label><input type="text" id="ajR" inputmode="decimal" placeholder="0,00"></div>' +
+        '<div class="fld"><label for="ajM">Remarque</label><input type="text" id="ajM" placeholder="Ex. doit repasser vendredi"></div>'
+      : '<div class="fld"><label for="ajM">Soin prévu</label><input type="text" id="ajM" placeholder="Ex. couronne 46"></div>' +
+        '<div class="fld"><label for="ajT">Montant du devis</label><input type="text" id="ajT" inputmode="decimal" placeholder="0,00 (facultatif)"></div>' +
+        '<div class="fld"><label for="ajO">Notes de relance</label><textarea id="ajO" placeholder="Facultatif"></textarea></div>') +
+    '<div class="err" id="ajE"></div>' +
+    '<p class="hint">La ligne est ajoutée dans l’onglet du jour du classeur du mois' + (imp ? ' (case « Impayé » cochée, reste dû rempli)' : ' (case « Relance devis » cochée)') + ' et dans « Impayés et relances ». Elle apparaît partout, y compris après les mises à jour automatiques.</p>',
+    '<button class="btn" id="ajA">Annuler</button><span class="sp"></span><button class="btn pri" id="ajS">Ajouter</button>');
+  $('#ajA').onclick = fermer;
+  setTimeout(function () { $('#ajD') && $('#ajD').focus(); }, 50);
+  $('#ajS').onclick = function () {
+    var b = this, pid = $('#ajP') ? $('#ajP').value : S.me.id;
+    var d = { jour: $('#ajD').value, patient: $('#ajN').value, remarque: $('#ajM').value };
+    if (!d.jour) { $('#ajE').textContent = 'Indiquez la date du soin.'; return; }
+    if (!d.patient.trim()) { $('#ajE').textContent = 'Indiquez le nom du patient.'; return; }
+    if (imp) { d.reste = $('#ajR').value; if (!d.reste.trim()) { $('#ajE').textContent = 'Indiquez le reste dû.'; return; } }
+    else { d.montant = $('#ajT').value; d.notes = $('#ajO').value; }
+    b.disabled = true; b.textContent = 'Ajout…'; $('#ajE').textContent = '';
+    api('ajouterSuivi', pid === S.me.id ? '' : pid, imp ? 'impaye' : 'relance', d).then(function (r) {
+      fermer();
+      if (S.sv.data && S.sv.data.praticiens) {
+        var dedans = S.sv.data.praticiens.some(function (p) { return r.praticiens.some(function (n) { return n.id === p.id; }); });
+        if (dedans) appliquerSuivi(r);
+      }
+      toast(imp ? 'Impayé ajouté' : 'Devis ajouté');
+    }).catch(function (e) { b.disabled = false; b.textContent = 'Ajouter'; $('#ajE').textContent = msgErr(e); });
+  };
+}
 function histSuivi(l) {
   return l.journal && l.journal.length ? '<div class="sec">Historique des modifications</div><div class="sv-hist">' + l.journal.map(function (j) { return '<div><b>' + esc(j.nom) + '</b> · ' + esc(dHeure(j.date)) + '<br>' + esc(j.detail) + '</div>'; }).join('') + '</div>' : '';
 }
@@ -2925,10 +2967,10 @@ function ficheSuivi(imp, pid, cle) {
     (imp ? '<div><span>Reste dû</span><span style="color:var(--red)">' + esc(l.reste) + '</span></div>' : '') + (l.remarque && !imp ? '<div><span>Remarque</span><span>' + esc(l.remarque) + '</span></div>' : '') + '</div>';
   if (imp) {
     tiroir(esc(l.patient), info +
-      '<button class="btn ok sv-regle" id="svOk">✓ Le patient a réglé</button><p class="hint" style="margin:0 0 6px">Décoche « Impayé » dans la journée du ' + esc(joursFr(l.jour)) + ', met le reste dû à 0 et note la date du règlement.</p>' +
+      '<button class="btn ok sv-regle" id="svOk">✓ Le patient a réglé</button><p class="hint" style="margin:0 0 6px">' + (l.manuel ? 'Le retire de la liste des impayés ; la modification est enregistrée.' : 'Décoche « Impayé » dans la journée du ' + esc(joursFr(l.jour)) + ', met le reste dû à 0 et note la date du règlement.') + '</p>' +
       '<div class="sec">Ou corriger</div><div class="fld"><label for="svRe">Reste dû</label><input type="text" id="svRe" inputmode="decimal" value="' + esc(String(l.nReste).replace('.', ',')) + '"></div>' +
       '<div class="fld"><label for="svRm">Remarque</label><input type="text" id="svRm" value="' + esc(l.remarque) + '"></div><div class="err" id="svE"></div>' + histSuivi(l) +
-      '<p class="hint">Modifié aussi dans le classeur du mois de ' + esc(p.prenom) + ' (onglet du ' + esc(String(Number(l.jour.slice(8, 10)))) + ').</p>',
+      '<p class="hint">' + (l.manuel ? 'Ligne ajoutée dans l’application : le classeur de ce mois n’a pas de colonnes « Impayé ».' : 'Modifié aussi dans le classeur du mois de ' + esc(p.prenom) + ' (onglet du ' + esc(String(Number(l.jour.slice(8, 10)))) + ').') + '</p>',
       '<button class="btn" id="svA">Annuler</button><span class="sp"></span><button class="btn pri" id="svS">Enregistrer</button>');
     $('#svOk').onclick = function () {
       if (!confirm('Confirmer que ' + l.patient + ' a réglé ' + l.reste + ' ?')) return;
@@ -2945,7 +2987,7 @@ function ficheSuivi(imp, pid, cle) {
       '<div class="fld"><label for="svMt">Montant du devis</label><input type="text" id="svMt" inputmode="decimal" value="' + esc(l.nMontant ? String(l.nMontant).replace('.', ',') : '') + '" placeholder="0,00"></div>' +
       dt('svR1', 'Relance 1', l.r1) + dt('svR2', 'Relance 2', l.r2) + dt('svR3', 'Relance 3', l.r3) +
       '<div class="fld"><label for="svNo">Notes de relance</label><textarea id="svNo" placeholder="Ce que le patient a répondu…">' + esc(l.notes) + '</textarea></div><div class="err" id="svE"></div>' + histSuivi(l) +
-      '<p class="hint">Enregistré dans « ' + esc(p.fichier) + ' » (colonnes saisies à la main, conservées à chaque mise à jour).</p>',
+      '<p class="hint">' + (l.manuel ? 'Ligne ajoutée dans l’application : le classeur de ce mois n’a pas de colonne « Relance devis ».' : 'Enregistré dans « ' + esc(p.fichier) + ' » (colonnes saisies à la main, conservées à chaque mise à jour).') + '</p>',
       '<button class="btn" id="svA">Annuler</button><span class="sp"></span><button class="btn pri" id="svS">Enregistrer</button>');
     $$('[data-auj]').forEach(function (b) { b.onclick = function () { $('#' + b.getAttribute('data-auj')).value = S.today; }; });
     $('#svS').onclick = function () {
