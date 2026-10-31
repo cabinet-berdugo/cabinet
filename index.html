@@ -394,6 +394,36 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .mbar2{display:flex;gap:8px}
 .mbar2 .btn{box-shadow:0 4px 14px rgba(0,0,0,.12);padding:12px;font-size:15px;justify-content:center}
 .mbar2 .btn.pri{flex:1}
+
+/* Impayés et relances */
+.sv-sum{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;margin:2px 0 14px;color:var(--ink2);font-size:14.5px}
+.sv-sum b{font-size:22px;color:var(--ink);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sv-sum b.r{color:var(--red)}
+.sv-g{display:flex;align-items:baseline;gap:8px;margin:22px 0 8px}
+.sv-g h2{margin:0}
+.sv-g span{color:var(--ink3);font-size:13.5px}
+.sv-c{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:8px;box-shadow:var(--sh);cursor:pointer;font:inherit;color:inherit}
+.sv-c:hover{border-color:var(--line2)}
+.sv-c .b{flex:1;min-width:0}
+.sv-c .b b{display:block;font-size:15.5px}
+.sv-c .b small{display:block;color:var(--ink2);font-size:13px;margin-top:1px}
+.sv-c .b .j{color:var(--ink3);font-size:12px;margin-top:4px}
+.sv-c .m{font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-c .m.r{color:var(--red)}
+.sv-c.imp{border-left:5px solid var(--red)}
+.sv-rl{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.sv-rl span{font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;background:#eef3f3;color:var(--ink3)}
+.sv-rl span.f{background:var(--accbg);color:var(--acc2)}
+.sv-rl span.a{background:var(--ambbg);color:var(--amb)}
+.sv-d{background:#f2f6f6;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.sv-d div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.sv-d div span:first-child{color:var(--ink2)}
+.sv-d div span:last-child{font-weight:600;text-align:right}
+.sv-regle{width:100%;justify-content:center;padding:13px;font-size:15.5px;margin-bottom:6px}
+.sv-dt{display:flex;gap:8px;align-items:center}
+.sv-dt input{flex:1}
+.sv-hist{font-size:12.5px;color:var(--ink2);margin-top:6px}
+.sv-hist div{padding:5px 0;border-bottom:1px solid var(--line)}
 /* Comptabilité */
 .cp-pr{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px;scrollbar-width:none}
 .cp-pr::-webkit-scrollbar{display:none}
@@ -523,6 +553,7 @@ header{background:var(--deep);border-bottom:0;color:#fff}
 .out{color:rgba(255,255,255,.75)}
 .bell{color:rgba(255,255,255,.9)} .bell:hover{background:rgba(255,255,255,.1)}
 .me-m{color:rgba(255,255,255,.85);font-weight:600;cursor:pointer}
+@media (min-width:761px) and (max-width:1480px){.hd:has(#tabRel:not(.hidden)) .who{display:none}.hd:has(#tabRel:not(.hidden)) .me-m{display:block}.hd:has(#tabRel:not(.hidden)) .tab{padding:8px 11px}}
 main{padding-top:0}
 .ph{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;color:#fff;
   padding:14px 0 30px;margin-bottom:22px;background:var(--deep);box-shadow:0 0 0 100vmax var(--deep);clip-path:inset(0 -100vmax)}
@@ -685,6 +716,8 @@ html.mode-auth body{background:var(--deep)}
       <button class="tab" data-v="conges">Congés<span class="cnt hidden" id="c2"></span></button>
       <button class="tab" data-v="materiel">Matériel<span class="cnt hidden" id="c3"></span></button>
       <button class="tab hidden" data-v="compta" id="tabCpt">Comptabilité</button>
+      <button class="tab hidden" data-v="impayes" id="tabImp">Impayés</button>
+      <button class="tab hidden" data-v="relances" id="tabRel">Relances</button>
       <button class="tab hidden" data-v="personnel" id="tabPers">Personnel</button>
     </nav>
     <span class="sp"></span>
@@ -870,9 +903,9 @@ function appliquerDemarrage(d) {
     majCloche();
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
-    ['#tabCpt', '#bnCpt'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
+    ['#tabCpt', '#bnCpt', '#tabImp', '#tabRel'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
     S.f.portee = 'tout';
-    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 || (PARAMS.v === 'compta' && S.cfg.compta) ? PARAMS.v : 'taches';
+    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 || (['compta', 'impayes', 'relances'].indexOf(PARAMS.v) >= 0 && S.cfg.compta) ? PARAMS.v : 'taches';
     aller(v);
     if (PARAMS.t) ouvrirTache(PARAMS.t);
     PARAMS.t = ''; PARAMS.v = '';
@@ -1278,6 +1311,8 @@ function aller(v) {
   if (v === 'personnel') chargerPersonnel();
   if (v === 'materiel') { rendreMateriel(); chargerMateriel(); }
   if (v === 'compta') ouvrirCompta();
+  if (v === 'impayes' || v === 'relances') ouvrirSuivi(v);
+  if (/^(compta|impayes|relances)$/.test(v) && $('#bnCpt')) $('#bnCpt').classList.add('on'); // téléphone : un seul bouton « Compta »
 }
 
 function majCompteurs() {
@@ -2747,6 +2782,7 @@ function rendreCompta() {
   var tous = S.cfg.compta && S.cfg.compta.tous;
   var h = '<div class="ph"><div class="ph-t"><h1>Comptabilité</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires de chaque praticien, jour par jour, et leurs impayés et relances. ' : 'Votre chiffre d’affaires du mois, jour par jour, et vos impayés et relances. ') +
     'Les chiffres viennent des classeurs Google Sheets : on continue de les remplir là-bas.</p></div></div>';
+  h += segCompta('compta');
   if (tous) h += '<div class="cp-pr">' + tous.map(function (p) { return '<button data-pp="' + esc(p.id) + '" class="' + (p.id === c.pid ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
   h += '<div class="cp-mo"><button id="cpP" aria-label="Mois précédent">‹</button><b>' + MOIS_NOMS[c.mois - 1] + ' ' + c.annee + '</b><button id="cpN" aria-label="Mois suivant">›</button><button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
   if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
@@ -2777,6 +2813,7 @@ function rendreCompta() {
   if (d) h += '<div class="cp-o">' + (d.url ? '<a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir le classeur du mois</a>' : '') + (d.suivi && d.suivi.url ? '<a class="btn" href="' + esc(d.suivi.url) + '" target="_blank" rel="noopener">Ouvrir impayés et relances</a>' : '') + '</div>' +
     '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. Les boutons ouvrent Google Sheets avec les droits de votre compte Google.</p>';
   $('#main').innerHTML = h;
+  brancherSegCompta();
   $$('[data-pp]').forEach(function (b) { b.onclick = function () { S.cpt.pid = b.getAttribute('data-pp'); S.cpt.ouverts = {}; chargerCompta(true); }; });
   $('#cpP').onclick = function () { if (--c.mois < 1) { c.mois = 12; c.annee--; } c.ouverts = {}; chargerCompta(true); };
   $('#cpN').onclick = function () { if (++c.mois > 12) { c.mois = 1; c.annee++; } c.ouverts = {}; chargerCompta(true); };
@@ -2802,6 +2839,121 @@ function suiviCompta(d) {
   h += bloc('Impayés', s.impayes, /^reste/i);
   h += bloc('Relances de devis', s.relances, /^montant/i);
   return h;
+}
+
+// ───────── Impayés et relances de devis (modifiables depuis l'application) ─────────
+S.sv = { pid: null, data: null };
+function segCompta(v) {
+  return '<div class="seg seg-v" id="cpSeg">' + [['compta', 'Chiffre d’affaires'], ['impayes', 'Impayés'], ['relances', 'Relances']].map(function (x) {
+    return '<button data-cv="' + x[0] + '"' + (x[0] === v ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div>';
+}
+function brancherSegCompta() { $$('#cpSeg [data-cv]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-cv')); }; }); }
+function ouvrirSuivi(v) {
+  var tous = S.cfg.compta && S.cfg.compta.tous;
+  if (S.sv.pid === null) S.sv.pid = tous ? '*' : '';
+  rendreSuivi(v);
+  if (!S.sv.data || S.sv.dataPid !== S.sv.pid) chargerSuivi(); else chargerSuivi(true);
+}
+function chargerSuivi(discret) {
+  var pid = S.sv.pid; S.sv.attente = pid;
+  if (!discret) { S.sv.data = null; rendreSuivi(S.vue); }
+  api('getSuiviCompta', pid).then(function (r) {
+    if (S.sv.attente !== pid) return;
+    S.sv.data = r; S.sv.dataPid = pid;
+    if (S.vue === 'impayes' || S.vue === 'relances') rendreSuivi(S.vue);
+  }).catch(function (e) { if (S.sv.attente === pid) { S.sv.data = { erreur: msgErr(e) }; rendreSuivi(S.vue); } });
+}
+function svPid(p) { return p.id === S.me.id ? '' : p.id; }
+function joursFr(iso) { return iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
+function rendreSuivi(v) {
+  var imp = v === 'impayes', tous = S.cfg.compta && S.cfg.compta.tous, d = S.sv.data;
+  var h = '<div class="ph"><div class="ph-t"><h1>' + (imp ? 'Impayés' : 'Relances de devis') + '</h1><p class="ph-g">' + (imp
+    ? 'Les patients qui doivent encore un montant, d’après les journées remplies dans Google Sheets. Touchez un patient pour noter un règlement ou corriger le reste dû.'
+    : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div></div>';
+  h += segCompta(v);
+  if (tous) h += '<div class="cp-pr"><button data-sp="*" class="' + (S.sv.pid === '*' ? 'on' : '') + '">Tous</button>' + tous.map(function (p) { return '<button data-sp="' + esc(p.id) + '" class="' + (S.sv.pid === p.id || (S.sv.pid === '' && p.id === S.me.id) ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
+  if (!d) h += '<div class="load"><div class="spin"></div>Lecture des fichiers…</div>';
+  else if (d.erreur) h += '<div class="err">' + esc(d.erreur) + '</div>';
+  else {
+    var ps = d.praticiens, plus = ps.length > 1;
+    var toutes = [], total = 0;
+    ps.forEach(function (p) { (imp ? p.impayes : p.relances).forEach(function (l) { toutes.push(l); total += imp ? l.nReste : (l.nMontant || 0); }); });
+    var aRelancer = imp ? 0 : toutes.filter(function (l) { return !l.r1; }).length;
+    h += '<div class="sv-sum">' + (imp
+      ? '<b>' + toutes.length + '</b> impayé' + (toutes.length > 1 ? 's' : '') + ' · <b class="r">' + eur(total) + '</b> à récupérer'
+      : '<b>' + toutes.length + '</b> devis à suivre · <b>' + aRelancer + '</b> jamais relancé' + (aRelancer > 1 ? 's' : '') + (total ? ' · ' + eur(total) + ' de devis' : '')) + '</div>';
+    ps.forEach(function (p) {
+      var l = imp ? p.impayes : p.relances;
+      if (plus) h += '<div class="sv-g"><h2>' + esc(p.nom) + '</h2><span>' + (p.trouve ? l.length + (imp ? ' impayé' : ' devis') + (l.length > 1 && imp ? 's' : '') : 'fichier introuvable') + '</span></div>';
+      if (!p.trouve) { h += '<div class="cp-l"><div class="cp-vide">Fichier « ' + esc(p.fichier) + ' » introuvable dans Google Drive.</div></div>'; return; }
+      if (!l.length) { h += plus ? '' : '<div class="empty">' + (imp ? 'Aucun impayé. ' : 'Aucune relance de devis. ') + '<div class="hint" style="margin-top:6px">' + esc(imp ? p.majImp : p.majRel) + '</div></div>'; return; }
+      h += l.map(function (x, i) {
+        var der = x.journal && x.journal[0] ? '<div class="j">Modifié par ' + esc(x.journal[0].nom) + ' le ' + esc(dHeure(x.journal[0].date)) + '</div>' : '';
+        if (imp) return '<button class="sv-c imp" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>Soin du ' + esc(joursFr(x.jour) || x.date) + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' + der + '</span><span class="m r">' + esc(x.reste) + '</span></button>';
+        var n = [x.r1, x.r2, x.r3].filter(String).length;
+        return '<button class="sv-c" data-p="' + esc(p.id) + '" data-k="' + esc(x.cle) + '"><span class="b"><b>' + esc(x.patient) + '</b><small>Soin du ' + esc(joursFr(x.jour) || x.date) + (x.remarque ? ' · ' + esc(x.remarque) : '') + '</small>' +
+          '<span class="sv-rl">' + (n ? '' : '<span class="a">À relancer</span>') + [x.r1, x.r2, x.r3].map(function (r, k) { return '<span class="' + (r ? 'f' : '') + '">Relance ' + (k + 1) + (r ? ' · ' + esc(joursFr(r).slice(0, 5)) : '') + '</span>'; }).join('') + '</span>' +
+          (x.notes ? '<small style="margin-top:6px">« ' + esc(x.notes) + ' »</small>' : '') + der + '</span><span class="m">' + esc(x.montant || '') + '</span></button>';
+      }).join('');
+    });
+    var urls = ps.filter(function (p) { return p.url; });
+    if (urls.length === 1) h += '<div class="cp-o"><a class="btn" href="' + esc(urls[0].url) + '" target="_blank" rel="noopener">Ouvrir dans Google Sheets</a></div>';
+    h += '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. <button class="lk" id="svR">Actualiser</button></p>';
+  }
+  $('#main').innerHTML = h;
+  brancherSegCompta();
+  $$('[data-sp]').forEach(function (b) { b.onclick = function () { var x = b.getAttribute('data-sp'); S.sv.pid = x === S.me.id ? '' : x; chargerSuivi(); }; });
+  if ($('#svR')) $('#svR').onclick = function () { chargerSuivi(); };
+  $$('.sv-c').forEach(function (b) { b.onclick = function () { ficheSuivi(imp, b.getAttribute('data-p'), b.getAttribute('data-k')); }; });
+}
+function ligneSuivi(imp, pid, cle) {
+  var p = S.sv.data.praticiens.filter(function (x) { return x.id === pid; })[0];
+  return { p: p, l: p && (imp ? p.impayes : p.relances).filter(function (x) { return x.cle === cle; })[0] };
+}
+/** Le serveur renvoie le praticien modifié : on remplace ses données dans la liste affichée. */
+function appliquerSuivi(r) {
+  r.praticiens.forEach(function (np) { S.sv.data.praticiens = S.sv.data.praticiens.map(function (p) { return p.id === np.id ? np : p; }); });
+  S.sv.data.lu = r.lu; rendreSuivi(S.vue);
+}
+function histSuivi(l) {
+  return l.journal && l.journal.length ? '<div class="sec">Historique des modifications</div><div class="sv-hist">' + l.journal.map(function (j) { return '<div><b>' + esc(j.nom) + '</b> · ' + esc(dHeure(j.date)) + '<br>' + esc(j.detail) + '</div>'; }).join('') + '</div>' : '';
+}
+function ficheSuivi(imp, pid, cle) {
+  var x = ligneSuivi(imp, pid, cle), p = x.p, l = x.l; if (!l) return;
+  var info = '<div class="sv-d"><div><span>Praticien</span><span>' + esc(p.nom) + '</span></div><div><span>Date du soin</span><span>' + esc(joursFr(l.jour) || l.date) + '</span></div>' +
+    (imp ? '<div><span>Reste dû</span><span style="color:var(--red)">' + esc(l.reste) + '</span></div>' : '') + (l.remarque && !imp ? '<div><span>Remarque</span><span>' + esc(l.remarque) + '</span></div>' : '') + '</div>';
+  if (imp) {
+    tiroir(esc(l.patient), info +
+      '<button class="btn ok sv-regle" id="svOk">✓ Le patient a réglé</button><p class="hint" style="margin:0 0 6px">Décoche « Impayé » dans la journée du ' + esc(joursFr(l.jour)) + ', met le reste dû à 0 et note la date du règlement.</p>' +
+      '<div class="sec">Ou corriger</div><div class="fld"><label for="svRe">Reste dû</label><input type="text" id="svRe" inputmode="decimal" value="' + esc(String(l.nReste).replace('.', ',')) + '"></div>' +
+      '<div class="fld"><label for="svRm">Remarque</label><input type="text" id="svRm" value="' + esc(l.remarque) + '"></div><div class="err" id="svE"></div>' + histSuivi(l) +
+      '<p class="hint">Modifié aussi dans le classeur du mois de ' + esc(p.prenom) + ' (onglet du ' + esc(String(Number(l.jour.slice(8, 10)))) + ').</p>',
+      '<button class="btn" id="svA">Annuler</button><span class="sp"></span><button class="btn pri" id="svS">Enregistrer</button>');
+    $('#svOk').onclick = function () {
+      if (!confirm('Confirmer que ' + l.patient + ' a réglé ' + l.reste + ' ?')) return;
+      var b = this; b.disabled = true;
+      api('majImpaye', svPid(p), cle, 'regle', {}).then(function (r) { fermer(); appliquerSuivi(r); toast('Impayé marqué réglé'); }).catch(function (e) { b.disabled = false; $('#svE').textContent = msgErr(e); });
+    };
+    $('#svS').onclick = function () {
+      var b = this; b.disabled = true;
+      api('majImpaye', svPid(p), cle, 'modifier', { reste: $('#svRe').value, remarque: $('#svRm').value }).then(function (r) { fermer(); appliquerSuivi(r); toast('Impayé mis à jour'); }).catch(function (e) { b.disabled = false; $('#svE').textContent = msgErr(e); });
+    };
+  } else {
+    var dt = function (id, lab, val) { return '<div class="fld"><label for="' + id + '">' + lab + '</label><div class="sv-dt"><input type="date" id="' + id + '" value="' + esc(val || '') + '"><button class="btn sm" type="button" data-auj="' + id + '">Aujourd’hui</button></div></div>'; };
+    tiroir(esc(l.patient), info +
+      '<div class="fld"><label for="svMt">Montant du devis</label><input type="text" id="svMt" inputmode="decimal" value="' + esc(l.nMontant ? String(l.nMontant).replace('.', ',') : '') + '" placeholder="0,00"></div>' +
+      dt('svR1', 'Relance 1', l.r1) + dt('svR2', 'Relance 2', l.r2) + dt('svR3', 'Relance 3', l.r3) +
+      '<div class="fld"><label for="svNo">Notes de relance</label><textarea id="svNo" placeholder="Ce que le patient a répondu…">' + esc(l.notes) + '</textarea></div><div class="err" id="svE"></div>' + histSuivi(l) +
+      '<p class="hint">Enregistré dans « ' + esc(p.fichier) + ' » (colonnes saisies à la main, conservées à chaque mise à jour).</p>',
+      '<button class="btn" id="svA">Annuler</button><span class="sp"></span><button class="btn pri" id="svS">Enregistrer</button>');
+    $$('[data-auj]').forEach(function (b) { b.onclick = function () { $('#' + b.getAttribute('data-auj')).value = S.today; }; });
+    $('#svS').onclick = function () {
+      var b = this; b.disabled = true;
+      api('majRelance', svPid(p), cle, { montant: $('#svMt').value, r1: $('#svR1').value, r2: $('#svR2').value, r3: $('#svR3').value, notes: $('#svNo').value })
+        .then(function (r) { fermer(); appliquerSuivi(r); toast('Relance enregistrée'); }).catch(function (e) { b.disabled = false; $('#svE').textContent = msgErr(e); });
+    };
+  }
+  $('#svA').onclick = fermer;
 }
 
 demarrer();
