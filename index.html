@@ -823,6 +823,7 @@ html.mode-auth,html.mode-auth body{background:var(--deep)}
 .rl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
 .rl-c{display:flex;flex-direction:column;gap:8px;align-items:stretch;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh);cursor:pointer;font:inherit;color:inherit}
 .rl-c:hover{border-color:var(--line2);box-shadow:var(--sh-h)}
+.rl.ro .rl-c{cursor:default;opacity:1}.rl.ro .rl-c:hover{border-color:var(--line);box-shadow:var(--sh)}
 .rl-t{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .rl-t b{font-weight:600;font-size:15px}
 .rl-t small{color:var(--ink3);font-size:12.5px}
@@ -2394,7 +2395,7 @@ function rendrePersonnel() {
   if (!vis.length) h += '<div class="empty">Aucun membre ne correspond.</div>';
   $('#main').innerHTML = h;
   $('#pAdd').onclick = function () { fichePersonne(null); };
-  $$('.rl-c').forEach(function (c) { c.onclick = function () { ficheRole(c.getAttribute('data-r')); }; });
+  if (S.pers.peutAcces) $$('.rl-c').forEach(function (c) { c.onclick = function () { ficheRole(c.getAttribute('data-r')); }; });
   $('#pQ').oninput = function () { S.persQ = this.value; var pos = this.selectionStart; rendrePersonnel(); var n = $('#pQ'); n.focus(); n.setSelectionRange(pos, pos); };
   if ($('#pArch')) $('#pArch').onchange = function () { S.persArch = this.checked; rendrePersonnel(); };
   $$('.pc').forEach(function (c) {
@@ -2408,10 +2409,10 @@ var ROLES_PLURIEL = { 'Secrétaire': 'Secrétaires', 'Assistante dentaire': 'Ass
 /** Ce que chaque rôle voit dans l'application : un résumé par rôle, modifiable d'un geste. */
 function blocRoles(P) {
   var roles = ROLES_ORDRE.filter(function (r) { return P.roles.indexOf(r) >= 0; });
-  return '<div class="pg"><h2>Accès par rôle</h2><p class="hint" style="margin:-2px 0 10px">Ce que voit chaque catégorie de personnel. Touchez un rôle pour choisir ses onglets et ses droits ; cela s’applique à toutes les personnes de ce rôle.</p><div class="rl">' +
+  return '<div class="pg"><h2>Accès par rôle</h2><p class="hint" style="margin:-2px 0 10px">' + (P.peutAcces ? 'Ce que voit chaque catégorie de personnel. Touchez un rôle pour choisir ses onglets et ses droits ; cela s’applique à toutes les personnes de ce rôle. Vous seul pouvez modifier les accès.' : 'Ce que voit chaque catégorie de personnel. Seul Dr Maxime Berdugo peut modifier les accès.') + '</p><div class="rl' + (P.peutAcces ? '' : ' ro') + '">' +
     roles.map(function (r) {
       var l = P.permissionsRole[r] || [], nb = P.personnes.filter(function (p) { return p.role === r && !p.archive; }).length;
-      return '<button class="rl-c" data-r="' + esc(r) + '"><span class="rl-t"><b>' + esc(ROLES_PLURIEL[r] || r) + '</b><small>' + nb + ' personne' + (nb > 1 ? 's' : '') + '</small></span><span class="rl-o">' +
+      return '<button class="rl-c" data-r="' + esc(r) + '"' + (P.peutAcces ? '' : ' disabled') + '><span class="rl-t"><b>' + esc(ROLES_PLURIEL[r] || r) + '</b><small>' + nb + ' personne' + (nb > 1 ? 's' : '') + '</small></span><span class="rl-o">' +
         P.onglets.filter(function (o) { return o.cle !== 'ongletCompta' || r === 'Chirurgien-dentiste' || r === 'Administrateur'; }).map(function (o) { var on = l.indexOf(o.cle) >= 0; return '<span class="' + (on ? 'on' : 'off') + '">' + (on ? '✓ ' : '') + esc(o.libelle) + '</span>'; }).join('') +
         '</span></button>';
     }).join('') + '</div></div>';
@@ -2455,12 +2456,12 @@ function fichePersonne(p) {
     '<div class="two"><div class="fld"><label for="pPr">Prénom *</label><input type="text" id="pPr" maxlength="60" value="' + esc(p.prenom) + '"></div>' +
     '<div class="fld"><label for="pNo">Nom</label><input type="text" id="pNo" maxlength="60" value="' + esc(p.nom) + '"></div></div>' +
     '<div class="two"><div class="fld"><label for="pFo">Fonction *</label><select id="pFo">' + opt(P.fonctions, p.fonction) + '</select></div>' +
-    '<div class="fld"><label for="pRo">Rôle *</label><select id="pRo">' + opt(P.roles, p.role) + '</select></div></div>' +
+    '<div class="fld"><label for="pRo">Rôle *</label><select id="pRo"' + (P.peutAcces ? '' : ' disabled') + '>' + opt(P.roles, p.role) + '</select></div></div>' +
     '<div class="fld"><label for="pEm">Adresse e-mail (facultative)</label><input type="email" id="pEm" autocapitalize="none" inputmode="email" placeholder="prenom.nom@gmail.com" value="' + esc(p.email) + '">' +
     '<div class="hint">Nécessaire pour se connecter et recevoir les notifications. Modifier l’adresse ferme l’accès lié à l’ancienne.</div></div>' +
     '<label class="chk2" style="margin:4px 0 14px"><input type="checkbox" id="pAc"' + (p.actif ? ' checked' : '') + (p.archive ? ' disabled' : '') + '> Compte actif</label>' +
     '<div class="sec" style="margin-top:6px">Autorisations</div><div id="pPerms"></div>' +
-    '<div class="hint">Cochées par défaut selon le rôle ; vous pouvez les ajuster pour cette personne.</div>' +
+    '<div class="hint">' + (P.peutAcces ? 'Cochées par défaut selon le rôle ; vous pouvez les ajuster pour cette personne.' : 'Seul Dr Maxime Berdugo peut modifier le rôle et les autorisations. Un nouveau membre reçoit le rôle de sa fonction.') + '</div>' +
     '<div class="err" id="pErr"></div>' +
     (nouveau ? '' : '<div class="sec">Historique</div><div id="pHist"><div class="load" style="padding:16px"><div class="spin"></div></div></div>');
   var pied = (nouveau ? '' : '<button class="btn ' + (p.archive ? '' : 'ko') + '" id="pArc">' + (p.archive ? 'Restaurer' : 'Archiver') + '</button>' +
@@ -2471,7 +2472,7 @@ function fichePersonne(p) {
   var dessinerPerms = function () {
     var d = defauts($('#pRo').value);
     var ligne = function (x) {
-      return '<label class="perm"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + '><span>' + esc(x.libelle) +
+      return '<label class="perm' + (P.peutAcces ? '' : ' dis') + '"><input type="checkbox" data-k="' + esc(x.cle) + '"' + (perms[x.cle] ? ' checked' : '') + (P.peutAcces ? '' : ' disabled') + '><span>' + esc(x.libelle) +
         '<small>' + (d[x.cle] ? 'Inclus dans le rôle' : 'Non inclus dans le rôle') + (perms[x.cle] !== !!d[x.cle] ? ' · personnalisé' : '') + '</small></span></label>';
     };
     var og = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') === 0; }), dr = P.permissions.filter(function (x) { return x.cle.indexOf('onglet') !== 0; });
@@ -2480,7 +2481,7 @@ function fichePersonne(p) {
   };
   dessinerPerms();
   $('#pRo').onchange = function () { var d = defauts(this.value); P.permissions.forEach(function (x) { perms[x.cle] = !!d[x.cle]; }); dessinerPerms(); };
-  $('#pFo').onchange = function () { if (!$('#pRo').value && P.roles.indexOf(this.value) >= 0) { $('#pRo').value = this.value; $('#pRo').onchange(); } };
+  $('#pFo').onchange = function () { if ((!$('#pRo').value || !P.peutAcces) && P.roles.indexOf(this.value) >= 0 && (nouveau || P.peutAcces)) { $('#pRo').value = this.value; $('#pRo').onchange(); } };
   $('#pAnn').onclick = fermer;
   var enregistrer = function (confirmerDoublon) {
     var d = { id: p.id, prenom: $('#pPr').value.trim(), nom: $('#pNo').value.trim(), fonction: $('#pFo').value, role: $('#pRo').value, email: $('#pEm').value.trim(), actif: $('#pAc').checked, permissions: perms, confirmerDoublon: !!confirmerDoublon };
