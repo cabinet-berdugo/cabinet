@@ -1019,7 +1019,20 @@ var push = {
   }
 };
 if (AUTONOME && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(function () { });
+  navigator.serviceWorker.register('sw.js').then(function (reg) {
+    // l'application revient au premier plan (iPhone : elle peut rester en mémoire des heures) : on vérifie s'il y a une nouvelle version
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') reg.update().catch(function () { }); });
+    setInterval(function () { if (document.visibilityState === 'visible') reg.update().catch(function () { }); }, 30 * 60000);
+  }).catch(function () { });
+  // nouvelle version installée : on recharge, sans jamais interrompre une saisie en cours
+  var dejaControle = !!navigator.serviceWorker.controller, aRecharger = false;
+  var rechargerSiLibre = function () {
+    var occupe = $('#drawer') && $('#drawer').innerHTML || $('#modal') && $('#modal').innerHTML || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+    if (occupe) { aRecharger = true; return; }
+    location.reload();
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', function () { if (dejaControle) rechargerSiLibre(); dejaControle = true; });
+  document.addEventListener('click', function () { if (aRecharger) setTimeout(rechargerSiLibre, 300); }, true);
   // clic sur une notification alors que l'application est déjà ouverte
   navigator.serviceWorker.addEventListener('message', function (e) {
     var d = e.data || {};

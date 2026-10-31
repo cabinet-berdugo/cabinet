@@ -1,5 +1,5 @@
 // Service worker du Cabinet Berdugo : ouverture rapide, et notifications même application fermée.
-const VERSION = 'v-4bb6aa3819';
+const VERSION = 'v-e21ee16b99';
 const API = 'https://script.google.com/macros/s/AKfycbzbVH_ipWjDwJzQ2q7SCj0VqC5K9pI_4tovfU-ywQ0ez8i24ElDaF0t-nVsg6avISw/exec';
 const FICHIERS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -14,8 +14,10 @@ self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
   if (r.mode === 'navigate') {
-    e.respondWith(fetch(r).then(rep => { const c = rep.clone(); caches.open(VERSION).then(x => x.put('./index.html', c)); return rep; })
-      .catch(() => caches.match('./index.html')));
+    e.respondWith(fetch(r).then(rep => {
+      if (!rep.ok) return caches.match('./index.html').then(m => m || rep); // incident passager du site : on garde la dernière bonne version
+      const c = rep.clone(); caches.open(VERSION).then(x => x.put('./index.html', c)); return rep;
+    }).catch(() => caches.match('./index.html')));
     return;
   }
   e.respondWith(caches.match(r).then(m => m || fetch(r)));
