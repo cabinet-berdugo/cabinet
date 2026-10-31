@@ -394,6 +394,53 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .mbar2{display:flex;gap:8px}
 .mbar2 .btn{box-shadow:0 4px 14px rgba(0,0,0,.12);padding:12px;font-size:15px;justify-content:center}
 .mbar2 .btn.pri{flex:1}
+/* Comptabilité */
+.cp-pr{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px;scrollbar-width:none}
+.cp-pr::-webkit-scrollbar{display:none}
+.cp-pr button{flex:none;border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;color:var(--ink2);cursor:pointer}
+.cp-pr button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.cp-mo{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.cp-mo button{border:1px solid var(--line2);background:var(--card);width:40px;height:40px;border-radius:11px;font-size:18px;color:var(--ink2);cursor:pointer;flex:none}
+.cp-mo b{flex:1;text-align:center;font-size:16.5px}
+.cp-k{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.cp-k div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;box-shadow:var(--sh);min-width:0}
+.cp-k small{display:block;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.cp-k b{display:block;font-size:22px;font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-k .ca{background:var(--deep);border-color:var(--deep);color:#fff}
+.cp-k .ca small{color:rgba(255,255,255,.72)} .cp-k .ca b{font-size:27px}
+@media (max-width:760px){.cp-k{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cp-k .ca{grid-column:1/-1}.cp-k div{padding:11px 11px}.cp-k small{font-size:11.5px}.cp-k b{font-size:16.5px}.cp-k .ca b{font-size:28px}}
+.cp-et{display:flex;gap:8px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:14px;background:var(--ambbg);color:var(--amb)}
+.cp-et.ok{background:var(--grnbg);color:var(--grn)}
+.cp-l{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);overflow:hidden}
+.cp-j{border-bottom:1px solid var(--line)}
+.cp-j:last-child{border-bottom:0}
+.cp-j>button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:12px 14px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.cp-j .d{flex:1;font-weight:600}
+.cp-j .t{font-weight:700;font-variant-numeric:tabular-nums}
+.cp-j .chev{width:16px;height:16px;color:var(--ink3);transition:transform .15s}
+.cp-j.open .chev{transform:rotate(90deg)}
+.cp-j .bar{height:4px;border-radius:2px;background:var(--accbg);margin:0 14px 10px;overflow:hidden}
+.cp-j .bar i{display:block;height:100%;background:var(--acc);border-radius:2px}
+.cp-md{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px}
+.cp-md span{background:#eef3f3;color:var(--ink2);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600}
+.cp-zero{color:var(--ink3);font-weight:400}
+table.cp-t{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.cp-t th{text-align:right;font-size:12.5px;color:var(--ink2);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:#f4f7f7}
+.cp-t th:first-child,.cp-t td:first-child{text-align:left}
+.cp-t td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line)}
+.cp-t tr:last-child td{border-bottom:0}
+.cp-t .neg{color:var(--red);font-weight:600} .cp-t .pos{color:var(--grn);font-weight:600}
+.cp-i{padding:12px 14px;border-bottom:1px solid var(--line)}
+.cp-i:last-child{border-bottom:0}
+.cp-i .h{display:flex;gap:8px;align-items:baseline}
+.cp-i .h b{flex:1}
+.cp-i .h span{font-weight:700;font-variant-numeric:tabular-nums}
+.cp-i .m{color:var(--ink2);font-size:13px;margin-top:2px}
+.cp-vide{padding:16px 14px;color:var(--ink3);font-size:14px}
+.cp-o{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.cp-s{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.cp-s .n{font-size:13px;color:var(--ink3);font-weight:500}
+
 .stp{display:flex;align-items:center;border:1px solid var(--line2);border-radius:10px;overflow:hidden;flex:none;background:var(--card)}
 .stp button{width:38px;height:38px;border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--acc)}
 .stp button:disabled{color:var(--line2);cursor:default}
@@ -468,6 +515,9 @@ header{background:var(--deep);border-bottom:0;color:#fff}
 .tab{color:rgba(255,255,255,.7);font-weight:600;padding:8px 14px;border-radius:10px}
 .tab:hover{background:rgba(255,255,255,.08);color:#fff}
 .tab.on{background:rgba(255,255,255,.15);color:#fff}
+.tab{white-space:nowrap}
+@media (max-width:1180px){.tabs{margin-left:4px;gap:2px}.tab{padding:8px 10px}}
+.who{white-space:nowrap}
 .cnt{background:#e5484d;box-shadow:0 0 0 2px var(--deep)}
 .who{color:rgba(255,255,255,.66)} .who b{color:#fff}
 .out{color:rgba(255,255,255,.75)}
@@ -634,6 +684,7 @@ html.mode-auth body{background:var(--deep)}
       <button class="tab" data-v="planning">Planning</button>
       <button class="tab" data-v="conges">Congés<span class="cnt hidden" id="c2"></span></button>
       <button class="tab" data-v="materiel">Matériel<span class="cnt hidden" id="c3"></span></button>
+      <button class="tab hidden" data-v="compta" id="tabCpt">Comptabilité</button>
       <button class="tab hidden" data-v="personnel" id="tabPers">Personnel</button>
     </nav>
     <span class="sp"></span>
@@ -648,6 +699,7 @@ html.mode-auth body{background:var(--deep)}
   <button data-v="planning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Planning</button>
   <button data-v="conges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 0 1 7 7H5a7 7 0 0 1 7-7Z"/><path d="M12 10v10M8 20h8"/></svg>Congés<span class="cnt hidden" id="c2m"></span></button>
   <button data-v="materiel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg>Matériel<span class="cnt hidden" id="c3m"></span></button>
+  <button data-v="compta" class="hidden" id="bnCpt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Compta</button>
   <button data-v="personnel" class="hidden" id="bnPers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg>Personnel</button>
 </nav>
 <div id="drawer"></div>
@@ -818,8 +870,9 @@ function appliquerDemarrage(d) {
     majCloche();
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
+    ['#tabCpt', '#bnCpt'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
     S.f.portee = 'tout';
-    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 ? PARAMS.v : 'taches';
+    var v = ['planning', 'conges', 'materiel'].indexOf(PARAMS.v) >= 0 || (PARAMS.v === 'compta' && S.cfg.compta) ? PARAMS.v : 'taches';
     aller(v);
     if (PARAMS.t) ouvrirTache(PARAMS.t);
     PARAMS.t = ''; PARAMS.v = '';
@@ -1224,6 +1277,7 @@ function aller(v) {
   if (v === 'conges') { rendreConges(); rafraichirConges(); }
   if (v === 'personnel') chargerPersonnel();
   if (v === 'materiel') { rendreMateriel(); chargerMateriel(); }
+  if (v === 'compta') ouvrirCompta();
 }
 
 function majCompteurs() {
@@ -2668,6 +2722,86 @@ function formFournisseur(x) {
     api('enregistrerFournisseur', { nom: $('#fN').value, email: $('#fM').value, note: $('#fT').value })
       .then(function (r) { S.mat = r; gererCatalogue(); toast('Fournisseur enregistré'); }).catch(function (e) { b.disabled = false; $('#fE').textContent = msgErr(e); });
   };
+}
+
+// ───────── Comptabilité (lecture seule, depuis les classeurs Google Sheets) ─────────
+S.cpt = { pid: '', annee: 0, mois: 0, data: null, tous: false };
+function ouvrirCompta() {
+  if (!S.cpt.pid) S.cpt.pid = S.me.id;
+  if (!S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); }
+  rendreCompta(); chargerCompta();
+}
+function chargerCompta(force) {
+  var c = S.cpt, cle = c.pid + ':' + c.annee + '-' + c.mois;
+  c.charge = cle; if (force) c.data = null;
+  rendreCompta();
+  api('getCompta', c.pid === S.me.id ? '' : c.pid, c.annee, c.mois).then(function (r) {
+    if (c.charge !== cle) return; // l'utilisateur a changé de mois ou de praticien entre-temps
+    c.data = r; if (S.vue === 'compta') rendreCompta();
+  }).catch(function (e) { if (c.charge === cle) { c.data = { erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
+}
+var MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+function eur(n) { return (Math.round(n * 100) / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+function rendreCompta() {
+  var c = S.cpt, d = c.data && !c.data.erreur && c.data.annee === c.annee && c.data.mois === c.mois ? c.data : null;
+  var tous = S.cfg.compta && S.cfg.compta.tous;
+  var h = '<div class="ph"><div class="ph-t"><h1>Comptabilité</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires de chaque praticien, jour par jour, et leurs impayés et relances. ' : 'Votre chiffre d’affaires du mois, jour par jour, et vos impayés et relances. ') +
+    'Les chiffres viennent des classeurs Google Sheets : on continue de les remplir là-bas.</p></div></div>';
+  if (tous) h += '<div class="cp-pr">' + tous.map(function (p) { return '<button data-pp="' + esc(p.id) + '" class="' + (p.id === c.pid ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
+  h += '<div class="cp-mo"><button id="cpP" aria-label="Mois précédent">‹</button><b>' + MOIS_NOMS[c.mois - 1] + ' ' + c.annee + '</b><button id="cpN" aria-label="Mois suivant">›</button><button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
+  if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
+  else if (!d) h += '<div class="load"><div class="spin"></div>Lecture du classeur…</div>';
+  else if (!d.trouve) h += '<div class="empty">Pas de classeur « ' + esc(d.fichier) + ' » dans Google Drive.<div class="hint" style="margin-top:6px">Le nom du fichier doit être exactement celui-ci.</div></div>' + suiviCompta(d);
+  else {
+    var jours = d.jours || [], max = Math.max.apply(null, jours.map(function (j) { return j.n; }).concat([1]));
+    var actifs = jours.filter(function (j) { return j.n > 0; });
+    h += (d.etat ? '<div class="cp-et' + (/^✓/.test(d.etat) ? ' ok' : '') + '">' + esc(d.etat) + '</div>' : '') +
+      '<div class="cp-k"><div class="ca"><small>Chiffre d’affaires facturé</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div>' +
+      '<div><small>Encaissé</small><b>' + (d.encaisse ? eur(d.totalEncaisse) : '—') + '</b></div>' +
+      '<div><small>Jours travaillés</small><b>' + esc(d.joursTravailles || actifs.length) + '</b></div>' +
+      '<div><small>Moyenne / jour</small><b>' + esc(d.moyenne || '—') + '</b></div></div>';
+    h += '<div class="cp-s"><h2>Jour par jour</h2>' + (jours.length > actifs.length ? '<button class="lk" id="cpTous">' + (c.tousJours ? 'Jours travaillés seulement' : 'Afficher tous les jours') + '</button>' : '') + '</div>';
+    var liste = c.tousJours ? jours : actifs;
+    h += liste.length ? '<div class="cp-l">' + liste.map(function (j, i) {
+      var k = j.date, o = !!(c.ouverts || {})[k];
+      return '<div class="cp-j' + (o ? ' open' : '') + '" data-j="' + esc(k) + '"><button><span class="d">' + esc(j.date) + '</span><span class="t' + (j.n ? '' : ' cp-zero') + '">' + esc(j.total) + '</span>' + CHEV + '</button>' +
+        (j.n ? '<div class="bar"><i style="width:' + Math.round(j.n / max * 100) + '%"></i></div>' : '') +
+        (o ? '<div class="cp-md">' + (d.modes || []).map(function (m, x) { return euros(j.modes[x]) ? '<span>' + esc(m) + ' ' + esc(j.modes[x]) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
+    }).join('') + '</div>' : '<div class="empty">Aucune journée remplie pour l’instant ce mois-ci.</div>';
+    if (d.encaisse && d.encaisse.length) {
+      h += '<h2>Facturé et encaissé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><tr><th>Mode</th><th>Facturé</th><th>Encaissé</th><th>Écart</th></tr>' +
+        d.encaisse.map(function (x) { return '<tr><td>' + esc(x.mode) + '</td><td>' + esc(x.facture) + '</td><td>' + esc(x.encaisse || '—') + '</td><td class="' + (x.nEcart < 0 ? 'neg' : x.nEcart > 0 ? 'pos' : '') + '">' + esc(x.ecart || '—') + '</td></tr>'; }).join('') + '</table></div>';
+    }
+    h += suiviCompta(d);
+  }
+  if (d) h += '<div class="cp-o">' + (d.url ? '<a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir le classeur du mois</a>' : '') + (d.suivi && d.suivi.url ? '<a class="btn" href="' + esc(d.suivi.url) + '" target="_blank" rel="noopener">Ouvrir impayés et relances</a>' : '') + '</div>' +
+    '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. Les boutons ouvrent Google Sheets avec les droits de votre compte Google.</p>';
+  $('#main').innerHTML = h;
+  $$('[data-pp]').forEach(function (b) { b.onclick = function () { S.cpt.pid = b.getAttribute('data-pp'); S.cpt.ouverts = {}; chargerCompta(true); }; });
+  $('#cpP').onclick = function () { if (--c.mois < 1) { c.mois = 12; c.annee--; } c.ouverts = {}; chargerCompta(true); };
+  $('#cpN').onclick = function () { if (++c.mois > 12) { c.mois = 1; c.annee++; } c.ouverts = {}; chargerCompta(true); };
+  $('#cpR').onclick = function () { chargerCompta(true); };
+  if ($('#cpTous')) $('#cpTous').onclick = function () { c.tousJours = !c.tousJours; rendreCompta(); };
+  $$('.cp-j>button').forEach(function (b) { b.onclick = function () { var k = b.parentNode.getAttribute('data-j'); c.ouverts = c.ouverts || {}; c.ouverts[k] = !c.ouverts[k]; rendreCompta(); }; });
+}
+function euros(t) { var n = parseFloat(String(t || '').replace(/[^\d,.-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
+/** Impayés et relances de devis (fichier « Impayés et relances - Prénom »). */
+function suiviCompta(d) {
+  var s = d.suivi || {}, h = '';
+  var bloc = function (titre, t, montantCol) {
+    if (!t) return '<h2>' + titre + '</h2><div class="cp-l"><div class="cp-vide">' + (s.trouve ? 'Onglet introuvable.' : 'Fichier « ' + esc(s.fichier || '') + ' » introuvable dans Google Drive.') + '</div></div>';
+    var col = t.colonnes || [], ix = function (re) { for (var i = 0; i < col.length; i++) if (re.test(col[i])) return i; return -1; };
+    var iD = ix(/^date/i), iP = ix(/^patient/i), iM = ix(montantCol), iR = ix(/^remarque/i);
+    return '<div class="cp-s"><h2>' + titre + (t.lignes.length ? ' (' + t.lignes.length + ')' : '') + '</h2><span class="n">' + esc((t.maj.match(/mis à jour.*$/i) || [''])[0]) + '</span></div><div class="cp-l">' +
+      (t.lignes.length ? t.lignes.map(function (l) {
+        var autres = col.map(function (c, i) { return i !== iD && i !== iP && i !== iM && i !== iR && l[i] ? c + ' : ' + l[i] : ''; }).filter(String);
+        return '<div class="cp-i"><div class="h"><b>' + esc(iP >= 0 ? l[iP] : l[1]) + '</b><span>' + esc(iM >= 0 ? l[iM] : '') + '</span></div><div class="m">' + esc([iD >= 0 ? l[iD] : '', iR >= 0 ? l[iR] : ''].filter(String).join(' · ')) + '</div>' +
+          (autres.length ? '<div class="m">' + esc(autres.join(' · ')) + '</div>' : '') + '</div>';
+      }).join('') : '<div class="cp-vide">' + esc(t.maj.split('—')[0].trim() || 'Rien pour l’instant.') + '</div>') + '</div>';
+  };
+  h += bloc('Impayés', s.impayes, /^reste/i);
+  h += bloc('Relances de devis', s.relances, /^montant/i);
+  return h;
 }
 
 demarrer();
