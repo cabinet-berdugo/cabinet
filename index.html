@@ -9,10 +9,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Cabinet">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="robots" content="noindex">
 <meta charset="utf-8">
-<meta name="theme-color" content="#0f6e64">
+<meta name="theme-color" content="#0a3b39">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <style>
 :root{
   --bg:#f5f4f0; --card:#ffffff; --line:#e3e1da; --line2:#cfccc2;
@@ -437,13 +439,177 @@ h2.etage{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:
 .auth input.code{letter-spacing:.4em;font-size:22px!important;text-align:center;font-variant-numeric:tabular-nums}
 .out{border:0;background:none;color:var(--ink3);font-size:12.5px;cursor:pointer;padding:2px 0;text-decoration:underline}
 .me-m{cursor:pointer}
+
+/* ═══════════ Habillage : porcelaine et lagon ═══════════ */
+:root{
+  --bg:#edf1f2; --card:#ffffff; --line:#dde5e6; --line2:#c5d1d3;
+  --ink:#102a2e; --ink2:#4a6166; --ink3:#7f9397;
+  --acc:#0b6f69; --acc2:#075550; --accbg:#e0f0ed;
+  --deep:#0a3b39; --deep2:#0f4a47;
+  --amb:#9a5806; --ambbg:#fcf0d9; --red:#b42318; --redbg:#fdecea;
+  --grn:#1b7a4a; --grnbg:#e2f3e9; --blu:#1f5c99; --blubg:#e5eef8;
+  --r:14px; --sh:0 1px 2px rgba(16,42,46,.05),0 3px 10px rgba(16,42,46,.04);
+}
+html,body{font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15.5px;line-height:1.5}
+body{overflow-x:clip;-webkit-font-smoothing:antialiased}
+h1,h2,.dtitle{letter-spacing:-.022em}
+h2{font-size:17px;font-weight:700;margin:26px 0 12px}
+:focus-visible{outline:3px solid rgba(11,111,105,.38);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Bandeau du haut : lagon profond, d'un seul tenant avec le titre de la page */
+header{background:var(--deep);border-bottom:0;color:#fff}
+.hd{padding:12px 20px}
+.logo{color:#fff;font-weight:700;font-size:16.5px;letter-spacing:-.015em}
+.logo i{width:34px;height:34px;border-radius:11px;background:#fff;color:var(--deep)}
+.logo i svg{width:21px;height:21px}
+.tab{color:rgba(255,255,255,.7);font-weight:600;padding:8px 14px;border-radius:10px}
+.tab:hover{background:rgba(255,255,255,.08);color:#fff}
+.tab.on{background:rgba(255,255,255,.15);color:#fff}
+.cnt{background:#e5484d;box-shadow:0 0 0 2px var(--deep)}
+.who{color:rgba(255,255,255,.66)} .who b{color:#fff}
+.out{color:rgba(255,255,255,.75)}
+.bell{color:rgba(255,255,255,.9)} .bell:hover{background:rgba(255,255,255,.1)}
+.me-m{color:rgba(255,255,255,.85);font-weight:600;cursor:pointer}
+main{padding-top:0}
+.ph{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;color:#fff;
+  padding:14px 0 30px;margin-bottom:22px;background:var(--deep);box-shadow:0 0 0 100vmax var(--deep);clip-path:inset(0 -100vmax)}
+.ph-t{flex:1 1 320px;min-width:0}
+.ph h1{margin:0;font-size:31px;font-weight:700;line-height:1.1;color:#fff}
+.ph-g{margin:8px 0 0;color:rgba(255,255,255,.72);font-size:14.5px;line-height:1.45;max-width:64ch}
+.ph-a{display:flex;gap:8px;flex-wrap:wrap}
+.ph .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
+.ph .btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.45)}
+.ph .btn.pri{background:#fff;border-color:#fff;color:var(--deep);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.ph .btn.pri:hover{background:#e9f4f2}
+.nvadr{border-radius:12px;margin-top:12px}
+@media (max-width:760px){
+  .hd{padding:10px 16px}
+  .ph{padding:6px 0 22px;margin-bottom:16px}
+  .ph h1{font-size:25px}
+  .ph-g{font-size:14px}
+  .ph-a{width:100%} .ph-a .btn{flex:1;justify-content:center;padding:11px 14px}
+}
+
+/* Navigation du bas (téléphone) */
+@media (max-width:760px){
+  .bnav{background:rgba(255,255,255,.96);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);border-top:1px solid var(--line)}
+  .bnav button{color:var(--ink3);font-weight:600;font-size:11.5px;padding:7px 0 9px}
+  .bnav button svg{width:52px;height:30px;padding:4px 15px;border-radius:15px;margin-bottom:3px;transition:background .15s,color .15s}
+  .bnav button.on{color:var(--acc2)}
+  .bnav button.on svg{background:var(--accbg)}
+  .bnav .cnt{top:3px;margin-left:8px;box-shadow:0 0 0 2px #fff}
+}
+
+/* Boutons */
+.btn{border-radius:10px;padding:9px 15px;font-weight:600;font-size:14.5px;border-color:var(--line2);transition:background .12s,border-color .12s,box-shadow .12s}
+.btn:hover{border-color:var(--ink3)}
+.btn.pri{box-shadow:0 1px 2px rgba(7,85,80,.35),inset 0 1px 0 rgba(255,255,255,.12)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px}
+.btn.ok{border-color:#b5dcc4}
+.lk{font-weight:600}
+.sbtn{border-radius:10px;font-weight:700}
+
+/* Surfaces */
+.tc,.cg-c,.pc,.mc,.stat,.salle,.day,.ml,.grid,.refuse{border-color:var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.tc{padding:15px 16px;gap:14px}
+.tc .tt{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+.tc.st-todo,.tc.st-cours,.tc.st-fin,.tc.late{border-left:1px solid var(--line);padding-left:20px;position:relative;overflow:hidden}
+.tc.st-todo::before,.tc.st-cours::before,.tc.st-fin::before,.tc.late::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#b9c4c7}
+.tc.st-cours::before{background:#e08a1e} .tc.st-fin::before{background:#1f8a4c} .tc.late::before{background:var(--red)}
+.tc:hover,.pc:hover,.stat:hover{border-color:var(--line2)}
+.meta{color:var(--ink2);font-size:13.5px}
+.pill{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+.p-todo{background:#e9eef0;color:#45575c}
+.p-cours{background:#fde9d2;color:#9a4a00}
+.stats{gap:12px}
+.stat{padding:14px 16px;transition:border-color .12s,background .12s}
+.stat small{font-size:13px;font-weight:600;color:var(--ink2)}
+.stat b{font-size:28px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat.on{border-color:var(--acc);background:var(--accbg);box-shadow:0 0 0 1px var(--acc)}
+.empty{background:transparent;border:1.5px dashed var(--line2);border-radius:var(--r);padding:34px 22px;color:var(--ink2);font-size:14.5px}
+
+/* Contrôles segmentés et filtres */
+.seg{background:#e2e9ea;border:0;border-radius:11px;padding:3px;gap:2px}
+.seg button{border-radius:9px;padding:7px 13px;font-weight:600;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(16,42,46,.14)}
+.seg-v{margin-bottom:16px}
+.filters select,.filters input,.mq,.selp-q{border-radius:10px;border-color:var(--line2);background:var(--card)}
+.filters select,.filters input{padding:8px 11px;min-height:40px}
+.mq{padding:13px 15px;border-radius:12px;box-shadow:var(--sh);border-color:var(--line)}
+.filters input:focus,.filters select:focus,.mq:focus{outline:0;border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,111,105,.16)}
+
+/* Formulaires */
+.fld label{font-size:13.5px;font-weight:600;color:var(--ink)}
+.fld input[type=text],.fld input[type=email],.fld input[type=password],.fld input[type=date],.fld input[type=time],.fld input[type=url],.fld select,.fld textarea{border-radius:10px;padding:11px 12px;border-color:var(--line2);transition:border-color .12s,box-shadow .12s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:0;border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,111,105,.16)}
+.hint{color:var(--ink3);font-size:13px}
+.chip,.pch{border-radius:999px}
+
+/* Libellés de section : en clair, sans majuscules */
+.sec,.pg h2,h2.etage,.selp-gt,.mg{text-transform:none;letter-spacing:-.005em;font-size:14px;font-weight:700;color:var(--ink)}
+.sec{margin:26px 0 10px}
+.selp-gt{font-size:12.5px;color:var(--ink2)}
+.auj-t,.ajd-t{text-transform:none;letter-spacing:0;font-size:13px}
+.ma-t .ch{text-transform:none;letter-spacing:0;font-size:12px}
+
+/* Panneau latéral et fenêtres */
+.ov{background:rgba(8,32,34,.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.dr{box-shadow:-12px 0 40px rgba(8,32,34,.18)}
+@media (min-width:761px){.dr{border-radius:20px 0 0 20px}}
+.dr-h{padding:16px 20px;border-bottom:1px solid var(--line)}
+.dr-h b{font-size:17px;font-weight:700;letter-spacing:-.015em}
+.dr-b{padding:20px}
+.dr-f{padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#f7f9f9}
+.x{border-radius:10px;background:var(--bg)}
+.dtitle{font-size:22px;font-weight:700}
+.acts,.ma,.desc{background:#f2f6f6;border-radius:12px}
+.modal{background:rgba(8,32,34,.5)}
+.modal .box{border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(8,32,34,.3)}
+.toast{background:var(--deep);border-radius:12px;font-weight:600}
+.alerte-n{border-radius:14px}
+
+/* Planning, affectations, aujourd'hui */
+.pl th,.pl td.nm{background:#f4f7f7}
+.ajd,.auj{background:var(--accbg);border-color:#c3e1db;border-radius:var(--r)}
+.af{border-radius:10px;background:#f8fafa}
+
+/* Matériel */
+.mc{overflow:hidden}
+.mc-h{padding:16px}
+.mc-h b{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.ms-h{background:#f4f7f7}
+.ma-r .cb{border-radius:8px}
+
+/* Écran de connexion : sur le lagon */
+html{background:var(--deep)}
+body{min-height:100vh}
+html.mode-auth body{background:var(--deep)}
+.logo{white-space:nowrap}
+.av-m{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:13.5px;letter-spacing:.02em;border:1.5px solid rgba(255,255,255,.35)}
+@media (max-width:760px){
+  .stats.st3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px;padding:0}
+  .stats.st3 .stat{min-width:0;padding:10px 12px}
+  .stats.st3 .stat b{font-size:23px}
+  .filters .seg button{font-size:14px;padding:8px 4px}
+  .logo span{font-size:16px}
+}
+.auth{margin-top:9vh}
+.auth .brand{color:#fff;margin-bottom:26px}
+.auth .brand i{background:#fff;color:var(--deep);width:46px;height:46px;border-radius:14px}
+.auth .brand i svg{width:28px;height:28px}
+.auth .brand b{font-size:21px;font-weight:700}
+.auth .brand small{color:rgba(255,255,255,.7);font-size:14px}
+.auth .box{border:0;border-radius:20px;padding:26px 24px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
+.auth h1{font-size:22px;font-weight:700}
+.auth .btn.pri{padding:13px 14px;font-size:15.5px;border-radius:12px}
 </style>
 </head>
 <body>
 <div id="busy" class="busy hidden"></div>
 <header>
   <div class="hd">
-    <div class="logo"><i>+</i><span id="appName">Cabinet</span></div>
+    <div class="logo"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/></svg></i><span id="appName">Cabinet</span></div>
     <nav class="tabs" id="tabs">
       <button class="tab on" data-v="taches">Tâches<span class="cnt hidden" id="c1"></span></button>
       <button class="tab" data-v="planning">Planning</button>
@@ -609,6 +775,11 @@ function demarrer() {
     $('#main').innerHTML = '<div class="refuse"><h1>Erreur</h1><p>' + esc(msgErr(e)) + '</p><button class="btn pri" onclick="location.reload()">Réessayer</button></div>';
   });
 }
+function initiales(u) {
+  var p = String(u.prenom || u.nom || '?').trim(), mots = String(u.nom || '').replace(/^Dr\s+/, '').trim().split(/\s+/);
+  var der = mots.length > 1 ? mots[mots.length - 1] : '';
+  return (p.charAt(0) + (der && der !== p ? der.charAt(0) : '')).toUpperCase();
+}
 function appliquerDemarrage(d) {
   {
     var init = d.init;
@@ -616,10 +787,11 @@ function appliquerDemarrage(d) {
     S.taches = d.taches; S.charge = true; S.vT = d.vTaches; S.conges = d.conges; S.auj = d.auj; S.matAttente = d.matAttente || 0;
     S.notifs = d.notifs; S.notifVues = {}; d.notifs.liste.forEach(function (n) { S.notifVues[n.id] = 1; });
     S.semaine = lundi(S.today);
-    $('header').classList.remove('hidden'); $('#bnav').classList.remove('hidden');
+    $('header').classList.remove('hidden'); $('#bnav').classList.remove('hidden'); document.documentElement.classList.remove('mode-auth');
     $('#appName').textContent = S.cfg.nomApp;
     $('#who').innerHTML = '<b>' + esc(S.me.nom) + '</b>' + esc(S.me.role) + ' · <button class="out" id="out1">Se déconnecter</button>';
-    $('#meM').textContent = S.me.nom;
+    $('#meM').innerHTML = '<span class="av-m" title="Mon compte">' + esc(initiales(S.me)) + '</span>';
+    $('#meM').setAttribute('aria-label', 'Mon compte : ' + S.me.nom);
     $('#out1').onclick = seDeconnecter;
     $('#meM').onclick = monCompte;
     $('#who b').style.cursor = 'pointer'; $('#who b').onclick = monCompte;
@@ -922,8 +1094,8 @@ function seDeconnecter() {
 // ───────── Connexion ─────────
 var A = { email: '' };
 function cadreAuth(contenu) {
-  $('header').classList.add('hidden'); $('#bnav').classList.add('hidden');
-  $('#main').innerHTML = '<div class="auth"><div class="brand"><i>+</i><div><b>Cabinet Berdugo</b><small>Tâches · Planning · Congés</small></div></div><div class="box">' + contenu + '</div></div>';
+  $('header').classList.add('hidden'); $('#bnav').classList.add('hidden'); document.documentElement.classList.add('mode-auth');
+  $('#main').innerHTML = '<div class="auth"><div class="brand"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/></svg></i><div><b>Cabinet Berdugo</b><small>L’espace de travail de l’équipe</small></div></div><div class="box">' + contenu + '</div></div>';
 }
 function ecranConnexion(message) {
   cadreAuth(
@@ -1053,8 +1225,8 @@ function rendreTaches() {
   var optsSt = [['ouvertes', 'Non terminées'], ['tous', 'Tous statuts']].concat(S.cfg.statuts.map(function (s) { return [s, s]; }))
     .map(function (o) { return '<option value="' + esc(o[0]) + '"' + (f.statut === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
   $('#main').innerHTML =
-    '<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Tâches et demandes</h1><span class="sp"></span>' +
-    '<button class="btn pri" id="nv">+ Nouvelle tâche</button></div>' +
+    '<div class="ph"><div class="ph-t"><h1>Tâches et demandes</h1><p class="ph-g">Touchez une tâche pour l’ouvrir. Indiquez « En cours » quand vous commencez, « Terminée » quand c’est fait.</p></div><div class="ph-a">' +
+    '<button class="btn pri" id="nv">+ Nouvelle tâche</button></div></div>' +
     '<div id="ajd"></div><div class="stats st3" id="stats"></div>' +
     '<div class="filters">' +
     '<div class="seg" id="seg"><button data-p="tout">Toutes</button><button data-p="moi">Mes tâches</button><button data-p="crees">Mes demandes</button></div>' +
@@ -1500,8 +1672,8 @@ function ouvrirPlanning() {
   else chargerPlanning(S.semaine);
 }
 function enTetePlanning() {
-  return '<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Planning</h1><span class="sp"></span>' +
-    '<div class="seg" id="plSeg">' + vuesPlanning().map(function (v) { return '<button data-pv="' + v[0] + '"' + (S.plVue === v[0] ? ' class="on"' : '') + '>' + v[1] + '</button>'; }).join('') + '</div></div>';
+  return '<div class="ph"><div class="ph-t"><h1>Planning</h1><p class="ph-g">Qui travaille, dans quelle salle et avec qui. Choisissez la vue qui vous convient.</p></div></div>' +
+    '<div class="seg seg-v" id="plSeg">' + vuesPlanning().map(function (v) { return '<button data-pv="' + v[0] + '"' + (S.plVue === v[0] ? ' class="on"' : '') + '>' + v[1] + '</button>'; }).join('') + '</div>';
 }
 function brancherEnTete() {
   $$('#plSeg button').forEach(function (b) { b.onclick = function () { S.plVue = b.getAttribute('data-pv'); ouvrirPlanning(); }; });
@@ -1906,7 +2078,7 @@ function editerCase(email, i) {
 
 // ───────── Gestion du personnel (administrateurs) ─────────
 function chargerPersonnel() {
-  if (!S.pers) $('#main').innerHTML = '<h1>Personnel</h1><div class="load"><div class="spin"></div></div>';
+  if (!S.pers) $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Personnel</h1></div></div><div class="load"><div class="spin"></div></div>';
   api('getPersonnel').then(function (p) { S.pers = p; if (S.vue === 'personnel') rendrePersonnel(); }).catch(echec);
 }
 function rafraichirUsers() {
@@ -1921,7 +2093,7 @@ function rendrePersonnel() {
     return !q || (p.nomAffiche + ' ' + p.email + ' ' + p.fonction).toLowerCase().indexOf(q) >= 0;
   });
   var nbArch = P.personnes.filter(function (p) { return p.archive; }).length;
-  var h = '<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Personnel</h1><span class="sp"></span><button class="btn pri" id="pAdd">+ Ajouter un membre</button></div>' +
+  var h = '<div class="ph"><div class="ph-t"><h1>Personnel</h1><p class="ph-g">Les membres du cabinet, leur accès à l’application et leurs droits. Touchez un nom pour le modifier.</p></div><div class="ph-a"><button class="btn pri" id="pAdd">+ Ajouter un membre</button></div></div>' +
     '<div class="filters"><input id="pQ" type="search" placeholder="Rechercher un nom ou une adresse" value="' + esc(S.persQ || '') + '">' +
     (nbArch ? '<label class="chk2" style="padding:0 6px"><input type="checkbox" id="pArch"' + (S.persArch ? ' checked' : '') + '> Afficher les archivés (' + nbArch + ')</label>' : '') + '</div>';
   var ordre = P.fonctions.concat(['']);
@@ -2071,7 +2243,7 @@ function signalerVuesConges() {
 
 function rendreConges() {
   var c = S.conges;
-  var h = '<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Congés</h1><span class="sp"></span><button class="btn pri" id="cgNv">+ Demander un congé</button></div>';
+  var h = '<div class="ph"><div class="ph-t"><h1>Congés</h1><p class="ph-g">' + (S.conges && S.conges.peutValider ? 'Les demandes à valider sont en haut. Vos propres demandes et l’historique suivent.' : 'Choisissez vos dates et envoyez la demande. Vous êtes prévenu dès qu’elle est acceptée ou refusée.') + '</p></div><div class="ph-a"><button class="btn pri" id="cgNv">+ Demander un congé</button></div></div>';
   if (!c) { $('#main').innerHTML = h + '<div class="load"><div class="spin"></div></div>'; $('#cgNv').onclick = formConge; return; }
   if (c.peutValider) {
     h += '<h2>À valider' + (c.aValider.length ? ' (' + c.aValider.length + ')' : '') + '</h2>' +
@@ -2192,8 +2364,8 @@ function rangeeArticle(a, chemin) {
 
 function rendreMateriel(garder) {
   var y = garder ? window.scrollY : 0;
-  var h = '<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Matériel</h1><span class="sp"></span>' +
-    (S.mat && S.mat.gestion ? '<button class="btn sm" id="mGer">Catalogue</button>' : '') + '</div>';
+  var h = '<div class="ph"><div class="ph-t"><h1>Matériel</h1><p class="ph-g">Cochez les produits dont vous avez besoin, puis validez en bas de l’écran. Ce que d’autres ont déjà demandé est signalé en orange.</p></div>' +
+    (S.mat && S.mat.gestion ? '<div class="ph-a"><button class="btn" id="mGer">Gérer le catalogue</button></div>' : '') + '</div>';
   if (!S.mat) { $('#main').innerHTML = h + '<div class="load"><div class="spin"></div></div>'; return; }
   var cat = S.mat.catalogue;
   h += '<input class="mq" id="mQ" type="search" placeholder="Rechercher un produit ou une référence" value="' + esc(S.matQ) + '" autocomplete="off">';
