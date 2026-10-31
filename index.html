@@ -1300,7 +1300,7 @@ function afficherTache(t) {
     '<div style="margin-top:8px"><label class="lk" style="cursor:pointer">+ Ajouter une photo ou un fichier<input type="file" id="pj" multiple accept="image/*,application/pdf" class="hidden"></label></div>' +
     '<div class="sec">Personnes concernées · ' + t.nbTerminees + '/' + t.participations.length + ' terminé' + (t.nbTerminees > 1 ? 's' : '') + (groupes.length ? ' · groupes : ' + esc(groupes.join(', ')) : '') + '</div><div id="parts">' +
     t.participations.map(function (p) {
-      var info = p.majLe && p.statut !== 'À faire' ? 'le ' + dHeure(p.majLe) + (p.majParNom ? ' par ' + p.majParNom : '') : (t.lus[p.id] ? 'ouverte le ' + dHeure(t.lus[p.id]) : (p.id === t.creePar ? '' : 'pas encore ouverte'));
+      var info = p.majLe && p.statut !== 'À faire' ? 'le ' + dHeure(p.majLe) + (p.majParNom ? ' par ' + p.majParNom : '') : !t.traca ? '' : (t.lus[p.id] ? 'ouverte le ' + dHeure(t.lus[p.id]) : (p.id === t.creePar ? '' : 'pas encore ouverte'));
       var sv = t.suivi && t.suivi[p.id];
       return '<div class="pr"><span class="n">' + esc(p.id === moi ? 'Moi' : p.nom) + '</span><span class="pill ' + clsStatut(p.statut) + '">' + esc(p.statut) + '</span>' +
         (sv ? '' : '<span class="d">' + esc(info) + '</span>') +
