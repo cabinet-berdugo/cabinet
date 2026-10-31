@@ -11,6 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="Cabinet">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="robots" content="noindex">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <meta charset="utf-8">
 <meta name="theme-color" content="#0a3b39">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1021,8 +1023,10 @@ var push = {
 if (AUTONOME && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(function (reg) {
     // l'application revient au premier plan (iPhone : elle peut rester en mémoire des heures) : on vérifie s'il y a une nouvelle version
-    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') reg.update().catch(function () { }); });
-    setInterval(function () { if (document.visibilityState === 'visible') reg.update().catch(function () { }); }, 30 * 60000);
+    var derniere = Date.now();
+    var verifier = function () { if (document.visibilityState !== 'visible' || Date.now() - derniere < 3 * 60000) return; derniere = Date.now(); reg.update().catch(function () { }); };
+    document.addEventListener('visibilitychange', verifier);
+    setInterval(verifier, 30 * 60000);
   }).catch(function () { });
   // nouvelle version installée : on recharge, sans jamais interrompre une saisie en cours
   var dejaControle = !!navigator.serviceWorker.controller, aRecharger = false;
