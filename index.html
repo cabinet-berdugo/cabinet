@@ -558,6 +558,11 @@ main{padding-top:0}
 .dr{box-shadow:-12px 0 40px rgba(8,32,34,.18)}
 @media (min-width:761px){.dr{border-radius:20px 0 0 20px}}
 .dr-h{padding:16px 20px;border-bottom:1px solid var(--line)}
+.dr{padding-top:env(safe-area-inset-top)}
+.alerte-n{top:calc(12px + env(safe-area-inset-top))}
+.modal{padding-top:calc(16px + env(safe-area-inset-top))}
+.tc.neuve{animation:neuve 2.4s ease-out}
+@keyframes neuve{0%,35%{box-shadow:0 0 0 3px rgba(11,111,105,.45),var(--sh);background:var(--accbg)}100%{box-shadow:var(--sh)}}
 .dr-h b{font-size:17px;font-weight:700;letter-spacing:-.015em}
 .dr-b{padding:20px}
 .dr-f{padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#f7f9f9}
@@ -1645,7 +1650,14 @@ function formTache(t) {
     Promise.all(files.map(preparerFichier)).then(function (l) {
       d.fichiers = l;
       return api('creerTache', d);
-    }).then(function (r) { afficherTache(r); toast('Tâche créée'); }).catch(fin);
+    }).then(function (r) {
+      // retour à la liste : la nouvelle tâche apparaît en haut, brièvement mise en évidence
+      majLocale(r); fermer();
+      var n = (r.participations || []).filter(function (p) { return p.id !== S.me.id; }).length;
+      toast(n ? 'Tâche créée et envoyée à ' + n + ' personne' + (n > 1 ? 's' : '') : 'Tâche créée');
+      if (S.vue !== 'taches') aller('taches');
+      setTimeout(function () { var c = document.querySelector('.tc[data-id="' + r.id + '"]'); if (c) { c.classList.add('neuve'); c.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 80);
+    }).catch(fin);
   };
   setTimeout(function () { if ($('#fT')) $('#fT').focus(); }, 50);
 }
