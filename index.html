@@ -1161,6 +1161,109 @@ html.ordre-admin .tab[data-v=impayes]{order:5}html.ordre-admin .tab[data-v=relan
 @media (max-width:760px){.cp-k2,.cp-k3{grid-template-columns:1fr 1fr}.cp-k2 .ca,.cp-k3 .ca{grid-column:1/-1}
   .cp-an .m-l{display:none}.cp-an .m-c{display:inline}.cp-an4 th{white-space:normal}.cp-an .eu{display:none}
   .cp-an{font-size:12px}.cp-an th,.cp-an td{padding:9px 4px}.cp-an th:first-child,.cp-an td:first-child{padding-left:9px}.cp-an th:last-child,.cp-an td:last-child{padding-right:9px}.cp-ann{padding:14px}.cp-ann b{font-size:16px}}
+/* ═════════════ Animations (actives seulement avec html.anim ; coupées si « réduire les animations ») ═════════════ */
+:root{
+  --d-c:150ms; --d-n:220ms; --d-l:280ms; --d-x:620ms;
+  --ease:cubic-bezier(.2,.8,.2,1); --ease-io:cubic-bezier(.45,0,.25,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  --t-op:opacity var(--d-n) var(--ease); --t-tr:transform var(--d-n) var(--ease);
+  --sh-hover:0 2px 4px rgba(0,40,140,.25),0 12px 26px rgba(0,71,217,.36);
+  --sq-base:#E4EBF6; --sq-reflet:#EEF3FB;
+}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes a-fade{from{opacity:0}to{opacity:1}}
+@keyframes a-monte{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes a-boite{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes a-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+@keyframes a-pill{0%{transform:scale(.88);filter:brightness(1.25)}100%{transform:none;filter:none}}
+@keyframes a-cloche{0%,100%{transform:rotate(0)}25%{transform:rotate(12deg)}55%{transform:rotate(-9deg)}80%{transform:rotate(4deg)}}
+@keyframes a-reflet{from{background-position:150% 0}to{background-position:-50% 0}}
+@keyframes a-barre{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes a-trait{to{stroke-dashoffset:0}}
+@keyframes a-maj{0%{box-shadow:0 0 0 3px rgba(18,91,255,.45);background-color:#EAF1FF}100%{box-shadow:0 0 0 0 rgba(18,91,255,0)}}
+@keyframes a-refus{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* 1 · indicateur bleu royal qui glisse dans la barre latérale */
+.tab-ind{display:none}
+@media (min-width:761px){
+  .tabs{position:relative}
+  .tab{position:relative;z-index:1}
+  .tab-ind{display:block;position:absolute;left:0;right:0;top:0;height:0;border-radius:11px;background:var(--btn-grad);box-shadow:0 6px 18px rgba(0,71,217,.45),inset 0 1px 0 rgba(255,255,255,.15);pointer-events:none;z-index:0;opacity:0}
+  html.anim .tabs.ind-on .tab.on{background:transparent;box-shadow:none}
+  html.anim .tabs.ind-on .tab-ind{opacity:1}
+  html.anim .tabs.ind-pret .tab-ind{transition:transform 230ms var(--ease-io),height 230ms var(--ease-io),opacity var(--d-c)}
+  html.anim .tab{transition:color 200ms var(--ease-io),background-color var(--d-c)}
+}
+/* 2 · barre latérale rétractable (ordinateur large) : largeur, libellés en fondu, icônes centrées */
+@media (min-width:1100px){
+  html.anim.anim-pret header{transition:width var(--d-l) var(--ease-io)}
+  html.anim.anim-pret body{transition:padding-left var(--d-l) var(--ease-io)}
+  html.anim header .hd{overflow:hidden}
+  html.anim header .logo{white-space:nowrap}
+  html.anim.anim-pret header .logo{transition:padding var(--d-l) var(--ease-io)}
+  html.anim.anim-pret header .logo span,html.anim.anim-pret .tab .tl,html.anim.anim-pret .who-t,html.anim.anim-pret .who .out{transition:opacity 180ms var(--ease-io)}
+  html.anim.anim-pret .who{transition:padding var(--d-l) var(--ease-io),background-color var(--d-l),border-color var(--d-l),gap var(--d-l)}
+  html.anim.anim-pret .replier{transition:transform var(--d-l) var(--ease-io),background-color var(--d-c)}
+  html.anim.lat-r header .logo{justify-content:flex-start;padding-left:7px;padding-right:0}
+  html.anim.lat-r header .logo span{display:inline;opacity:0}
+  html.anim.lat-r .tab{justify-content:flex-start;padding:11px 0 11px 14.5px!important}
+  html.anim.lat-r .tab .tl{display:block;opacity:0;flex:0 0 0;min-width:0;overflow:hidden}
+  html.anim.lat-r .who{justify-content:flex-start;gap:0;padding:8px 0 8px 6px}
+  html.anim.lat-r .who-t{display:flex;opacity:0;flex:0 0 0;width:0;overflow:hidden}
+  html.anim.lat-r .who .out{display:grid;opacity:0;width:0;overflow:hidden}
+}
+/* 3 · changement de rubrique : fondu et léger déplacement du contenu (le bandeau et la navigation restent stables) */
+html.anim #main.pg-in > :not(.ph){animation:a-monte 180ms var(--ease) backwards}
+html.anim #main.pg-in > .ph .ph-t,html.anim #main.pg-in > .ph .ph-a{animation:a-fade 160ms var(--ease) backwards}
+/* 5 et 6 · chiffres et barres */
+html.anim .a-barre{transform-origin:left center;animation:a-barre 650ms var(--ease-io) backwards}
+.cp-j .bar{cursor:default}
+/* 7 · squelettes de chargement */
+.load.sq{padding:6px 0 20px;text-align:left;animation:a-fade 200ms 120ms ease backwards}
+.sq .sq-txt{display:block;font-size:13px;color:var(--ink3,#7C8AA5);margin:2px 2px 12px}
+.sq i{display:block;border-radius:10px;background:var(--sq-base) linear-gradient(100deg,transparent 30%,var(--sq-reflet) 50%,transparent 70%) no-repeat;background-size:200% 100%}
+html.anim .sq i{animation:a-reflet 1.8s ease-in-out infinite}
+.sq .sq-row{display:flex;gap:12px;margin-bottom:12px}
+.sq .sq-card{background:#fff;border:1px solid var(--line);border-radius:var(--r,14px);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.sq .sq-l{height:12px;margin:8px 0}
+.sq .sq-t{height:16px;width:55%;margin:2px 0 12px}
+.sq .sq-s{height:12px;width:35%}
+.sq .sq-k{flex:1;height:86px;border-radius:var(--r,14px)}
+.sq .sq-tr{height:44px;border-radius:8px;margin-bottom:8px}
+.sq .sq-c{flex:1;height:96px;border-radius:10px}
+.sq .sq-pill{height:22px;width:84px;border-radius:999px;display:inline-block;margin-right:8px}
+.sq-mini i{height:12px;margin:10px 0}
+html.anim .sq-out{animation:a-fade 160ms var(--ease) backwards}
+@media (max-width:760px){.sq .sq-row.sq-3 .sq-k:nth-child(3){display:none}}
+/* 8 · statut des tâches */
+html.anim .sbtn{transition:background-color 260ms var(--ease-io),color 260ms var(--ease-io),border-color 260ms var(--ease-io),box-shadow 260ms var(--ease-io)}
+.sbtn .ck{width:15px;height:15px;margin:-2px 5px -2px -2px;vertical-align:-2px;display:inline-block}
+.sbtn .ck path{stroke-dasharray:24;stroke-dashoffset:24;animation:a-trait 320ms 40ms var(--ease-out) forwards}
+html:not(.anim) .sbtn .ck path{stroke-dashoffset:0;animation:none}
+html.anim .tc .pill.a-pill{animation:a-pill 320ms var(--ease-out)}
+html.anim .a-refus{animation:a-refus 280ms var(--ease-io) 2}
+/* 9 · notifications */
+html.anim .cnt.a-pop{animation:a-pop 240ms var(--ease-out)}
+html.anim .bell.a-cloche svg{transform-origin:50% 8%;animation:a-cloche 600ms var(--ease-io)}
+/* 10 · planning : mise en évidence d'une affectation ou d'une case modifiée */
+html.anim .a-maj{animation:a-maj 1.6s var(--ease) }
+/* 12 · reflet discret sur les boutons principaux */
+.btn.pri{position:relative;overflow:hidden;isolation:isolate}
+.btn.pri::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.30) 50%,transparent 65%);transform:translateX(-130%)}
+@media (hover:hover){
+  html.anim .btn.pri:not(:disabled):hover::after{transform:translateX(130%);transition:transform 340ms var(--ease-io)}
+  html.anim .btn.pri:not(:disabled):hover{filter:brightness(1.05);box-shadow:var(--sh-hover)}
+}
+@media (hover:none){html.anim .btn.pri:active{transform:scale(.97);filter:brightness(1.08);transition:transform 90ms,filter 90ms}}
+/* 13 · fenêtres et formulaires */
+html.anim #drawer.entre .ov{animation:a-fade 200ms var(--ease) backwards}
+html.anim #drawer.entre .dr{animation:a-boite 210ms var(--ease-out) backwards}
+html.anim .modal{animation:a-fade 200ms var(--ease) backwards}
+html.anim .modal .box{animation:a-boite 210ms var(--ease-out) backwards}
+.dr-sortie{position:fixed;inset:0;z-index:39;pointer-events:none}
+.dr-sortie .ov{transition:opacity 150ms var(--ease-io)}
+.dr-sortie .dr{transition:opacity 150ms var(--ease-io),transform 150ms var(--ease-io)}
+.dr-sortie.fin .ov{opacity:0}
+.dr-sortie.fin .dr{opacity:0;transform:translateY(8px) scale(.985)}
 </style>
 </head>
 <body>
@@ -1185,7 +1288,7 @@ html.ordre-admin .tab[data-v=impayes]{order:5}html.ordre-admin .tab[data-v=relan
     <button class="replier" id="replier" aria-label="Réduire le menu" title="Réduire le menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
   </div>
 </header>
-<main id="main"><div class="load"><div class="spin"></div>Chargement…</div></main>
+<main id="main"><div class="load sq sq-cartes" role="status" aria-live="polite"><span class="sq-txt">Chargement…</span><div class="sq-row sq-3"><i class="sq-k"></i><i class="sq-k"></i><i class="sq-k"></i></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:80%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:73%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:66%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div></div></main>
 <nav class="bnav" id="bnav">
   <button data-v="taches" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>Tâches<span class="cnt hidden" id="c1m"></span></button>
   <button data-v="planning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Planning</button>
@@ -1313,7 +1416,7 @@ var minuterie = null;
 function essayerLien() {
   var k = PARAMS.k; PARAMS.k = '';
   if (!k) return false;
-  $('#main').innerHTML = '<div class="load"><div class="spin"></div>Ouverture de la tâche…</div>';
+  $('#main').innerHTML = sq('cartes', 'Ouverture de la tâche…');
   apiPublic('connexionParLien', k).then(function (j) { K = j; garderJeton(j, true); demarrer(); })
     .catch(function () { ecranConnexion(PARAMS.t ? 'Ce lien a déjà servi ou a expiré : connectez-vous pour ouvrir la tâche.' : ''); });
   return true;
@@ -1326,7 +1429,7 @@ function demarrer() {
   // ouverture instantanée : on affiche tout de suite les données de la dernière visite, puis on met à jour
   var cache = AUTONOME ? lireCache() : null;
   if (cache) appliquerDemarrage(cache);
-  else $('#main').innerHTML = '<div class="load"><div class="spin"></div>Chargement…</div>';
+  else $('#main').innerHTML = sq('cartes', 'Chargement…');
   api('getDemarrage').then(function (d) {
     try { localStorage.setItem(CLE_CACHE, JSON.stringify({ k: K.slice(0, 12), d: d })); } catch (e) { }
     if (!cache || JSON.stringify(cache.init) !== JSON.stringify(d.init)) { appliquerDemarrage(d); return; }
@@ -1471,7 +1574,7 @@ function ouvrirNotifications() {
     }).join('') : '<div class="empty">Aucune notification pour l’instant.</div>';
     $$('#drb .nt').forEach(function (d) { d.onclick = function () { ouvrirNotif(l.filter(function (x) { return x.id === d.getAttribute('data-n'); })[0]); }; });
   };
-  tiroir('Notifications', '<div class="load"><div class="spin"></div></div>', '<button class="btn" id="nReg">Sur mon téléphone</button><span class="sp"></span><button class="btn" id="nTout">Tout marquer comme lu</button>');
+  tiroir('Notifications', sq('mini'), '<button class="btn" id="nReg">Sur mon téléphone</button><span class="sp"></span><button class="btn" id="nTout">Tout marquer comme lu</button>');
   $('#nTout').onclick = function () { api('marquerNotificationsLues', 'tout').then(function (r) { S.notifs = r; majCloche(); dessiner(); }).catch(echec); };
   $('#nReg').onclick = monCompte;
   api('getNotifications').then(function (r) { S.notifs = r; S.notifVues = S.notifVues || {}; r.liste.forEach(function (n) { S.notifVues[n.id] = 1; }); majCloche(); dessiner(); }).catch(echec);
@@ -1480,7 +1583,7 @@ function ouvrirNotifications() {
 // ───────── Mon compte : notifications sur le téléphone ─────────
 function monCompte() {
   tiroir('Mon compte', '<p style="margin-top:0"><b>' + esc(S.me.nom) + '</b><br><span class="meta">' + esc(S.me.fonction) + ' · ' + esc(S.me.role) + '</span></p>' +
-    '<div class="sec" style="margin-top:14px">Notifications sur mon téléphone</div><div id="regN"><div class="load" style="padding:16px"><div class="spin"></div></div></div>' +
+    '<div class="sec" style="margin-top:14px">Notifications sur mon téléphone</div><div id="regN">' + sq('mini') + '</div>' +
     '<div class="sec">Connexion</div><p class="hint" style="margin-top:0">Vous restez connecté 90 jours sur cet appareil, prolongés automatiquement à chaque utilisation. Pour changer de mot de passe : déconnectez-vous, puis « Mot de passe oublié ».</p>',
     '<button class="btn ko" id="out2">Se déconnecter</button>');
   $('#out2').onclick = seDeconnecter;
@@ -1861,7 +1964,7 @@ function rendreTaches() {
     '<select id="fSt" aria-label="Statut">' + optsSt + '</select><select id="fCat" aria-label="Catégorie">' + opts(S.cfg.categories, f.cat, 'Toutes catégories') + '</select>' +
     '<select id="fPrio" aria-label="Priorité">' + opts(S.cfg.priorites, f.prio, 'Toutes priorités') + '</select><select id="fPers" aria-label="Destinataire">' + optsPers + '</select><select id="fCre" aria-label="Créateur">' + optsCre + '</select>' +
     '<input id="fQ" type="search" placeholder="Rechercher" value="' + esc(f.q) + '"><button type="button" class="btn" id="fTog"></button></div>' +
-    '<div class="list" id="list">' + (S.charge ? '' : '<div class="load"><div class="spin"></div>Chargement des tâches…</div>') + '</div>';
+    '<div class="list" id="list">' + (S.charge ? '' : sq('cartes', 'Chargement des tâches…')) + '</div>';
   $('#nv').onclick = function () { formTache(); };
   majAujourdhui();
   $$('#seg button').forEach(function (b) { b.onclick = function () { f.portee = b.getAttribute('data-p'); rendreListe(); }; });
@@ -1978,11 +2081,13 @@ function brancherBoutonsStatut(zone) {
       // … puis enregistrement automatique
       api('changerParticipation', id, cible, pour).then(function (r) {
         if (S.detail === id && $('#drawer').innerHTML && $('#drb')) afficherTache(r); else majLocale(r);
+        ANIM.statutOk(id, cible);
         toast(cible === 'Terminée' ? (r.statut === 'Terminée' ? 'Tâche terminée ✓' : (pour ? 'Partie de ' + prenomDe(pour) + ' terminée ✓' : 'Votre partie est terminée ✓')) : cible === 'En cours' ? 'Passée « En cours »' : 'Remise à « À faire »');
       }).catch(function (e) {
         var i = S.taches.findIndex(function (x) { return x.id === id; }); if (i >= 0) S.taches[i] = JSON.parse(avant);
         if (S.vue === 'taches') rendreListe();
         if (S.detail === id && $('#drb')) ouvrirTache(id);
+        ANIM.statutKo(id);
         echec(e);
       });
     };
@@ -2097,7 +2202,7 @@ function ouvrirTache(id) {
   var local = (S.taches || []).filter(function (x) { return x.id === id; })[0];
   S.detail = id;
   if (local) afficherTache(Object.assign({}, local, { commentaires: null, historique: null }));
-  else tiroir('Tâche ' + esc(id), '<div class="load"><div class="spin"></div></div>');
+  else tiroir('Tâche ' + esc(id), sq('mini'));
   // ouvrir la tâche la marque comme lue (et ses notifications aussi)
   api('marquerLu', id).then(function (t) {
     afficherSiOuvert(t);
@@ -2316,7 +2421,7 @@ function enTetePlanning() {
 function brancherEnTete() {
   $$('#plSeg button').forEach(function (b) { b.onclick = function () { S.plVue = b.getAttribute('data-pv'); ouvrirPlanning(); }; });
 }
-function attentePlanning() { $('#main').innerHTML = enTetePlanning() + '<div class="load"><div class="spin"></div></div>'; brancherEnTete(); }
+function attentePlanning() { $('#main').innerHTML = enTetePlanning() + sq('planning'); brancherEnTete(); }
 function hm(h) { return String(h || '').replace(':', 'h'); }
 function dJour(s) { var d = dj(s); return ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][d.getDay()] + ' ' + dCourt(s); }
 function nomSalle(a) { return a.salleNom ? a.salleNom + (a.etage ? ' · ' + a.etage : '') : 'Salle à définir'; }
@@ -2716,7 +2821,7 @@ function editerCase(email, i) {
 
 // ───────── Gestion du personnel (administrateurs) ─────────
 function chargerPersonnel() {
-  if (!S.pers) $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Personnel</h1></div></div><div class="load"><div class="spin"></div></div>';
+  if (!S.pers) $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Personnel</h1></div></div>' + sq('pers');
   api('getPersonnel').then(function (p) { S.pers = p; if (S.vue === 'personnel') rendrePersonnel(); }).catch(echec);
 }
 function rafraichirUsers() {
@@ -2858,7 +2963,7 @@ function fichePersonne(p) {
     (avecDel ? '<div id="pDel"></div>' : '') +
     '<div class="hint">' + (P.peutAcces ? 'Cochées par défaut selon le rôle ; vous pouvez les ajuster pour cette personne.' : 'Seul Dr Maxime Berdugo peut modifier le rôle et les autorisations. Un nouveau membre reçoit le rôle de sa fonction.') + '</div>' +
     '<div class="err" id="pErr"></div>' +
-    (nouveau ? '' : '<div class="sec">Historique</div><div id="pHist"><div class="load" style="padding:16px"><div class="spin"></div></div></div>');
+    (nouveau ? '' : '<div class="sec">Historique</div><div id="pHist">' + sq('mini') + '</div>');
   var pied = (nouveau ? '' : '<button class="btn ' + (p.archive ? '' : 'ko') + '" id="pArc">' + (p.archive ? 'Restaurer' : 'Archiver') + '</button>' +
     (p.email && p.actif ? '<button class="btn" id="pInv">' + (p.invitation ? 'Renvoyer l’invitation' : 'Envoyer l’invitation') + '</button>' : '') +
     (p.email && p.id !== P.moi ? '<button class="btn" id="pRev">Déconnecter ses appareils</button>' : '') + '<span class="sp"></span>') +
@@ -2975,7 +3080,7 @@ function signalerVuesConges() {
 function rendreConges() {
   var c = S.conges;
   var h = '<div class="ph"><div class="ph-t"><h1>Congés</h1><p class="ph-g">' + (S.conges && S.conges.peutValider ? 'Les demandes à valider sont en haut. Vos propres demandes et l’historique suivent.' : 'Choisissez vos dates et envoyez la demande. Vous êtes prévenu dès qu’elle est acceptée ou refusée.') + '</p></div><div class="ph-a"><button class="btn pri" id="cgNv">+ Demander un congé</button></div></div>';
-  if (!c) { $('#main').innerHTML = h + '<div class="load"><div class="spin"></div></div>'; $('#cgNv').onclick = formConge; return; }
+  if (!c) { $('#main').innerHTML = h + sq('cartes'); $('#cgNv').onclick = formConge; return; }
   if (c.peutValider) {
     h += '<h2>À valider' + (c.aValider.length ? ' (' + c.aValider.length + ')' : '') + '</h2>' +
       (c.aValider.length ? c.aValider.map(function (x) {
@@ -3098,7 +3203,7 @@ function rendreMateriel(garder) {
   var y = garder ? window.scrollY : 0;
   var h = '<div class="ph"><div class="ph-t"><h1>Matériel</h1><p class="ph-g">Cochez les produits dont vous avez besoin, puis validez en bas de l’écran. Ce que d’autres ont déjà demandé est signalé en orange.</p></div>' +
     (S.mat && S.mat.gestion ? '<div class="ph-a"><button class="btn" id="mGer">Gérer le catalogue</button></div>' : '') + '</div>';
-  if (!S.mat) { $('#main').innerHTML = h + '<div class="load"><div class="spin"></div></div>'; return; }
+  if (!S.mat) { $('#main').innerHTML = h + sq('liste'); return; }
   var cat = S.mat.catalogue;
   h += '<input class="mq" id="mQ" type="search" placeholder="Rechercher un produit ou une référence" value="' + esc(S.matQ) + '" autocomplete="off">';
   if (!cat.length) {
@@ -3411,7 +3516,7 @@ function joursCompta(d, c) {
   h += liste.length ? '<div class="cp-l">' + liste.map(function (j) {
     var k = j.date, o = !!(c.ouverts || {})[k];
     return '<div class="cp-j' + (o ? ' open' : '') + '" data-j="' + esc(k) + '"><button><span class="d">' + esc(j.date) + '</span><span class="t' + (j.n ? '' : ' cp-zero') + '">' + esc(j.total) + '</span>' + CHEV + '</button>' +
-      (j.n ? '<div class="bar"><i style="width:' + Math.round(j.n / max * 100) + '%"></i></div>' : '') +
+      (j.n ? '<div class="bar" title="' + esc(j.date + ' : ' + j.total) + '"><i style="width:' + Math.round(j.n / max * 100) + '%"></i></div>' : '') +
       (o ? '<div class="cp-md">' + (d.modes || []).map(function (m, x) { return euros(j.modes[x]) ? '<span>' + esc(m) + ' ' + esc(j.modes[x]) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
   }).join('') + '</div>' : '<div class="empty">Aucune journée remplie pour l’instant ce mois-ci.</div>';
   return h;
@@ -3438,7 +3543,7 @@ function rendreCompta() {
     // ── Praticien : son facturé du mois en cours, rien d'autre ──
     h += '<div class="cp-who"><b>' + esc(S.me.nom) + '</b><span>' + esc(d ? d.libelle : MOIS_NOMS[c.mois - 1] + ' ' + c.annee) + '</span><button id="cpR" class="cp-rf" aria-label="Actualiser" title="Actualiser">↻</button></div>';
     if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
-    else if (!d) h += '<div class="load"><div class="spin"></div>Lecture du classeur…</div>';
+    else if (!d) h += sq('stats', 'Lecture du classeur…');
     else if (!d.trouve) h += '<div class="empty">Aucune donnée disponible pour le mois en cours.</div>';
     else {
       h += '<div class="cp-k cp-k1"><div class="ca"><small>Chiffre d’affaires facturé · ' + esc(d.libelle) + '</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div></div>';
@@ -3455,7 +3560,7 @@ function rendreCompta() {
     var bandeau = '<button class="cp-ann" id="cpAnn">' + ico('compta', 'cp-ann-i') + '<span><b>Chiffre d’affaires annuel</b><small>' + c.annee + ' · tous les praticiens · facturé, encaissé et écart</small></span>' + CHEV + '</button>';
     if (c.pid === '*') {
       if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
-      else if (!an) h += '<div class="load"><div class="spin"></div>Lecture de la synthèse…</div>';
+      else if (!an) h += sq('table', 'Lecture de la synthèse…');
       else {
         var tf = 0, te = 0, af = false, ae = false;
         var lignes = an.praticiens.map(function (p) { var m = p.mois[mi]; if (m.f !== null) { tf += m.f; af = true; } if (m.e !== null) { te += m.e; ae = true; }
@@ -3467,7 +3572,7 @@ function rendreCompta() {
       }
     } else {
       if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
-      else if (!d) h += '<div class="load"><div class="spin"></div>Lecture du classeur…</div>';
+      else if (!d) h += sq('stats', 'Lecture du classeur…');
       else {
         h += '<h2 class="cp-h">' + esc(d.praticien.nom) + ' · ' + esc(d.libelle) + '</h2>';
         if (!d.trouve) h += '<div class="empty">Pas de classeur « ' + esc(d.fichier) + ' » dans Google Drive.</div>' + bandeau;
@@ -3505,7 +3610,7 @@ function rendreAnnuel() {
   var h = '<div class="ph"><div class="ph-t"><button class="ph-ret" id="cpRet">‹ Chiffre d’affaires du mois</button><h1>Chiffre d’affaires annuel</h1><p class="ph-g">Tous les praticiens, du 1er janvier au dernier mois disponible, d’après la synthèse Google Sheets. Touchez un praticien pour son détail mois par mois.</p></div></div>';
   h += selPeriode(c, false);
   if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
-  else if (!an) h += '<div class="load"><div class="spin"></div>Lecture de la synthèse…</div>';
+  else if (!an) h += sq('table', 'Lecture de la synthèse…');
   else if (!c.anP) {
     var T = { f: null, e: null, x: null }, plus = function (k, v) { if (v !== null) T[k] = (T[k] || 0) + v; };
     var lignes = an.praticiens.map(function (p) { var t = totauxMois(p.mois); plus('f', t.f); plus('e', t.e); plus('x', t.x);
@@ -3591,7 +3696,7 @@ function rendreSuivi(v) {
     : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div>' +
     '<div class="ph-a"><button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter une relance') + '</button></div></div>';
   if (tous) h += '<div class="cp-pr"><button data-sp="*" class="' + (S.sv.pid === '*' ? 'on' : '') + '">Tous</button>' + tous.map(function (p) { return '<button data-sp="' + esc(p.id) + '" class="' + (S.sv.pid === p.id || (S.sv.pid === '' && p.id === S.me.id) ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
-  if (!d) h += '<div class="load"><div class="spin"></div>Lecture des fichiers…</div>';
+  if (!d) h += sq('liste', 'Lecture des fichiers…');
   else if (d.erreur) h += '<div class="err">' + esc(d.erreur) + '</div>';
   else {
     var ps = d.praticiens, plus = ps.length > 1;
@@ -3714,6 +3819,265 @@ function ficheSuivi(imp, pid, cle) {
   }
   $('#svA').onclick = fermer;
 }
+
+// ═════════════ Animations ═════════════
+// Purement visuelles : elles ne changent ni les données, ni les calculs, ni les droits. Coupées si le système demande
+// de réduire les animations (et dans les navigateurs pilotés par les tests automatiques, sauf demande explicite).
+var ANIM = (function () {
+  var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var force = false; try { force = localStorage.getItem('cabinet_anim') === '1'; } catch (e) { }
+  function actif() { return (force || !navigator.webdriver) && !(mq && mq.matches); }
+  function maj() { document.documentElement.classList.toggle('anim', actif()); }
+  if (mq && mq.addEventListener) mq.addEventListener('change', maj);
+  var A = { actif: actif, maj: maj, vus: {}, vueRendue: '' };
+
+  // ── 1 · indicateur coulissant de la barre latérale ──
+  A.indicateur = function () {
+    var nav = $('#tabs'); if (!nav) return;
+    var ind = $('#tabInd');
+    if (!ind) { ind = document.createElement('span'); ind.id = 'tabInd'; ind.className = 'tab-ind'; ind.setAttribute('aria-hidden', 'true'); nav.insertBefore(ind, nav.firstChild); }
+    var on = nav.querySelector('.tab.on:not(.hidden)');
+    var lateral = window.innerWidth >= 761 && getComputedStyle(nav).flexDirection === 'column';
+    if (!on || !lateral || !actif()) { nav.classList.remove('ind-on'); return; }
+    ind.style.transform = 'translateY(' + on.offsetTop + 'px)';
+    ind.style.height = on.offsetHeight + 'px';
+    nav.classList.add('ind-on');
+    if (!nav.classList.contains('ind-pret')) requestAnimationFrame(function () { requestAnimationFrame(function () { nav.classList.add('ind-pret'); }); });
+  };
+  var indPlus = function () { A.indicateur(); setTimeout(A.indicateur, 320); };
+
+  // ── 5 · compteurs : les grands chiffres montent jusqu'à leur valeur exacte (une seule fois par carte) ──
+  var CIBLES = '#stats .stat b, .ps-c b, .cp-k > div > b, .sv-sum > b';
+  function lireNombre(t) {
+    var m = String(t).match(/^([^\d−-]*)([−-]?\d[\d\s  ]*(?:,\d+)?)(.*)$/);
+    if (!m) return null;
+    var brut = m[2], sep = (brut.match(/[\s  ]/) || [' '])[0], dec = (brut.split(',')[1] || '').length;
+    var n = Number(brut.replace(/[\s  ]/g, '').replace('−', '-').replace(',', '.'));
+    return isFinite(n) ? { avant: m[1], apres: m[3], n: n, dec: dec, sep: sep } : null;
+  }
+  function ecrire(p, v) {
+    var neg = v < 0, s = Math.abs(v).toFixed(p.dec).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, p.sep);
+    return p.avant + (neg ? '-' : '') + s[0] + (p.dec ? ',' + s[1] : '') + p.apres;
+  }
+  function contexte() {
+    if (S.vue === 'compta' && S.cpt) return [S.cpt.vue || '', S.cpt.pid, S.cpt.annee, S.cpt.mois].join(':');
+    if ((S.vue === 'impayes' || S.vue === 'relances') && S.sv) return S.sv.pid;
+    return '';
+  }
+  A.compteurs = function (zone) {
+    $$(CIBLES, zone).forEach(function (b, i) {
+      if (b.__vu) return; b.__vu = true;
+      var final = b.textContent, carteEl = b.closest('.stat,.ps-c,.cp-k > div,.sv-sum'), lib = carteEl && carteEl.querySelector('small');
+      var cle = S.vue + '|' + contexte() + '|' + (lib ? lib.textContent : i);
+      var deja = A.vus[cle]; A.vus[cle] = final;
+      if (deja !== undefined || !actif()) return; // déjà montré : on affiche directement la valeur
+      var p = lireNombre(final); if (!p || p.n === 0) return;
+      var t0 = performance.now(), d = 600;
+      b.style.fontVariantNumeric = 'tabular-nums';
+      (function pas(t) {
+        if (!b.isConnected) return;
+        var x = Math.min(1, (t - t0) / d), e = x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+        if (x >= 1) { b.textContent = final; b.style.fontVariantNumeric = ''; return; } // valeur finale : exactement le texte d'origine
+        b.textContent = ecrire(p, p.n * e);
+        requestAnimationFrame(pas);
+      })(t0);
+    });
+  };
+  // ── 6 · barres du facturé jour par jour : elles grandissent depuis leur base (la première fois) ──
+  A.barres = function (zone) {
+    $$('.cp-j .bar i', zone).forEach(function (i) {
+      if (i.__vu) return; i.__vu = true;
+      var j = i.closest('.cp-j'), cle = 'bar|' + contexte() + '|' + (j ? j.getAttribute('data-j') : '') + '|' + i.style.width;
+      if (A.vus[cle] || !actif()) { A.vus[cle] = 1; return; }
+      A.vus[cle] = 1; i.classList.add('a-barre');
+    });
+  };
+
+  // ── 11 · réorganisation des listes (filtres, tris) : les éléments gardés glissent, les autres s'effacent ou apparaissent ──
+  A.photo = function (sel, cle) {
+    if (!actif()) return null;
+    var els = $$(sel).filter(function (e) { return !e.classList.contains('a-fantome'); }); if (!els.length || els.length > 60) return null;
+    var m = {}; els.forEach(function (e) { var k = cle(e); if (k) m[k] = { r: e.getBoundingClientRect(), el: e }; });
+    return { vue: S.vue, m: m };
+  };
+  A.glisser = function (photo, sel, cle) {
+    if (!photo || photo.vue !== S.vue || !actif()) return;
+    var els = $$(sel).filter(function (e) { return !e.classList.contains('a-fantome'); }); if (els.length > 60) return;
+    var gardes = {};
+    els.forEach(function (e) {
+      var k = cle(e), a = photo.m[k]; if (!e.animate) return;
+      if (a) {
+        gardes[k] = 1;
+        var r = e.getBoundingClientRect(), dx = a.r.left - r.left, dy = a.r.top - r.top;
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) e.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 230, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      } else e.animate([{ opacity: 0, transform: 'scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+    });
+    // éléments retirés : un fantôme (copie inerte, sans identifiants) s'efface à leur ancienne place
+    Object.keys(photo.m).forEach(function (k) {
+      if (gardes[k]) return;
+      var a = photo.m[k], parent = els[0] ? els[0].parentNode : null; if (!parent || !a.el.cloneNode) return;
+      var g = a.el.cloneNode(true); g.removeAttribute('id'); [].slice.call(g.attributes).forEach(function (at) { if (/^data-/.test(at.name)) g.removeAttribute(at.name); }); g.classList.add('a-fantome'); $$('[id]', g).forEach(function (x) { x.removeAttribute('id'); });
+      g.setAttribute('aria-hidden', 'true'); g.inert = true;
+      g.style.cssText += ';position:fixed;margin:0;left:' + a.r.left + 'px;top:' + a.r.top + 'px;width:' + a.r.width + 'px;height:' + a.r.height + 'px;pointer-events:none;z-index:5';
+      parent.appendChild(g);
+      var an = g.animate ? g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.97)' }], { duration: 180, easing: 'ease-out', fill: 'forwards' }) : null;
+      setTimeout(function () { g.remove(); }, 200);
+      if (!an) g.remove();
+    });
+  };
+  A.envelopper = function (nom, sel, cle) {
+    var f = window[nom]; if (typeof f !== 'function') return;
+    window[nom] = function () {
+      var ph = A.vueRendue === S.vue + ':' + nom ? A.photo(sel, cle) : null;
+      var r = f.apply(this, arguments);
+      A.vueRendue = S.vue + ':' + nom;
+      A.glisser(ph, sel, cle);
+      return r;
+    };
+  };
+
+  // ── 10 · planning : glissement à la semaine (ou au jour) suivante / précédente, et mise en évidence de ce qui a changé ──
+  A.dirPl = 0; A.dirT = 0;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('#wPrev,#wNext,#dPrev,#dNext,#mPrev,#mNext,#wNow,#dNow,#mNow');
+    if (!b) return;
+    A.dirPl = /Prev$/.test(b.id) ? -1 : /Next$/.test(b.id) ? 1 : 0; A.dirT = Date.now();
+  }, true);
+  A.glissePlanning = function () {
+    if (!A.dirT || Date.now() - A.dirT > 8000 || !actif()) return;
+    var nav = $('#wPrev,#dPrev,#mPrev'); if (!nav) return;
+    var ligne = nav.closest('#main > *'); if (!ligne) return;
+    var dir = A.dirPl; A.dirT = 0;
+    for (var e = ligne.nextElementSibling; e; e = e.nextElementSibling) {
+      if (e.classList.contains('load') || !e.animate) continue;
+      e.animate([{ opacity: 0, transform: 'translateX(' + (dir * 16) + 'px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+    }
+  };
+  A.suivreChangements = function (nom, sel, cle, periode) {
+    var f = window[nom]; if (typeof f !== 'function') return;
+    var avant = { p: null, m: {} };
+    window[nom] = function () {
+      var r = f.apply(this, arguments), p = periode(), m = {};
+      $$(sel).forEach(function (e) { m[cle(e)] = e.innerHTML; });
+      if (actif() && avant.p === p) Object.keys(m).forEach(function (k) { if (avant.m[k] !== m[k]) { var e = $$(sel).filter(function (x) { return cle(x) === k; })[0]; if (e) e.classList.add('a-maj'); } });
+      avant = { p: p, m: m };
+      A.glissePlanning();
+      return r;
+    };
+  };
+
+  // ── 8 · statut d'une tâche : coche et badge, seulement après confirmation de l'enregistrement ──
+  var COCHE = '<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  A.statutOk = function (id, cible) {
+    if (!actif()) return;
+    if (cible === 'Terminée') $$('.sbtn.f.on[data-t="' + id + '"]').forEach(function (b) { if (!b.querySelector('.ck')) b.insertAdjacentHTML('afterbegin', COCHE); });
+    $$('.tc[data-id="' + id + '"] .pill:first-child').forEach(function (p) { p.classList.remove('a-pill'); void p.offsetWidth; p.classList.add('a-pill'); });
+  };
+  A.statutKo = function (id) {
+    if (!actif()) return;
+    $$('.tc[data-id="' + id + '"] .stb, #drb .stb').forEach(function (s) { s.classList.remove('a-refus'); void s.offsetWidth; s.classList.add('a-refus'); });
+  };
+
+  // ── 9 · cloche : petite animation quand une nouvelle notification arrive réellement ──
+  A.dernierN = null;
+  A.cloche = function (n) {
+    var avant = A.dernierN; A.dernierN = n;
+    if (avant === null || n <= avant || !actif()) return;
+    var c = $('#bellN'), b = $('#bell');
+    [c].forEach(function (x) { x.classList.remove('a-pop'); void x.offsetWidth; x.classList.add('a-pop'); });
+    b.classList.remove('a-cloche'); void b.offsetWidth; b.classList.add('a-cloche');
+    setTimeout(function () { b.classList.remove('a-cloche'); c.classList.remove('a-pop'); }, 700);
+  };
+
+  // ── 3 et 7 · contenu de #main : compteurs, barres, et fondu quand les données remplacent le squelette ──
+  var attente = false;
+  function passe() {
+    attente = false;
+    var m = $('#main'); if (!m) return;
+    A.compteurs(m); A.barres(m);
+  }
+  A.observer = function () {
+    var m = $('#main'); if (!m || !window.MutationObserver) return;
+    new MutationObserver(function (muts) {
+      var sqParti = muts.some(function (x) { return [].some.call(x.removedNodes, function (n) { return n.nodeType === 1 && (n.classList.contains('sq') || (n.querySelector && n.querySelector('.sq'))); }); });
+      if (sqParti && actif() && !m.querySelector('.sq')) muts.forEach(function (x) {
+        [].forEach.call(x.addedNodes, function (n) { if (n.nodeType === 1 && !n.classList.contains('ph') && !n.classList.contains('seg') && !n.classList.contains('cp-pr') && !n.classList.contains('wk')) { n.classList.remove('sq-out'); n.classList.add('sq-out'); } });
+      });
+      if (!attente) { attente = true; requestAnimationFrame(passe); }
+    }).observe(m, { childList: true, subtree: true });
+  };
+
+  // ── 3 · changement de rubrique ──
+  A.page = function () {
+    if (!actif()) return;
+    var m = $('#main'); m.classList.remove('pg-in'); void m.offsetWidth; m.classList.add('pg-in');
+    clearTimeout(A.tPage); A.tPage = setTimeout(function () { m.classList.remove('pg-in'); }, 260);
+  };
+
+  // ── 13 · fenêtres : apparition (fond qui s'assombrit, fenêtre qui monte légèrement) et sortie un peu plus rapide ──
+  A.entree = function () {
+    var d = $('#drawer'); if (!actif()) return;
+    d.classList.remove('entre'); void d.offsetWidth; d.classList.add('entre');
+    clearTimeout(A.tDr); A.tDr = setTimeout(function () { d.classList.remove('entre'); }, 260);
+  };
+  A.sortie = function () {
+    var d = $('#drawer'); if (!actif() || !d || !d.innerHTML) return;
+    var g = document.createElement('div'); g.className = 'dr-sortie'; g.setAttribute('aria-hidden', 'true'); g.inert = true;
+    [].forEach.call(d.children, function (c) { g.appendChild(c.cloneNode(true)); });
+    $$('[id]', g).forEach(function (x) { x.removeAttribute('id'); });
+    document.body.appendChild(g);
+    requestAnimationFrame(function () { g.classList.add('fin'); });
+    setTimeout(function () { g.remove(); }, 190);
+  };
+
+  // ── branchements (après la définition de toutes les fonctions de l'application) ──
+  A.brancher = function () {
+    maj();
+    var _aller = aller;
+    aller = function (v) { var avant = S.vue; var r = _aller.apply(this, arguments); if (avant !== S.vue) A.page(); indPlus(); return r; };
+    var _majBnav = majBnav;
+    majBnav = function () { var r = _majBnav.apply(this, arguments); A.indicateur(); return r; };
+    var _tiroir = tiroir;
+    tiroir = function () { var neuf = !$('#drawer').innerHTML; var r = _tiroir.apply(this, arguments); if (neuf) A.entree(); return r; };
+    var _fermer = fermer;
+    fermer = function () { A.sortie(); return _fermer.apply(this, arguments); };
+    var _majCloche = majCloche;
+    majCloche = function () { var r = _majCloche.apply(this, arguments); A.cloche(S.notifs ? S.notifs.nonLues : 0); return r; };
+    A.envelopper('rendreListe', '#list .tc', function (e) { return e.getAttribute('data-id'); });
+    A.envelopper('rendrePersonnel', '.mt-r', function (e) { return e.getAttribute('data-id'); });
+    A.envelopper('rendreConges', '.cg-c', function (e) { return e.getAttribute('data-id'); });
+    A.envelopper('rendreSuivi', '.sv-c', function (e) { return e.getAttribute('data-p') + '|' + e.getAttribute('data-k'); });
+    A.envelopper('rendreMateriel', '.ma-r', function (e) { return e.getAttribute('data-a'); });
+    A.suivreChangements('rendreJour', '.af[data-id]', function (e) { return e.getAttribute('data-id'); }, function () { return S.aff && S.aff.debut; });
+    A.suivreChangements('rendrePlanning', '.pl .cell', function (e) { return e.getAttribute('data-e') + '|' + e.getAttribute('data-i'); }, function () { return S.planning && S.planning.semaine; });
+    A.suivreChangements('rendreMoi', '.day', function (e) { return e.querySelector('small') ? e.querySelector('small').textContent : ''; }, function () { return S.semaine + '|' + (S.cible && S.cible.id); });
+    A.observer();
+    window.addEventListener('resize', function () { clearTimeout(A.tRs); A.tRs = setTimeout(A.indicateur, 80); });
+    var rep = $('#replier'); if (rep) rep.addEventListener('click', indPlus);
+    if (window.ResizeObserver && $('#tabs')) new ResizeObserver(function () { A.indicateur(); }).observe($('#tabs'));
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(A.indicateur);
+    setTimeout(function () { document.documentElement.classList.add('anim-pret'); }, 900);
+  };
+  return A;
+})();
+
+/** Squelette de chargement : la forme approximative de ce qui va s'afficher, avec le message de lecture habituel. */
+function sq(type, txt) {
+  var l = function (w) { return '<i class="sq-l" style="width:' + w + '%"></i>'; };
+  var cartes = function (n) { var h = ''; for (var k = 0; k < n; k++) h += '<div class="sq-card"><i class="sq-t"></i>' + l(80 - k * 7) + '<div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div>'; return h; };
+  var lignes = function (n) { var h = ''; for (var k = 0; k < n; k++) h += '<i class="sq-tr"></i>'; return h; };
+  var corps = type === 'stats' ? '<div class="sq-row sq-3"><i class="sq-k"></i><i class="sq-k"></i><i class="sq-k"></i></div>' + lignes(5)
+    : type === 'table' ? lignes(7)
+    : type === 'planning' ? '<div class="sq-row"><i class="sq-s" style="width:30%"></i></div><div class="sq-row"><i class="sq-c"></i><i class="sq-c"></i><i class="sq-c"></i></div><div class="sq-row"><i class="sq-c"></i><i class="sq-c"></i><i class="sq-c"></i></div>'
+    : type === 'pers' ? '<div class="sq-row sq-3"><i class="sq-k"></i><i class="sq-k"></i><i class="sq-k"></i></div>' + lignes(6)
+    : type === 'mini' ? l(90) + l(70) + l(80)
+    : type === 'cartes' ? '<div class="sq-row sq-3"><i class="sq-k"></i><i class="sq-k"></i><i class="sq-k"></i></div>' + cartes(3)
+    : cartes(4);
+  return '<div class="load sq sq-' + type + (type === 'mini' ? ' sq-mini' : '') + '" role="status" aria-live="polite">' + (txt ? '<span class="sq-txt">' + txt + '</span>' : '<span class="vh">Chargement…</span>') + corps + '</div>';
+}
+
+ANIM.brancher();
 
 demarrer();
 </script>
