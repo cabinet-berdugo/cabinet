@@ -1736,6 +1736,7 @@ function chargerComplements() {
     }
     if (r.jour && r.jour.aff) S.jourCache[r.jour.date] = r.jour.aff;
     sauverCache();
+    setTimeout(prechargerSuivi, 300);
   }).catch(function () { });
 }
 function lireCache() {
@@ -2110,7 +2111,7 @@ function sessionPerdue() {
 function seDeconnecter() {
   var j = K; K = ''; garderJeton('');
   if (push.dispo()) push.abonnement().then(function (a) { if (a) { var ep = a.endpoint; a.unsubscribe(); appel('supprimerAppareil', [j, ep]).catch(function () { }); } }).catch(function () { });
-  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.jourCache = {}; S.mat = null; S.det = {}; S.vers = null; S.sv.data = null; clearTimeout(tCache); S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } }; S.cptOuvert = false;
+  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.jourCache = {}; S.mat = null; S.det = {}; S.vers = null; S.sv.data = null; S.sv.parPid = {}; S.sv.pid = null; clearTimeout(tCache); S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } }; S.cptOuvert = false;
   apiPublic('deconnexion', j).catch(function () { });
   ecranConnexion('Vous êtes déconnecté.');
 }
@@ -4610,14 +4611,32 @@ function ouvrirSuivi(v) {
   rendreSuivi(v);
   if (!S.sv.data || S.sv.dataPid !== S.sv.pid) chargerSuivi(); else chargerSuivi(true);
 }
-function chargerSuivi(discret) {
+/** Impayés et relances : gardés en mémoire seulement (jamais sur l'appareil), par praticien ; lecture récente du serveur (≤ 3 min) sauf « Actualiser ». */
+S.sv.parPid = {};
+function chargerSuivi(discret, frais) {
   var pid = S.sv.pid; S.sv.attente = pid;
-  if (!discret) { S.sv.data = null; rendreSuivi(S.vue); }
-  (discret ? apiFond : api)('getSuiviCompta', pid, true).then(function (r) {
+  var connu = S.sv.parPid[pid];
+  if (!discret) {
+    if (connu) { S.sv.data = connu; S.sv.dataPid = pid; discret = true; }
+    else S.sv.data = null;
+    rendreSuivi(S.vue);
+  }
+  var avant = JSON.stringify(connu || null);
+  (discret ? apiFond : api)('getSuiviCompta', pid, !!frais).then(function (r) {
+    S.sv.parPid[pid] = r;
     if (S.sv.attente !== pid) return;
+    var change = avant !== JSON.stringify(r) || S.sv.dataPid !== pid || frais;
     S.sv.data = r; S.sv.dataPid = pid;
-    if (S.vue === 'impayes' || S.vue === 'relances') rendreSuivi(S.vue);
-  }).catch(function (e) { if (S.sv.attente === pid) { S.sv.data = { erreur: msgErr(e) }; rendreSuivi(S.vue); } });
+    if ((S.vue === 'impayes' || S.vue === 'relances') && change) rendreSuivi(S.vue);
+    if (frais) toast('Impayés et relances à jour');
+  }).catch(function (e) { if (S.sv.attente === pid && !S.sv.data) { S.sv.data = { erreur: msgErr(e) }; rendreSuivi(S.vue); } else if (frais) echec(e); });
+}
+/** Préparé en arrière-plan juste après l'ouverture, pour que le premier passage sur « Impayés » soit immédiat. */
+function prechargerSuivi() {
+  if (!ongletOuvert('impayes')) return;
+  var l = listeSuivi(), pid = S.sv.pid !== null ? S.sv.pid : (l.length > 1 ? '*' : (l[0] && l[0].id !== S.me.id ? l[0].id : ''));
+  if (S.sv.parPid[pid]) return;
+  apiFond('getSuiviCompta', pid, false).then(function (r) { S.sv.parPid[pid] = r; }).catch(function () { });
 }
 function svPid(p) { return p.id === S.me.id ? '' : p.id; }
 function joursFr(iso) { return iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
@@ -4659,7 +4678,7 @@ function rendreSuivi(v) {
   $('#main').innerHTML = h;
   brancherSegCompta();
   $$('[data-sp]').forEach(function (b) { b.onclick = function () { var x = b.getAttribute('data-sp'); S.sv.pid = x === S.me.id ? '' : x; chargerSuivi(); }; });
-  if ($('#svR')) $('#svR').onclick = function () { chargerSuivi(); };
+  if ($('#svR')) $('#svR').onclick = function () { this.disabled = true; this.textContent = 'Actualisation…'; chargerSuivi(true, true); };
   $('#svAj').onclick = function () { formAjoutSuivi(imp); };
   $$('.sv-c').forEach(function (b) { b.onclick = function () { ficheSuivi(imp, b.getAttribute('data-p'), b.getAttribute('data-k')); }; });
 }
@@ -4670,7 +4689,10 @@ function ligneSuivi(imp, pid, cle) {
 /** Le serveur renvoie le praticien modifié : on remplace ses données dans la liste affichée. */
 function appliquerSuivi(r) {
   r.praticiens.forEach(function (np) { S.sv.data.praticiens = S.sv.data.praticiens.map(function (p) { return p.id === np.id ? np : p; }); });
-  S.sv.data.lu = r.lu; rendreSuivi(S.vue);
+  S.sv.data.lu = r.lu;
+  // les autres vues déjà en mémoire (un praticien / tous) reçoivent aussi la modification
+  Object.keys(S.sv.parPid).forEach(function (k) { var x = S.sv.parPid[k]; if (x && x !== S.sv.data && x.praticiens) r.praticiens.forEach(function (np) { x.praticiens = x.praticiens.map(function (p) { return p.id === np.id ? np : p; }); }); });
+  rendreSuivi(S.vue);
 }
 /** Ajouter un patient oublié (impayé ou devis à relancer) : écrit dans la journée du classeur du mois et dans « Impayés et relances ». */
 function formAjoutSuivi(imp) {
