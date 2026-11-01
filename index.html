@@ -1585,6 +1585,18 @@ table.pl{border-collapse:separate;border-spacing:0}
 .ca-dr svg{width:14px;height:14px;flex:none}.ca-dr span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ca-seul .ca-t b{font-size:30px}
 @media (max-width:760px){.ca-seul .ca-t b{font-size:24px}}
+
+.ht-h{margin:26px 0 10px}
+table.pl.ht td{padding:10px;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);white-space:nowrap}
+table.pl.ht td small{display:block;font-weight:500;font-size:11.5px;color:var(--amb)}
+table.pl.ht td.ht-x{color:var(--ink3);font-weight:500}
+table.pl.ht .ht-s{background:#F2F6FF;color:#061B42}
+table.pl.ht th.ht-s{color:var(--acc)}
+table.pl.ht tfoot td{border-top:2px solid var(--line);background:#F8FAFD;font-weight:700}
+table.pl.ht tfoot td.nm{position:sticky;left:0;z-index:1}
+table.pl.ht tbody tr:hover td.ht-s{background:#EAF0FF}
+table.pl.ht .ht-s{position:sticky;right:0;z-index:1;box-shadow:-1px 0 0 var(--line)}
+table.pl.ht th.ht-s{z-index:3;background:#EEF3FF}
 </style>
 </head>
 <body>
@@ -3301,7 +3313,8 @@ function rendrePlanning() {
             return '<td><button class="' + cls + '" data-e="' + esc(pers.id) + '" data-i="' + i + '"' + (ed ? '' : ' tabindex="-1"') + '>' + inner + '</button></td>';
           }).join('') + '</tr>';
       }).join('') + '</tbody></table></div>' +
-      '<div class="hint" style="margin-top:8px">' + (ed ? 'Cliquez sur une case pour saisir les horaires. ' : '') + 'Les praticiens et salles viennent des affectations (vue « Par salle »). Les congés acceptés s’affichent automatiquement.</div>';
+      '<div class="hint" style="margin-top:8px">' + (ed ? 'Cliquez sur une case pour saisir les horaires. ' : '') + 'Les praticiens et salles viennent des affectations (vue « Par salle »). Les congés acceptés s’affichent automatiquement.</div>' +
+      tableauHeures(p, moi);
   }
   $('#main').innerHTML = h;
   brancherEnTete();
@@ -3318,6 +3331,47 @@ function rendrePlanning() {
     };
     $$('.pl .cell').forEach(function (b) { b.onclick = function () { editerCase(b.getAttribute('data-e'), Number(b.getAttribute('data-i'))); }; });
   }
+}
+
+/** Minutes travaillées d'une journée : fin − début − pause (repos, congé ou case vide : rien). */
+function minutesJour(c) {
+  if (!c || c.statut === 'Repos') return null;
+  var mn = function (v) { var m = String(v || '').match(/^(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+  var d = mn(c.debut), f = mn(c.fin), pd = mn(c.pauseDebut), pf = mn(c.pauseFin);
+  if (d === null || f === null || f <= d) return null;
+  return f - d - (pd !== null && pf !== null && pf > pd ? pf - pd : 0);
+}
+/** « 1h30 », « 1h », « 45 min », « 1,5 » → minutes (heures sup saisies librement). */
+function minutesSup(t) {
+  t = String(t || '').toLowerCase().replace(',', '.').trim(); if (!t) return 0;
+  var m = t.match(/^(\d+(?:\.\d+)?)\s*h\s*(\d{1,2})?/); if (m) return Math.round(Number(m[1]) * 60) + Number(m[2] || 0);
+  m = t.match(/^(\d+)\s*(?:min|mn|m)\b/); if (m) return Number(m[1]);
+  m = t.match(/^(\d+(?:\.\d+)?)$/); return m ? Math.round(Number(m[1]) * 60) : 0;
+}
+function hMin(n) { return Math.floor(n / 60) + 'h' + ('0' + n % 60).slice(-2); }
+/** Sous l'agenda des assistantes : heures de chaque assistante, jour par jour, et total de la semaine (pauses déduites). */
+function tableauHeures(p, moi) {
+  var totJ = p.jours.map(function () { return 0; }), totSem = 0, totSup = 0;
+  var lignes = p.personnes.map(function (pers) {
+    var sem = 0, sup = 0;
+    var cases = p.jours.map(function (j, i) {
+      var x = infoCase(p, pers.id, i);
+      if (x.conge) return '<td class="ht-x">Congé</td>';
+      if (x.c && x.c.statut === 'Repos') return '<td class="ht-x">Repos</td>';
+      var n = minutesJour(x.c);
+      if (n === null) return '<td class="ht-x">—</td>';
+      var s = minutesSup(x.c.heuresSup);
+      sem += n; sup += s; totJ[i] += n;
+      return '<td>' + hMin(n) + (s ? '<small>+' + hMin(s) + ' sup</small>' : '') + '</td>';
+    }).join('');
+    totSem += sem; totSup += sup;
+    return '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases +
+      '<td class="ht-s">' + (sem ? hMin(sem) : '—') + (sup ? '<small>+' + hMin(sup) + ' sup</small>' : '') + '</td></tr>';
+  }).join('');
+  return '<h2 class="ht-h">Total d’heures de la semaine</h2><div class="grid"><table class="pl ht"><thead><tr><th>Assistante</th>' +
+    p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + '<th class="ht-s">Semaine</th></tr></thead><tbody>' + lignes + '</tbody>' +
+    (p.personnes.length > 1 ? '<tfoot><tr><td class="nm">Total équipe</td>' + totJ.map(function (n) { return '<td>' + (n ? hMin(n) : '—') + '</td>'; }).join('') + '<td class="ht-s">' + (totSem ? hMin(totSem) : '—') + (totSup ? '<small>+' + hMin(totSup) + ' sup</small>' : '') + '</td></tr></tfoot>' : '') +
+    '</table></div><div class="hint" style="margin-top:8px">Heures de présence, pauses déduites. Les heures sup saisies dans une case sont indiquées à part.</div>';
 }
 
 function editerCase(email, i) {
