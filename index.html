@@ -1628,8 +1628,8 @@ function $(s, r) { return (r || document).querySelector(s); }
 function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 var nbAppels = 0;
-function appel(fn, args) {
-  var fond = fn === 'getNouveautes' || fn === 'prolongerCompta';
+function appel(fn, args, discret) {
+  var fond = discret || fn === 'getNouveautes' || fn === 'prolongerCompta';
   if (!fond) { nbAppels++; $('#busy').classList.remove('hidden'); }
   return new Promise(function (ok, ko) {
     var fin = function () { if (fond) return; if (--nbAppels <= 0) { nbAppels = 0; $('#busy').classList.add('hidden'); } };
@@ -1645,10 +1645,12 @@ function appel(fn, args) {
   });
 }
 /** Appel authentifié : ajoute le jeton de session ; renvoie vers la connexion si la session a expiré. */
-function api(fn) {
-  var args = Array.prototype.slice.call(arguments, 1);
-  if (/Affectation|Creneau|Planning|Conge|Absence/.test(fn) && !/^get/.test(fn)) S.semCache = {}; // une modification invalide les semaines déjà lues
-  return appel(fn, [K].concat(args)).catch(function (e) {
+function api(fn) { return apiX(false, fn, Array.prototype.slice.call(arguments, 1)); }
+/** Même appel, mais discret : mise à jour en arrière-plan, sans indicateur d'activité à l'écran. */
+function apiFond(fn) { return apiX(true, fn, Array.prototype.slice.call(arguments, 1)); }
+function apiX(discret, fn, args) {
+  if (/Affectation|Creneau|Planning|Conge|Absence/.test(fn) && !/^(get|vu|notifier)/.test(fn)) { S.semCache = {}; S.jourCache = {}; } // une modification invalide les semaines et jours déjà lus
+  return appel(fn, [K].concat(args), discret).catch(function (e) {
     if (msgErr(e).indexOf('SESSION_EXPIREE') >= 0) { sessionPerdue(); throw new Error('Votre session a expiré. Reconnectez-vous.'); }
     throw e;
   });
@@ -1695,6 +1697,47 @@ function essayerLien() {
     .catch(function () { ecranConnexion(PARAMS.t ? 'Ce lien a déjà servi ou a expiré : connectez-vous pour ouvrir la tâche.' : ''); });
   return true;
 }
+var tCache = null;
+function sauverCache() {
+  clearTimeout(tCache);
+  tCache = setTimeout(function () {
+    if (!K || !S.me || !AUTONOME) return;
+    var ecrire = function (avecDetails) {
+      var c = JSON.parse(localStorage.getItem(CLE_CACHE) || 'null');
+      if (!c || c.k !== K.slice(0, 12)) return;
+      var d = c.d;
+      d.taches = S.taches; d.vTaches = S.vT; d.conges = S.conges; d.notifs = S.notifs || d.notifs; d.auj = S.auj;
+      d.x = { mat: S.mat || null, pro: S.pro && S.pro.data || null, det: avecDetails ? S.det : null, vers: S.vers || null,
+        sem: S.semaine && S.semCache[S.semaine] ? { s: S.semaine, v: S.semCache[S.semaine] } : null };
+      localStorage.setItem(CLE_CACHE, JSON.stringify(c));
+    };
+    try { ecrire(true); } catch (e) { try { ecrire(false); } catch (e2) { } } // mémoire pleine : sans le détail des tâches
+  }, 1200);
+}
+function restaurerExtras(x) {
+  if (!x) return;
+  if (x.mat && !S.mat) S.mat = x.mat;
+  if (x.pro && S.pro && !S.pro.data) S.pro.data = x.pro;
+  if (x.det && (!S.det || !Object.keys(S.det).length)) S.det = x.det;
+  if (x.sem && x.sem.s && !S.semCache[x.sem.s]) S.semCache[x.sem.s] = x.sem.v;
+  if (x.vers && !S.vers) S.vers = x.vers;
+}
+/** Juste après l'ouverture : matériel, prothèses et planning de la semaine, en un seul appel discret. */
+function chargerComplements() {
+  var sem = S.semaine || lundi(S.today);
+  return apiFond('getComplements', sem).then(function (r) {
+    if (r.vers) S.vers = r.vers;
+    if (r.mat) appliquerMat(r.mat);
+    if (r.pro) { S.pro.data = r.pro; if (S.vue === 'protheses') rendreProtheses(); }
+    if (r.sem && r.sem.aff) {
+      var avant = JSON.stringify(S.semCache[r.sem.semaine] || null);
+      S.semCache[r.sem.semaine] = { aff: r.sem.aff, pl: r.sem.pl };
+      if (S.vue === 'planning' && S.plVue === 'personne' && S.semaine === r.sem.semaine && avant !== JSON.stringify(S.semCache[r.sem.semaine]) && S.cible) { S.moiAff = r.sem.aff; S.moiPl = r.sem.pl; rendreMoi(); }
+    }
+    if (r.jour && r.jour.aff) S.jourCache[r.jour.date] = r.jour.aff;
+    sauverCache();
+  }).catch(function () { });
+}
 function lireCache() {
   try { var c = JSON.parse(localStorage.getItem(CLE_CACHE) || 'null'); return c && c.k === K.slice(0, 12) ? c.d : null; } catch (e) { return null; }
 }
@@ -1702,10 +1745,11 @@ function demarrer() {
   if (!K) { if (!essayerLien()) ecranConnexion(); return; }
   // ouverture instantanée : on affiche tout de suite les données de la dernière visite, puis on met à jour
   var cache = AUTONOME ? lireCache() : null;
-  if (cache) appliquerDemarrage(cache);
+  if (cache) { restaurerExtras(cache.x); appliquerDemarrage(cache); }
   else $('#main').innerHTML = sq('cartes', 'Chargement…');
-  api('getDemarrage').then(function (d) {
+  (cache ? apiFond : api)('getDemarrage').then(function (d) {
     try { localStorage.setItem(CLE_CACHE, JSON.stringify({ k: K.slice(0, 12), d: d })); } catch (e) { }
+    setTimeout(chargerComplements, 50); sauverCache();
     if (!cache || JSON.stringify(cache.init) !== JSON.stringify(d.init)) { appliquerDemarrage(d); return; }
     // même profil : mise à jour discrète des données
     S.vT = d.vTaches; S.conges = d.conges; S.auj = d.auj; S.today = d.init.aujourdhui;
@@ -1759,7 +1803,7 @@ function appliquerDemarrage(d) {
     PARAMS.t = ''; PARAMS.v = '';
     majCompteurs(); majAujourdhui();
     if (minuterie) clearInterval(minuterie);
-    minuterie = setInterval(function () { if (K && document.visibilityState === 'visible') verifierNotifs(); }, 45000);
+    minuterie = setInterval(function () { if (K && document.visibilityState === 'visible') verifierNotifs(); }, 30000);
     if (S.cfg.urlPublique && !AUTONOME) nouvelleAdresse(S.cfg.urlPublique);
     if (AUTONOME) { push.rafraichir(); astuceInstallation(); }
   }
@@ -1804,8 +1848,8 @@ function majCloche() {
 var verifEnCours = false;
 function verifierNotifs() {
   if (!K || verifEnCours || nbAppels > 0) return Promise.resolve(); // jamais pendant une action en cours
-  verifEnCours = true;
-  return appel('getNouveautes', [K, S.vT || '']).then(function (d) {
+  verifEnCours = true; S.dernVerif = Date.now();
+  return appel('getNouveautes', [K, S.vT || '', S.vers || {}]).then(function (d) {
     var r = d.notifs;
     var premier = !S.notifVues;
     S.notifVues = S.notifVues || {};
@@ -1813,6 +1857,15 @@ function verifierNotifs() {
     r.liste.forEach(function (n) { S.notifVues[n.id] = 1; });
     S.notifs = r; majCloche();
     if (d.taches) { S.vT = d.vTaches; remplacerTaches(d.taches); }
+    if (d.conges) { S.conges = d.conges; majCompteurs(); if (S.vue === 'conges') rendreConges(); }
+    if (d.mat) appliquerMat(d.mat);
+    if (d.pro) { S.pro.data = d.pro; if (S.vue === 'protheses') rendreProtheses(); }
+    if (d.vers) {
+      var planningChange = S.vers && S.vers.planning && S.vers.planning !== d.vers.planning;
+      S.vers = d.vers;
+      if (planningChange && S.vue === 'planning' && !$('#drawer').innerHTML) rafraichirPlanningDiscret();
+    }
+    sauverCache();
     if (!premier && nouvelles.length) alerteNotif(nouvelles[0], nouvelles.length);
   }).catch(function (e) { if (msgErr(e).indexOf('SESSION_EXPIREE') >= 0) sessionPerdue(); })
     .then(function () { verifEnCours = false; });
@@ -1821,7 +1874,7 @@ function verifierNotifs() {
 function remplacerTaches(l) {
   var avant = JSON.stringify(S.taches);
   S.taches = l; S.charge = true;
-  prechargerDetails();
+  prechargerDetails(); sauverCache();
   if (JSON.stringify(l) === avant) return;
   majCompteurs();
   if (S.vue === 'taches') rendreListe();
@@ -1836,7 +1889,7 @@ function alerteNotif(n, total) {
 }
 function ouvrirNotif(n) {
   if (!n) return;
-  api('marquerNotificationsLues', [n.id]).then(function (r) { S.notifs = r; majCloche(); }).catch(function () { });
+  apiFond('marquerNotificationsLues', [n.id]).then(function (r) { S.notifs = r; majCloche(); }).catch(function () { });
   var c = String(n.tache || '');
   if (c.indexOf('v=') === 0) { fermer(); aller(c.slice(2) === 'planning' ? 'planning' : c.slice(2) === 'conges' ? 'conges' : 'taches'); }
   else if (c) ouvrirTache(c);
@@ -2057,7 +2110,7 @@ function sessionPerdue() {
 function seDeconnecter() {
   var j = K; K = ''; garderJeton('');
   if (push.dispo()) push.abonnement().then(function (a) { if (a) { var ep = a.endpoint; a.unsubscribe(); appel('supprimerAppareil', [j, ep]).catch(function () { }); } }).catch(function () { });
-  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } }; S.cptOuvert = false;
+  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.jourCache = {}; S.mat = null; S.det = {}; S.vers = null; S.sv.data = null; clearTimeout(tCache); S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } }; S.cptOuvert = false;
   apiPublic('deconnexion', j).catch(function () { });
   ecranConnexion('Vous êtes déconnecté.');
 }
@@ -2191,7 +2244,7 @@ function aller(v) {
   S.vue = v;
   $$('[data-v]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
   window.scrollTo(0, 0);
-  if (v === 'taches') { rendreTaches(); if (!S.charge) recharger(true); }
+  if (v === 'taches') { rendreTaches(); if (!S.charge) recharger(true); else if (Date.now() - (S.dernVerif || 0) > 15000) verifierNotifs(); }
   if (v === 'planning') ouvrirPlanning();
   if (v === 'conges') { rendreConges(); rafraichirConges(); }
   if (v === 'personnel') chargerPersonnel();
@@ -2359,7 +2412,7 @@ function brancherBoutonsStatut(zone) {
       });
       if (S.vue === 'taches' && zone.id !== 'drb') rendreListe();
       // … puis enregistrement automatique
-      api('changerParticipation', id, cible, pour).then(function (r) {
+      apiFond('changerParticipation', id, cible, pour).then(function (r) {
         if (S.detail === id && $('#drawer').innerHTML && $('#drb')) afficherTache(r); else majLocale(r);
         ANIM.statutOk(id, cible);
         toast(cible === 'Terminée' ? (r.statut === 'Terminée' ? 'Tâche terminée ✓' : (pour ? 'Partie de ' + prenomDe(pour) + ' terminée ✓' : 'Votre partie est terminée ✓')) : cible === 'En cours' ? 'Passée « En cours »' : 'Remise à « À faire »');
@@ -2486,7 +2539,7 @@ function ouvrirTache(id) {
   if (local) afficherTache(Object.assign({}, local, det ? { commentaires: det.commentaires, historique: det.historique, suivi: det.suivi || local.suivi } : { commentaires: null, historique: null }));
   else tiroir('Tâche ' + esc(id), sq('mini'));
   // ouvrir la tâche la marque comme lue (et ses notifications aussi)
-  api('marquerLu', id).then(function (t) {
+  apiFond('marquerLu', id).then(function (t) {
     garderDetail(t);
     afficherSiOuvert(t);
     if (S.notifs) { S.notifs.liste.forEach(function (n) { if (n.tache === id) n.lue = true; }); S.notifs.nonLues = S.notifs.liste.filter(function (n) { return !n.lue; }).length; majCloche(); }
@@ -2506,8 +2559,8 @@ function prechargerDetails() {
     if (!l.length) return;
     prechargeEnCours = true;
     var sigs = {}; l.forEach(function (t) { sigs[t.id] = sigTache(t); });
-    api('getDetailsTaches', l.map(function (t) { return t.id; })).then(function (r) {
-      prechargeEnCours = false;
+    apiFond('getDetailsTaches', l.map(function (t) { return t.id; })).then(function (r) {
+      prechargeEnCours = false; sauverCache();
       Object.keys(r || {}).forEach(function (id) { var x = r[id]; S.det[id] = { commentaires: x.commentaires, historique: x.historique, suivi: x.suivi, sig: sigs[id] }; });
     }).catch(function () { prechargeEnCours = false; });
   }, 400);
@@ -2522,7 +2575,7 @@ function majLocale(t) {
   var copie = Object.assign({}, t); delete copie.commentaires; delete copie.historique;
   if (i >= 0 && JSON.stringify(S.taches[i]) === JSON.stringify(copie)) return; // rien de changé : pas de redessin
   if (i >= 0) S.taches[i] = copie; else S.taches.unshift(copie);
-  majCompteurs(); if (S.vue === 'taches') rendreListe();
+  majCompteurs(); if (S.vue === 'taches') rendreListe(); sauverCache();
 }
 
 var CANAL_TXT = { 'application': 'sur le téléphone', 'application (9 h)': 'sur le téléphone, à 9 h', 'téléphone': 'par Telegram', 'téléphone (9 h)': 'par Telegram, à 9 h',
@@ -2647,23 +2700,42 @@ function majBrouillon() {
   if ($('#tBr')) $('#tBr').textContent = n ? n + ' modification' + (n > 1 ? 's' : '') + ' à valider' : '';
 }
 function validerTache(t) {
-  var b = $('#tVal'), id = t.id, com = $('#com') ? $('#com').value.trim() : '';
+  var id = t.id, com = $('#com') ? $('#com').value.trim() : '';
   var changes = Object.keys(S.brSt).map(function (pour) { return { pour: pour, cible: S.brSt[pour] }; });
   if (!changes.length && !com) { fermer(); return; }
-  b.disabled = true; b.textContent = 'Enregistrement…'; $('#tErr').textContent = '';
-  var dernier = null, chaine = Promise.resolve();
-  changes.forEach(function (c) { chaine = chaine.then(function () { return api('changerParticipation', id, c.cible, c.pour).then(function (r) { dernier = r; delete S.brSt[c.pour]; }); }); });
-  if (com) chaine = chaine.then(function () { return api('ajouterCommentaire', id, com).then(function (r) { dernier = r; if ($('#com') && S.detail === id) $('#com').value = ''; }); });
-  chaine.then(function () {
-    if (dernier) { garderDetail(dernier); majLocale(dernier); }
-    if (S.detail === id) fermer();
-    var fin = changes.filter(function (c) { return !c.pour && c.cible === 'Terminée'; }).length;
-    toast(fin && dernier && dernier.statut === 'Terminée' ? 'Tâche terminée ✓' : 'Tâche enregistrée ✓');
-    changes.forEach(function (c) { if (!c.pour) ANIM.statutOk(id, c.cible); });
+  // état affiché tout de suite (le serveur confirme juste après) ; en cas d'échec, tout revient et la fenêtre se rouvre
+  var avant = (S.taches || []).filter(function (x) { return x.id === id; })[0];
+  var brouillon = { st: Object.assign({}, S.brSt), com: com };
+  if (avant) {
+    var opt = JSON.parse(JSON.stringify(avant));
+    changes.forEach(function (c) {
+      var qui = c.pour || S.me.id;
+      (opt.participations || []).forEach(function (p) { if (p.id === qui) { p.statut = c.cible; p.majLe = ''; } });
+      if (qui === S.me.id) opt.monStatut = c.cible;
+    });
+    var sts = (opt.participations || []).map(function (p) { return p.statut; });
+    if (sts.length) opt.statut = sts.every(function (x) { return x === 'Terminée'; }) ? 'Terminée' : sts.some(function (x) { return x === 'En cours' || x === 'Terminée'; }) ? 'En cours' : 'À faire';
+    opt.nbTerminees = sts.filter(function (x) { return x === 'Terminée'; }).length;
+    if (com) opt.nbCommentaires = (opt.nbCommentaires || 0) + 1;
+    majLocale(opt);
+  }
+  S.brSt = {}; if (S.detail === id) fermer();
+  var fin = changes.filter(function (c) { return !c.pour && c.cible === 'Terminée'; }).length;
+  toast(fin ? 'Tâche terminée ✓' : 'Tâche enregistrée ✓');
+  changes.forEach(function (c) { if (!c.pour) ANIM.statutOk(id, c.cible); });
+  apiFond('validerTache', id, changes, com).then(function (r) {
+    garderDetail(r); majLocale(r);
   }).catch(function (e) {
-    if (dernier) { garderDetail(dernier); majLocale(dernier); }
-    if ($('#tVal') && S.detail === id) { $('#tVal').disabled = false; $('#tVal').textContent = 'Valider'; $('#tErr').textContent = 'Non enregistré : ' + msgErr(e); majBrouillon(); }
-    else echec(e);
+    if (avant) majLocale(avant);
+    S.brId = id; S.brSt = brouillon.st;
+    ouvrirTache(id);
+    setTimeout(function () {
+      if (S.detail !== id) return;
+      if ($('#com') && brouillon.com) $('#com').value = brouillon.com;
+      if ($('#tErr')) $('#tErr').textContent = 'Non enregistré : ' + msgErr(e) + ' Vos changements sont conservés : réessayez.';
+      majBrouillon();
+    }, 60);
+    toast('Tâche non enregistrée : ' + msgErr(e), true);
   });
 }
 
@@ -2796,10 +2868,25 @@ function htmlProblemes(a) {
 }
 
 // ── Vue par salle (une journée) ──
+S.jourCache = {};
 function chargerJour(date) {
   S.jour = date;
-  if (!S.aff || S.aff.debut !== date || S.aff.fin !== date) attentePlanning();
-  api('getAffectations', date, date).then(function (r) { S.aff = r; if (S.vue === 'planning' && S.plVue === 'jour') rendreJour(); }).catch(echec);
+  var c = S.jourCache[date];
+  if (c) { S.aff = c; rendreJour(); }
+  else if (!S.aff || S.aff.debut !== date || S.aff.fin !== date) attentePlanning();
+  (c ? apiFond : api)('getAffectations', date, date).then(function (r) {
+    var avant = JSON.stringify(S.jourCache[date] || null);
+    S.jourCache[date] = r;
+    if (S.vue === 'planning' && S.plVue === 'jour' && S.jour === date && JSON.stringify(r) !== avant) { S.aff = r; rendreJour(); }
+    // jours voisins préparés à l'avance : précédent / suivant s'affichent sans attendre
+    [ajout(date, 1), ajout(date, -1)].forEach(function (j) { if (!S.jourCache[j]) apiFond('getAffectations', j, j).then(function (x) { S.jourCache[j] = x; }).catch(function () { }); });
+  }).catch(echec);
+}
+/** Le planning a changé chez quelqu'un d'autre : on remet à jour la vue affichée, sans écran d'attente. */
+function rafraichirPlanningDiscret() {
+  if (S.plVue === 'personne' && S.cible) chargerMoi(S.semaine);
+  else if (S.plVue === 'jour') { delete S.jourCache[S.jour]; apiFond('getAffectations', S.jour, S.jour).then(function (r) { S.jourCache[S.jour] = r; if (S.vue === 'planning' && S.plVue === 'jour') { S.aff = r; rendreJour(); } }).catch(function () { }); }
+  else if (S.plVue === 'horaires') chargerPlanning(S.semaine);
 }
 
 function rendreJour() {
@@ -2880,10 +2967,11 @@ function chargerMoi(sem) {
   // déjà en mémoire : affichage immédiat (changement de personne ou de semaine déjà vue), mise à jour discrète ensuite
   if (c && (c.pl || !S.cible.assistante)) { S.moiAff = c.aff; S.moiPl = c.pl; rendreMoi(); }
   else attentePlanning();
-  Promise.all([api('getAffectations', semaine, fin), api('getPlanning', semaine).catch(function () { return null; })])
+  var f = c ? apiFond : api;
+  Promise.all([f('getAffectations', semaine, fin), f('getPlanning', semaine).catch(function () { return null; })])
     .then(function (x) {
       var avant = JSON.stringify(S.semCache[semaine] || null);
-      S.semCache[semaine] = { aff: x[0], pl: x[1] };
+      S.semCache[semaine] = { aff: x[0], pl: x[1] }; sauverCache();
       if (S.vue !== 'planning' || S.plVue !== vue || S.semaine !== semaine) return;
       if (JSON.stringify(S.semCache[semaine]) === avant && c) return; // rien de nouveau : pas de redessin
       S.moiAff = x[0]; S.moiPl = x[1]; rendreMoi();
@@ -3112,9 +3200,16 @@ function formSalles() {
 // ── Horaires des assistantes (vue existante) ──
 function chargerPlanning(sem) {
   S.semaine = lundi(sem);
-  if (!S.planning || S.planning.semaine !== S.semaine) attentePlanning();
-  Promise.all([api('getPlanning', S.semaine), api('getAffectations', S.semaine, ajout(S.semaine, 6))])
-    .then(function (x) { S.planning = x[0]; S.semAff = x[1]; if (S.vue === 'planning' && S.plVue === 'horaires') rendrePlanning(); }).catch(echec);
+  var semaine = S.semaine, c = S.semCache[semaine];
+  if (c && c.pl && c.aff) { S.planning = c.pl; S.semAff = c.aff; rendrePlanning(); }
+  else if (!S.planning || S.planning.semaine !== S.semaine) attentePlanning();
+  var f = c && c.pl ? apiFond : api;
+  Promise.all([f('getPlanning', semaine), f('getAffectations', semaine, ajout(semaine, 6))])
+    .then(function (x) {
+      var avant = JSON.stringify(S.semCache[semaine] || null);
+      S.semCache[semaine] = { aff: x[1], pl: x[0] }; sauverCache();
+      if (S.vue === 'planning' && S.plVue === 'horaires' && S.semaine === semaine && JSON.stringify(S.semCache[semaine]) !== avant) { S.planning = x[0]; S.semAff = x[1]; rendrePlanning(); }
+    }).catch(echec);
 }
 
 function infoCase(p, email, i) {
@@ -3220,7 +3315,7 @@ function editerCase(email, i) {
 // ───────── Gestion du personnel (administrateurs) ─────────
 function chargerPersonnel() {
   if (!S.pers) $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Personnel</h1></div></div>' + sq('pers');
-  api('getPersonnel').then(function (p) { S.pers = p; if (S.vue === 'personnel') rendrePersonnel(); }).catch(echec);
+  (S.pers ? apiFond : api)('getPersonnel').then(function (p) { S.pers = p; if (S.vue === 'personnel') rendrePersonnel(); }).catch(echec);
 }
 function rafraichirUsers() {
   return api('getInit').then(function (i) { S.users = i.users; }).catch(function () { });
@@ -3529,7 +3624,7 @@ function fichePersonne(p) {
 
 // ───────── Congés ─────────
 function rafraichirConges(silence) {
-  return api('getConges').then(function (c) { S.conges = c; majCompteurs(); if (S.vue === 'conges') rendreConges(); }).catch(function (e) { if (!silence) echec(e); });
+  return (S.conges ? apiFond : api)('getConges').then(function (c) { S.conges = c; majCompteurs(); if (S.vue === 'conges') rendreConges(); }).catch(function (e) { if (!silence) echec(e); });
 }
 
 function pillConge(s) {
@@ -3561,7 +3656,7 @@ function signalerVuesConges() {
     .filter(function (id) { return !(S.congesSignales || {})[id]; });
   if (!ids.length) return;
   S.congesSignales = S.congesSignales || {}; ids.forEach(function (id) { S.congesSignales[id] = 1; });
-  api('vuConges', ids).catch(function () { ids.forEach(function (id) { delete S.congesSignales[id]; }); });
+  apiFond('vuConges', ids).catch(function () { ids.forEach(function (id) { delete S.congesSignales[id]; }); });
 }
 
 function rendreConges() {
@@ -3602,8 +3697,13 @@ function rendreConges() {
       b.onclick = function () {
         var d = b.getAttribute('data-d');
         if (d === 'Refusée' && motif.classList.contains('hidden')) { motif.classList.remove('hidden'); motif.focus(); b.textContent = 'Confirmer le refus'; return; }
-        $$('button', card).forEach(function (x) { x.disabled = true; });
-        api('traiterConge', id, d, d === 'Refusée' ? motif.value.trim() : '').then(function (r) { S.conges = r; majCompteurs(); rendreConges(); toast(d === 'Acceptée' ? 'Congé accepté, la personne est prévenue' : 'Refus envoyé'); }).catch(function (e) { echec(e); rafraichirConges(); });
+        // décision affichée tout de suite ; si l'enregistrement échoue, la demande revient « à valider »
+        var avantCg = JSON.stringify(S.conges), rep = d === 'Refusée' ? motif.value.trim() : '';
+        var x = S.conges.aValider.filter(function (c) { return c.id === id; })[0];
+        if (x) { S.conges.aValider = S.conges.aValider.filter(function (c) { return c.id !== id; }); x.statut = d; x.reponse = rep; (S.conges.equipe = S.conges.equipe || []).unshift(x); }
+        majCompteurs(); rendreConges(); toast(d === 'Acceptée' ? 'Congé accepté, la personne est prévenue' : 'Refus envoyé');
+        apiFond('traiterConge', id, d, rep).then(function (r) { S.conges = r; majCompteurs(); sauverCache(); if (S.vue === 'conges') rendreConges(); })
+          .catch(function (e) { S.conges = JSON.parse(avantCg); majCompteurs(); if (S.vue === 'conges') rendreConges(); echec(new Error('Décision non enregistrée : ' + msgErr(e))); });
       };
     });
   });
@@ -3646,12 +3746,13 @@ function sansAcc(x) { return String(x || '').toLowerCase().normalize('NFD').repl
 document.addEventListener('visibilitychange', function () { if (K && S.me && S.vue === 'materiel' && document.visibilityState === 'visible') chargerMateriel(true); });
 document.addEventListener('visibilitychange', function () { if (K && S.me && (S.vue === 'impayes' || S.vue === 'relances') && document.visibilityState === 'visible' && S.sv.data && !S.sv.data.erreur) chargerSuivi(true); });
 function chargerMateriel(silence) {
-  return api('getMateriel').then(function (r) { appliquerMat(r); }).catch(function (e) { if (!silence) echec(e); });
+  return (S.mat ? apiFond : api)('getMateriel').then(function (r) { appliquerMat(r); }).catch(function (e) { if (!silence) echec(e); });
 }
 /** Nouvelle réponse du serveur : on garde les quantités que l'utilisateur est en train de modifier. */
 function appliquerMat(r) {
-  S.mat = r; majCompteurs();
-  if (S.vue === 'materiel') rendreMateriel(true);
+  var change = JSON.stringify(S.mat) !== JSON.stringify(r);
+  S.mat = r; majCompteurs(); sauverCache();
+  if (S.vue === 'materiel' && change) rendreMateriel(true);
   if ($('#drawer').innerHTML && S.matTiroir) S.matTiroir();
 }
 function demandesArticle(id) { return S.mat.enCours.filter(function (d) { return d.article === id; }); }
@@ -4315,7 +4416,12 @@ S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } };
 function ouvrirProtheses() { rendreProtheses(); chargerProtheses(); }
 function chargerProtheses(force) {
   if (force && $('#ptR')) { $('#ptR').disabled = true; $('#ptR').textContent = 'Actualisation…'; }
-  return api('getProtheasy').then(function (r) { S.pro.data = r; if (S.vue === 'protheses') rendreProtheses(); if (force) toast('Livraisons à jour'); })
+  var avant = S.pro.data ? JSON.stringify(S.pro.data.livraisons) + JSON.stringify(S.pro.data.aVenir) + JSON.stringify(S.pro.data.sync) : '';
+  return (force || !S.pro.data ? api : apiFond)('getProtheasy').then(function (r) {
+    S.pro.data = r; sauverCache();
+    if (S.vue === 'protheses' && (force || avant !== JSON.stringify(r.livraisons) + JSON.stringify(r.aVenir) + JSON.stringify(r.sync))) rendreProtheses();
+    if (force) toast('Livraisons à jour');
+  })
     .catch(function (e) { if (S.vue === 'protheses' && $('#ptR')) { $('#ptR').disabled = false; $('#ptR').textContent = '↻ Actualiser les livraisons'; } echec(e); });
 }
 function ptzExpediee(l, d) { return l.statut === 'Expédiée' || (l.statut === 'En cours' && l.commandes.some(function (c) { return d.expedie.indexOf(c.statut) >= 0; })); }
@@ -4507,7 +4613,7 @@ function ouvrirSuivi(v) {
 function chargerSuivi(discret) {
   var pid = S.sv.pid; S.sv.attente = pid;
   if (!discret) { S.sv.data = null; rendreSuivi(S.vue); }
-  api('getSuiviCompta', pid, true).then(function (r) {
+  (discret ? apiFond : api)('getSuiviCompta', pid, true).then(function (r) {
     if (S.sv.attente !== pid) return;
     S.sv.data = r; S.sv.dataPid = pid;
     if (S.vue === 'impayes' || S.vue === 'relances') rendreSuivi(S.vue);
