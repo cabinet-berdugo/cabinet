@@ -1653,6 +1653,73 @@ table.pl.ht{width:100%;table-layout:auto}
   table.pl.ht td small{display:block;font-size:11px}
   table.pl.ht td.ht-e small.ht-l{display:block}
 }
+
+/* ───────── Planning « Par personne » : vraie vue téléphone ───────── */
+.pm{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.pm-who{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:var(--sh);position:relative;cursor:pointer}
+.pm-av{width:40px;height:40px;border-radius:12px;background:var(--btn-grad);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;flex:none;letter-spacing:.02em}
+.pm-wt{display:flex;flex-direction:column;flex:1;min-width:0}
+.pm-wt small{font-size:12px;color:var(--ink2);font-weight:600}
+.pm-wt select{appearance:none;-webkit-appearance:none;border:0;background:none;padding:0;margin:0;font:inherit;font-size:17px;font-weight:700;color:var(--ink);width:100%;min-height:26px;box-shadow:none;outline:none;text-overflow:ellipsis}
+.pm-who:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(18,91,255,.15)}
+.pm-chev{width:22px;height:22px;color:var(--acc);flex:none;pointer-events:none}
+.pm-wk{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--sh)}
+.pm-fl{width:44px;height:44px;border-radius:12px;border:0;background:#EEF3FC;color:var(--acc);display:grid;place-items:center;flex:none;cursor:pointer}
+.pm-fl svg{width:22px;height:22px}
+.pm-fl:active{background:#DCE6FA}
+.pm-wl{flex:1;min-width:0;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;padding:4px 0}
+.pm-wl b{font-family:var(--f-titre);font-size:17px;color:var(--ink);white-space:nowrap}
+.pm-wl small{font-size:12.5px;color:var(--acc);font-weight:600}
+.pm-wl[aria-current] small{color:var(--ink2);font-weight:500}
+.pm-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.pm-dj{border:1px solid var(--line);background:#fff;border-radius:12px;padding:6px 0 7px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;min-width:0}
+.pm-dj small{font-size:11px;color:var(--ink3);font-weight:700}
+.pm-dj b{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.pm-dj i{width:5px;height:5px;border-radius:50%;background:transparent;margin-top:2px}
+.pm-dj.occ i{background:var(--acc)}
+.pm-dj.td{background:var(--btn-grad);border-color:transparent}
+.pm-dj.td small,.pm-dj.td b{color:#fff}
+.pm-dj.td.occ i{background:#fff}
+.pm-days{display:flex;flex-direction:column;gap:10px}
+.pm-day{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--sh);scroll-margin-top:84px}
+.pm-day.td{border-color:#9DBBF6;box-shadow:0 0 0 3px rgba(18,91,255,.12),var(--sh)}
+.pm-day.vide{padding:11px 14px;box-shadow:none;background:#FAFBFE}
+.pm-dh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pm-dn{font-size:14px;color:var(--ink2)}.pm-dn b{font-size:16px;color:var(--ink)}
+.pm-auj{font-size:11.5px;font-weight:700;color:#fff;background:var(--btn-grad);border-radius:999px;padding:3px 9px}
+.pm-hz{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--acc);background:#EEF3FC;border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums}
+.pm-hz.cg{color:var(--amb);background:var(--ambbg)}.pm-hz.rep{color:var(--ink2);background:#F1F4F9}
+.pm-v{margin:4px 0 0;font-size:13.5px;color:#8A99B2}
+.pm-dh .pm-v{margin:0 0 0 auto;font-size:13px;color:#8A99B2;white-space:nowrap}
+.pm-day.vide{padding:12px 14px}
+.pm-it{margin-top:10px;padding:12px;border-radius:12px;background:#F7F9FE;border:1px solid #E8EEF8;display:flex;flex-direction:column;gap:7px}
+.pm-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pm-h b{font-size:17px;color:var(--acc);font-variant-numeric:tabular-nums;font-weight:700}
+.pm-h small{font-size:12.5px;color:var(--ink2)}
+.pm-q{display:flex;flex-direction:column;gap:2px}
+.pm-dr{font-size:16px;color:var(--ink)}
+.pm-sl{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.pm-sl b{font-size:15.5px;color:var(--ink)}
+.pm-sl small{font-size:12.5px;color:var(--ink3)}
+.pm-as{display:flex;flex-wrap:wrap;gap:6px}
+.pm-a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E1E8F4;border-radius:999px;padding:5px 11px;font-size:14px;max-width:100%}
+.pm-a b{font-weight:600;color:var(--ink)}
+.pm-a small{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.pm-a em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--acc);background:#EAF1FF;border-radius:999px;padding:1px 7px}
+.pm-a.vide{color:var(--amb);background:var(--ambbg);border-color:transparent;font-weight:600}
+.pm-x{font-size:13px;color:var(--ink2)}.pm-n{font-style:italic}
+.pm-tg{font-size:11.5px;font-weight:600;color:var(--acc);background:#EAF1FF;border-radius:999px;padding:1px 7px}
+.pm-it .pb{margin:0}
+@media (max-width:760px){
+  main{padding-bottom:calc(var(--nav) + 28px + env(safe-area-inset-bottom))!important}
+}
+@media (max-width:360px){.pm-strip{gap:4px}.pm-dj b{font-size:15px}.pm-wl b{font-size:16px}}
+
+@media (max-width:760px){
+  .ph.ph-pl{padding-top:14px;padding-bottom:16px;margin-bottom:14px}
+  .ph.ph-pl h1{font-size:26px}
+  .ph.ph-pl .ph-g{display:none}
+}
 </style>
 </head>
 <body>
@@ -2961,7 +3028,7 @@ function ouvrirPlanning() {
   else chargerPlanning(S.semaine);
 }
 function enTetePlanning() {
-  return '<div class="ph"><div class="ph-t"><h1>Planning</h1><p class="ph-g">Qui travaille, dans quelle salle et avec qui. Choisissez la vue qui vous convient.</p></div></div>' +
+  return '<div class="ph ph-pl"><div class="ph-t"><h1>Planning</h1><p class="ph-g">Qui travaille, dans quelle salle et avec qui. Choisissez la vue qui vous convient.</p></div></div>' +
     '<div class="seg seg-v" id="plSeg">' + vuesPlanning().map(function (v) { return '<button data-pv="' + v[0] + '"' + (S.plVue === v[0] ? ' class="on"' : '') + '>' + v[1] + '</button>'; }).join('') + '</div>';
 }
 function brancherEnTete() {
@@ -3122,6 +3189,9 @@ function rendreMoi() {
   // Carte « Aujourd'hui » en tête
   var auj = mes.filter(function (a) { return a.date === S.today; });
   var h = enTetePlanning();
+  var mob = planningMobile();
+  if (mob) h += htmlMoiMobile(r, p, moi, assistante, perso, jours, mes);
+  else {
   if (perso) {
     var cand = S.users.filter(function (u) { return u.fonction === S.cfg.fonctionDentiste || S.cfg.fonctionsAssistantes.indexOf(u.fonction) >= 0 || u.fonction === 'Secrétaire'; });
     h += '<div class="fld" style="max-width:420px"><label for="pCible">Praticien ou assistante</label><select id="pCible">' + groupesPersonnes(cand).map(function (g) {
@@ -3151,7 +3221,9 @@ function rendreMoi() {
       (lst.length ? lst.map(ligne).join('') : S.cible.secretaire ? (hor ? '' : '<div class="meta">—</div>') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
   });
   h += '</div>';
+  }
   $('#main').innerHTML = h;
+  S.moiMob = mob;
   brancherEnTete();
   if ($('#pCible')) $('#pCible').onchange = function () { S.cibleP = this.value; ouvrirPlanning(); };
   // les semaines voisines sont préparées en arrière-plan : la navigation est immédiate
@@ -3163,7 +3235,76 @@ function rendreMoi() {
   $('#mPrev').onclick = function () { chargerMoi(ajout(S.semaine, -7)); };
   $('#mNext').onclick = function () { chargerMoi(ajout(S.semaine, 7)); };
   $('#mNow').onclick = function () { chargerMoi(S.today); };
+  // mobile : bandeau des jours → va au jour touché
+  $$('[data-pj]').forEach(function (b) { b.onclick = function () { var z = document.getElementById('pj-' + b.getAttribute('data-pj')); if (z) z.scrollIntoView({ behavior: 'smooth', block: 'start' }); }; });
 }
+function planningMobile() { return window.matchMedia('(max-width:760px)').matches; }
+/** « Par personne » sur téléphone : choix de la personne, semaine, bandeau des 7 jours, puis une carte par jour (lisible, sans colonnes serrées). */
+function htmlMoiMobile(r, p, moi, assistante, perso, jours, mes) {
+  var horairesDe = function (j, i) {
+    if (!((assistante || S.cible.secretaire) && p)) return null;
+    var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
+    var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
+    if (cg) return { t: 'Congé', k: 'cg' };
+    if (!c) return null;
+    if (c.statut === 'Repos') return { t: 'Repos', k: 'rep' };
+    return { t: hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + '–' + hm(c.pauseFin) : ''), k: '' };
+  };
+  var u = S.users.filter(function (x) { return x.id === moi; })[0] || { nom: '' };
+  var ini = String(u.nom || '').replace(/^Dr\.?\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (x) { return x.charAt(0).toUpperCase(); }).join('');
+  var h = '<div class="pm">';
+  // personne
+  if (perso) {
+    var cand = S.users.filter(function (x) { return x.fonction === S.cfg.fonctionDentiste || S.cfg.fonctionsAssistantes.indexOf(x.fonction) >= 0 || x.fonction === 'Secrétaire'; });
+    h += '<label class="pm-who" for="pCible"><span class="pm-av" aria-hidden="true">' + esc(ini) + '</span><span class="pm-wt"><small>Planning de</small>' +
+      '<select id="pCible" aria-label="Choisir la personne">' + groupesPersonnes(cand).map(function (g) {
+        return '<optgroup label="' + esc(g.fonction) + '">' + g.liste.map(function (x) { return '<option value="' + esc(x.id) + '"' + (x.id === moi ? ' selected' : '') + '>' + esc(x.nom) + '</option>'; }).join('') + '</optgroup>';
+      }).join('') + '</select></span><svg class="pm-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></label>';
+  }
+  // semaine
+  var cette = jours.indexOf(S.today) >= 0, m0 = MOIS_COURTS[Number(jours[0].slice(5, 7)) - 1].toLowerCase(), m6 = MOIS_COURTS[Number(jours[6].slice(5, 7)) - 1].toLowerCase();
+  var titre = Number(jours[0].slice(8, 10)) + (m0 !== m6 ? ' ' + m0 : '') + ' – ' + Number(jours[6].slice(8, 10)) + ' ' + m6;
+  h += '<div class="pm-wk"><button type="button" id="mPrev" class="pm-fl" aria-label="Semaine précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>' +
+    '<button type="button" id="mNow" class="pm-wl"' + (cette ? ' aria-current="true"' : '') + '><b>' + esc(titre) + '</b><small>' + (cette ? 'Cette semaine' : '↺ Revenir à cette semaine') + '</small></button>' +
+    '<button type="button" id="mNext" class="pm-fl" aria-label="Semaine suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></div>';
+  // bandeau des 7 jours
+  var lettres = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  h += '<div class="pm-strip" role="tablist">' + jours.map(function (j, i) {
+    var n = mes.filter(function (a) { return a.date === j; }).length, hz = horairesDe(j, i);
+    return '<button type="button" data-pj="' + j + '" class="pm-dj' + (j === S.today ? ' td' : '') + (n || (hz && !hz.k) ? ' occ' : '') + '"><small>' + lettres[i] + '</small><b>' + Number(j.slice(8, 10)) + '</b><i></i></button>';
+  }).join('') + '</div></div>';
+  // une carte par jour
+  h += '<div class="pm-days">' + jours.map(function (j, i) {
+    var lst = mes.filter(function (a) { return a.date === j; }), hz = horairesDe(j, i);
+    var tete = '<div class="pm-dh"><span class="pm-dn"><b>' + JOURS[i] + ' ' + Number(j.slice(8, 10)) + '</b> ' + MOIS_COURTS[Number(j.slice(5, 7)) - 1].toLowerCase() + '</span>' +
+      (j === S.today ? '<span class="pm-auj">Aujourd’hui</span>' : '') + (hz ? '<span class="pm-hz' + (hz.k ? ' ' + hz.k : '') + '">' + esc(hz.t) + '</span>' : '') + '</div>';
+    if (!lst.length) {
+      var vide = S.cible.secretaire ? '' : assistante ? 'Aucun praticien affecté' : 'Pas d’affectation';
+      if (vide && !hz) tete = tete.replace(/<\/div>$/, '<span class="pm-v">' + vide + '</span></div>');
+      return '<section class="pm-day vide' + (j === S.today ? ' td' : '') + '" id="pj-' + j + '">' + tete + (vide && hz && !hz.k ? '<p class="pm-v">' + vide + '</p>' : '') + '</section>';
+    }
+    return '<section class="pm-day' + (j === S.today ? ' td' : '') + '" id="pj-' + j + '">' + tete + lst.map(function (a) {
+      var moiA = a.assistantes.filter(function (y) { return y.cle === moi; })[0];
+      var heure = '<div class="pm-h"><b>' + hm(a.debut) + ' – ' + hm(a.fin) + '</b>' + (a.pause ? '<small>pause ' + hm(a.pause.debut) + '–' + hm(a.pause.fin) + '</small>' : '') + '</div>';
+      var salle = '<span class="pm-sl"><b>' + esc(a.salleNom || 'Salle à définir') + '</b>' + (a.etage ? '<small>' + esc(a.etage) + '</small>' : '') + '</span>';
+      var corps;
+      if (assistante) {
+        corps = '<div class="pm-q"><b class="pm-dr">' + esc(a.dentisteNom) + '</b>' + salle + '</div>' +
+          (moiA && moiA.propre ? '<div class="pm-x">Vos horaires : ' + hm(moiA.debut) + ' – ' + hm(moiA.fin) + '</div>' : '') +
+          (moiA && moiA.partageeAvec.length ? '<div class="pm-x"><span class="pm-tg">Partagée</span> aussi avec ' + esc(moiA.partageeAvec.map(function (q) { return q.dentisteNom + (q.salleNom ? ' (' + q.salleNom + ')' : ''); }).join(', ')) + '</div>' : '');
+      } else {
+        corps = '<div class="pm-q">' + salle + '</div><div class="pm-as">' + (a.assistantes.length ? a.assistantes.map(function (y) {
+          return '<span class="pm-a"><b>' + esc(y.nom) + '</b>' + (y.propre ? '<small>' + hm(y.debut) + '–' + hm(y.fin) + '</small>' : '') +
+            (y.independante ? '<em>indép.</em>' : '') + (y.partageeAvec.length ? '<em title="' + esc('Aussi avec ' + y.partageeAvec.map(function (q) { return q.dentisteNom; }).join(', ')) + '">partagée</em>' : '') + '</span>';
+        }).join('') : '<span class="pm-a vide">Assistante à affecter</span>') + '</div>';
+      }
+      return '<div class="pm-it">' + heure + corps + (a.note ? '<div class="pm-x pm-n">' + esc(a.note) + '</div>' : '') + htmlProblemes(a) + '</div>';
+    }).join('') + '</section>';
+  }).join('') + '</div>';
+  return h;
+}
+// passage ordinateur ↔ téléphone (rotation, fenêtre) : la vue « Par personne » se redessine dans la bonne mise en page
+window.addEventListener('resize', function () { if (S.vue === 'planning' && S.plVue === 'personne' && S.moiAff && S.moiMob !== planningMobile()) rendreMoi(); });
 
 // ── Éditeur d'affectation ──
 /**
