@@ -1757,11 +1757,12 @@ table.pl.ht{width:100%;table-layout:auto}
    Sinon iOS fait remonter la barre du bas (élément fixe) au milieu de l'écran pendant le défilement. */
 html.ios-defil{height:100%;overflow:hidden}
 html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;scroll-padding-top:20px}
-/* Barre du bas sur téléphone : plus fine, collée au bord de l'écran.
-   --ecart-bas : correction d'iOS 26, qui laisse un vide sous les éléments fixes dans l'application installée. */
+/* Barre du bas sur téléphone : plus fine, collée au bas de la zone affichée. */
 @media (max-width:760px){
   :root{--nav:54px}
-  .bnav{bottom:calc(-1 * var(--ecart-bas, 0px));padding:4px 6px max(6px, calc(env(safe-area-inset-bottom) - 16px));box-shadow:0 -4px 14px rgba(11,23,54,.05)}
+  .bnav{bottom:0;padding:4px 6px max(6px, calc(env(safe-area-inset-bottom) - 16px));background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border-top:1px solid var(--line)}
+  /* iOS 26 (application installée) : le bas de l'écran est une bande dessinée par iOS ; la barre s'arrête juste au-dessus, sans marge en plus */
+  html.ecart-ios .bnav{padding-bottom:4px}
   .bnav button{padding:5px 0 4px;margin:0 3px;font-size:10.5px;border-radius:12px;line-height:1.25}
   .bnav button svg{width:22px;height:22px;margin-bottom:1px}
   .bnav button.on{box-shadow:0 3px 10px rgba(0,71,217,.28)}
@@ -1829,6 +1830,7 @@ function ecartBas() {
     }
   } catch (e) { g = 0; }
   document.documentElement.style.setProperty('--ecart-bas', Math.round(g) + 'px');
+  document.documentElement.classList.toggle('ecart-ios', g > 0);
 }
 ecartBas();
 window.addEventListener('resize', ecartBas);
