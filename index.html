@@ -1512,6 +1512,13 @@ table.pl{border-collapse:separate;border-spacing:0}
   .pro-f input{grid-column:1/-1}
   .pt-dr{grid-template-columns:80px 1fr}.pt-dr .meta{grid-column:1/-1;text-align:left}
 }
+.pro-h.pt-h6,.pro-r.pt-h6{grid-template-columns:.8fr 1.5fr 1.3fr .9fr 1.2fr 1.1fr}
+.pt-pa{font-weight:600;color:var(--ink)}.pt-pa small{display:block;font-weight:400;color:var(--ink3);font-size:12px}
+.pt-dr{grid-template-columns:80px 1.4fr auto 1fr}
+@media (max-width:760px){
+  .pro-r.pt-h6{grid-template-columns:1fr auto;grid-template-areas:'d s' 'a a' 'p l'}.pro-r.pt-h6 .pro-d{grid-area:d}.pro-r.pt-h6 .pt-s{grid-area:s;justify-self:end}.pro-r.pt-h6 .pt-pa{grid-area:a}.pro-r.pt-h6 .pro-p{grid-area:p}.pro-r.pt-h6 .pro-l{grid-area:l;justify-self:end}.pro-r.pt-h6 .pt-cr{display:none}
+  .pt-dr{grid-template-columns:70px 1fr auto}.pt-dr .meta{grid-column:1/-1;text-align:left}
+}
 </style>
 </head>
 <body>
@@ -4287,7 +4294,7 @@ function sourceAnnuel(an) {
     (an.source === 'classeurs' ? '<p class="hint">Pas de synthèse pour ' + an.annee + ' : facturé lu dans les classeurs du mois ; encaissé non disponible.</p>' : '');
 }
 function euros(t) { var n = parseFloat(String(t || '').replace(/[^\d,.-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
-// ───────── Prothèses : suivi des livraisons Protheasy (numéros, dates, statuts ; jamais de nom de patient ni de montant) ─────────
+// ───────── Prothèses : suivi des livraisons Protheasy (numéros, patient, dentiste, dates, statuts — comme dans Protheasy ; jamais de montant) ─────────
 S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } };
 function ouvrirProtheses() { rendreProtheses(); chargerProtheses(); }
 function chargerProtheses(force) {
@@ -4309,7 +4316,7 @@ function ptzJ(prevue, auj) {
 function dateHeurePtz(v) { if (!v) return '—'; var h = String(v).slice(11, 16); return esc(dCourt(v.slice(0, 10))) + (h ? ' à ' + h.replace(':', 'h') : ''); }
 function rendreProtheses() {
   var d = S.pro.data, f = S.pro.f;
-  var h = '<div class="ph"><div class="ph-t"><h1>Prothèses</h1><p class="ph-g">Les livraisons du laboratoire, d’après Protheasy : numéros, dates et statuts. Jamais de nom de patient ni de montant.</p></div>' +
+  var h = '<div class="ph"><div class="ph-t"><h1>Prothèses</h1><p class="ph-g">Les commandes et livraisons du laboratoire, relevées sur Protheasy plusieurs fois par jour.</p></div>' +
     '<div class="ph-a"><button class="btn pri" id="ptI">Importer depuis Protheasy</button></div></div>';
   if (!d) { $('#main').innerHTML = h + sq('stats', 'Lecture des livraisons…'); $('#ptI').onclick = importPtz; return; }
   var auj = d.aujourdhui, lun = lundi(auj), dim = ajout(lun, 6);
@@ -4321,22 +4328,23 @@ function rendreProtheses() {
     '<div><small>Livraisons en cours</small><b>' + ((cat.encours || 0) + (cat.expediees || 0)) + '</b></div><div><small>Commandes à venir</small><b>' + d.aVenir.length + '</b></div></div>';
   h += '<div class="pt-sync">' + (d.sync ? '<span class="pt-ok"></span>Dernière synchronisation réussie : <b>' + esc(dHeure(d.sync.le)) + '</b>' + (d.sync.parNom ? ' par ' + esc(d.sync.parNom) : '') : '<span class="pt-ko"></span>Aucune synchronisation pour l’instant : importez la page « Livraisons » de Protheasy.') + '</div>';
   h += '<div class="seg pt-seg" id="ptV">' + vues.map(function (v) { return '<button data-pv="' + v[0] + '"' + (f.vue === v[0] ? ' class="on"' : '') + '>' + v[1] + ' <span class="cnt">' + v[2] + '</span></button>'; }).join('') + '</div>';
-  h += '<div class="filters pro-f"><input type="search" id="ptQ" placeholder="Rechercher un n° de livraison ou de commande" value="' + esc(f.q) + '" inputmode="numeric" aria-label="Rechercher par numéro">' +
+  h += '<div class="filters pro-f"><input type="search" id="ptQ" placeholder="Rechercher : n° de livraison, de commande ou patient" value="' + esc(f.q) + '" aria-label="Rechercher par numéro ou patient">' +
     (f.vue === 'avenir' ? '<select id="ptP" aria-label="Praticien"><option value="">Tous les praticiens</option>' + d.praticiens.map(function (p) { return '<option value="' + esc(p.id) + '"' + (f.prat === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select>' : '') +
     '<button class="btn" id="ptR">↻ Actualiser les livraisons</button><a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir Protheasy ↗</a></div>';
-  var q = f.q.replace(/[#\s]/g, '');
+  var q = f.q.replace(/[#\s]/g, ''), qn = sansAccent(f.q).trim();
+  var trouveC = function (c) { return !qn || (q && c.numero.indexOf(q) >= 0) || sansAccent(c.patient).indexOf(qn) >= 0; };
   h += '<div id="ptL">';
   if (f.vue === 'avenir') {
-    var v = d.aVenir.filter(function (c) { return (!q || c.numero.indexOf(q) >= 0) && (!f.prat || c.praticien === f.prat); });
+    var v = d.aVenir.filter(function (c) { return trouveC(c) && (!f.prat || c.praticien === f.prat); });
     if (!d.aVenir.length) h += '<div class="empty">Aucune commande à venir connue.<div class="hint" style="margin-top:6px">Importez la page « Commandes » de Protheasy pour voir les dates de livraison prévues et les statuts de fabrication.</div></div>';
     else if (!v.length) h += '<div class="empty">Aucune commande ne correspond.</div>';
-    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h4"><span>Commande</span><span>Praticien</span><span>Statut</span><span>Livraison prévue</span></div>' + v.map(function (c) {
-      return '<div class="pro-r pt-h4 pt-c"><span class="pro-d"><b>#' + esc(c.numero) + '</b></span><span class="pro-p">' + esc(c.praticienNom || '—') + '</span><span>' + ptzPill(c.statut) + '</span><span class="pro-l">' + ptzJ(c.prevue, auj) + '</span></div>';
+    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h6"><span>Commande</span><span>Patient</span><span>Dentiste</span><span>Commandée le</span><span>Livraison prévue</span><span>Statut</span></div>' + v.map(function (c) {
+      return '<div class="pro-r pt-h6 pt-c"><span class="pro-d"><b>#' + esc(c.numero) + '</b></span><span class="pt-pa">' + esc(c.patient || '—') + '</span><span class="pro-p">' + esc(c.praticienNom || '—') + '</span><span class="pt-cr">' + (c.creeLe ? esc(dCourt(c.creeLe)) : '—') + '</span><span class="pro-l">' + ptzJ(c.prevue, auj) + '</span><span class="pt-s">' + ptzPill(c.statut) + '</span></div>';
     }).join('') + '</div>';
   } else {
     var w = d.livraisons.filter(function (l) {
       if (f.vue !== 'toutes' && ptzCategorie(l, d) !== f.vue) return false;
-      return !q || l.numero.indexOf(q) >= 0 || l.commandes.some(function (c) { return c.numero.indexOf(q) >= 0; });
+      return !qn || (q && l.numero.indexOf(q) >= 0) || l.commandes.some(trouveC);
     });
     if (!d.livraisons.length) h += '<div class="empty">Aucune livraison importée pour l’instant.<div class="hint" style="margin-top:6px">Cliquez sur « Importer depuis Protheasy » : quelques secondes suffisent.</div></div>';
     else if (!w.length) h += '<div class="empty">Aucune livraison ne correspond.</div>';
@@ -4345,7 +4353,7 @@ function rendreProtheses() {
         '<span class="pt-n">' + l.nbCommandes + ' commande' + (l.nbCommandes > 1 ? 's' : '') + '</span><span class="pro-l pt-p">' + (l.statut === 'Livrée' ? '<span class="meta">—</span>' : ptzJ(l.prevue, auj)) + '</span><span class="pt-s">' + ptzPill(l.statut) + '</span></div>';
     }).join('') + '</div>';
   }
-  h += '</div><p class="hint">Protheasy ne propose ni API ni export : la mise à jour se fait en collant une copie de sa page (bouton « Importer »). Les montants et les noms de patients ne sont jamais repris.' + (d.peutLien ? '' : '') + '</p>';
+  h += '</div><p class="hint">Relevé automatiquement sur Protheasy à 7h35, 11h35 et 16h35 (du lundi au samedi), quand l’ordinateur du cabinet est allumé. « Importer depuis Protheasy » permet aussi de mettre à jour à la main. Les montants ne sont jamais repris.</p>';
   $('#main').innerHTML = h;
   $('#ptI').onclick = importPtz;
   $('#ptR').onclick = function () { chargerProtheses(true); };
@@ -4364,7 +4372,7 @@ function detailPtz(num) {
     (l.prevue && l.statut !== 'Livrée' ? '<div><small>Livraison prévue</small><b>' + ptzJ(l.prevue, auj) + '</b></div>' : '') + '</div>' +
     '<div class="sec">Commandes de cette livraison</div>' +
     (l.commandes.length ? '<div class="pt-dl">' + l.commandes.map(function (c) {
-      return '<div class="pt-dr"><b>#' + esc(c.numero) + '</b><span>' + ptzPill(c.statut) + '</span><span class="meta">' + (c.prevue ? 'Prévue ' + ptzJ(c.prevue, auj) : 'Date prévue inconnue') + '</span></div>';
+      return '<div class="pt-dr"><b>#' + esc(c.numero) + '</b><span class="pt-pa">' + esc(c.patient || '—') + (c.praticienNom ? '<small>' + esc(c.praticienNom) + '</small>' : '') + '</span><span>' + ptzPill(c.statut) + '</span><span class="meta">' + (c.prevue ? 'Prévue ' + ptzJ(c.prevue, auj) : '') + '</span></div>';
     }).join('') + '</div>' + (l.commandes.length < l.nbCommandes ? '<p class="hint">' + (l.nbCommandes - l.commandes.length) + ' commande(s) pas encore connue(s) : dans Protheasy, dépliez la livraison avant de copier la page.</p>' : '')
       : '<p class="hint">Numéros de commande pas encore connus : dans Protheasy, dépliez la livraison (flèche à gauche du numéro) avant de copier la page.</p>') +
     '<p class="hint">Mis à jour le ' + esc(dHeure(l.majLe)) + '. Pour le détail des articles, ouvrez Protheasy.</p>';
@@ -4398,8 +4406,9 @@ function lireCopiePtz(txt, d) {
       if (j < lignes.length && !/^\s*#\d/.test(lignes[j])) { cells = lignes[j].split('\t').map(function (x) { return x.trim(); }).filter(Boolean); i = j; }
     }
     // ligne suivante éventuelle : badge de statut seul (ex. « direct », « hub ») — ignorée
-    var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [];
+    var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [], patient = '';
     cells.forEach(function (c) {
+      if (!patient && !/€|\d{3,}|^J[-+]?\d+$|^—$/.test(c) && !datesPtz(c).length && !trouve(c, stL) && !trouve(c.replace(/\s+(direct|hub)$/i, ''), stC) && !trouve(c, prat) && !/^\d+\s+commandes?$/i.test(c)) patient = c.slice(0, 80);
       var k = c.match(/^(\d{1,4})\s+commandes?$/i); if (k) nb = Number(k[1]);
       var sl = trouve(c, stL); if (sl) stLiv = sl;
       var sc = trouve(c.replace(/\s+(direct|hub)$/i, ''), stC); if (sc) stCmd = sc;
@@ -4412,10 +4421,10 @@ function lireCopiePtz(txt, d) {
       livs.push(cur); detail = false;
     } else if (stCmd) {
       var cree = dates.filter(function (x) { return x.h; })[0], prev = dates.filter(function (x) { return !x.h; })[0];
-      cmds.push({ numero: m[1], statut: stCmd, prevue: prev ? prev.j : '', praticien: praticien, creeLe: cree ? cree.j : '' });
+      cmds.push({ numero: m[1], patient: patient, statut: stCmd, prevue: prev ? prev.j : '', praticien: praticien, creeLe: cree ? cree.j : '' });
       cur = null; detail = false;
     } else if (cur && detail) {
-      cur.commandes.push({ numero: m[1], creeLe: dates[0] ? dates[0].j : '' });
+      cur.commandes.push({ numero: m[1], patient: patient, creeLe: dates[0] ? dates[0].j : '' });
     }
   }
   return { livraisons: livs, commandes: cmds };
@@ -4429,7 +4438,7 @@ function importPtz() {
     '<li>Sélectionnez toute la page (<kbd>⌘ A</kbd> ou <kbd>Ctrl A</kbd>), copiez (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>), puis collez ci-dessous.</li></ol>' +
     '<div class="fld"><label for="ptT">Copie de la page Protheasy</label><textarea id="ptT" rows="7" placeholder="Collez ici…" autocomplete="off" spellcheck="false"></textarea></div>' +
     '<div class="pt-ap" id="ptA" aria-live="polite"><span class="meta">Rien de collé pour l’instant.</span></div>' +
-    '<p class="hint">La copie est lue sur votre appareil : seuls les numéros, dates, statuts et praticiens sont envoyés. Les noms de patients, les articles et les montants sont ignorés et la copie est effacée après l’import.</p><div class="err" id="ptE"></div>',
+    '<p class="hint">La copie est lue sur votre appareil : seuls les numéros, patients, dentistes, dates et statuts sont envoyés. Les articles et les montants sont ignorés et la copie est effacée après l’import.</p><div class="err" id="ptE"></div>',
     '<button class="btn" id="ptX">Annuler</button><span class="sp"></span><button class="btn pri" id="ptO" disabled>Enregistrer</button>');
   var lu = null;
   var effacer = function () { if ($('#ptT')) $('#ptT').value = ''; lu = null; };
