@@ -1539,6 +1539,45 @@ table.pl{border-collapse:separate;border-spacing:0}
 .btn.sv-act.tourne{pointer-events:none;opacity:.85}.btn.sv-act.tourne svg{animation:svTourne .9s linear infinite}
 @keyframes svTourne{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.btn.sv-act.tourne svg{animation:none}}
+.ca-c{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);overflow:hidden;margin-bottom:18px}
+.ca-b{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding:18px 22px;background:var(--deep,#061B42);color:#fff}
+.ca-cab .ca-b{background:#0A2A63}
+.ca-n b{display:block;font-family:var(--f-titre);font-size:18px;letter-spacing:-.01em}
+.ca-n small,.ca-t small{display:block;color:rgba(255,255,255,.72);font-size:12.5px;margin-top:3px}
+.ca-t{text-align:right}.ca-t small{margin:0 0 2px}
+.ca-t b{display:block;font-family:var(--f-titre);font-size:26px;letter-spacing:-.02em;line-height:1.1}
+.ca-t span{display:block;font-size:12px;color:rgba(255,255,255,.72);margin-top:3px}
+.ca-g{position:relative;padding:14px 12px 0;min-height:150px}
+.ca-g svg{display:block;overflow:visible;touch-action:pan-y}
+.ca-gr{stroke:#E6ECF5;stroke-width:1}
+.ca-ax{font-size:11px;fill:#7C8AA5;font-family:inherit}
+.ca-ligne{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ca-aire{fill:var(--acc);opacity:.07}
+.ca-pt{fill:var(--acc);stroke:#fff;stroke-width:2}
+.ca-pt.max{fill:#061B42}
+.ca-lab{font-size:11.5px;font-weight:700;fill:var(--ink)}
+.ca-cr{stroke:#B8C6E3;stroke-width:1;stroke-dasharray:3 3}
+.ca-hv{fill:#fff;stroke:var(--acc);stroke-width:2.5}
+.ca-hit{fill:transparent;cursor:crosshair}
+.ca-tip{display:none;position:absolute;pointer-events:none;background:#0B1730;color:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 6px 18px rgba(6,27,66,.25);white-space:nowrap;z-index:2}
+.ca-tip small{display:block;font-size:11.5px;color:rgba(255,255,255,.7)}.ca-tip b{font-size:14px}
+.ca-vide{padding:30px 10px;text-align:center;color:var(--ink3);font-size:14px}
+.ca-m{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line);margin-top:10px}
+.ca-mo{background:#fff;border:0;padding:11px 12px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
+.ca-mo:hover{background:#F5F8FE}
+.ca-mo small{font-size:12px;color:var(--ink2);font-weight:600}
+.ca-mo b{font-size:14.5px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ca-mo.fut{cursor:default}.ca-mo.fut b,.ca-mo.fut small{color:#B3BFD3}.ca-mo.fut:hover{background:#fff}
+.ca-mo.cur{background:#F2F6FF}.ca-mo.cur small::after{content:' · en cours';font-weight:500;color:var(--acc)}
+.ca-mo.top b{color:#061B42}.ca-mo.top small::after{content:' · meilleur mois';font-weight:500;color:var(--acc)}
+.cp-j.fixe>button{cursor:default}
+@media (max-width:760px){
+  .ca-b{padding:15px 16px;flex-wrap:wrap}.ca-t{text-align:left}.ca-t b{font-size:22px}
+  .ca-m{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ca-mo{padding:10px}.ca-mo b{font-size:13.5px}
+  .ca-mo.top small::after{content:' ★'}
+  .ca-g{padding:10px 6px 0}
+}
 </style>
 </head>
 <body>
@@ -4062,6 +4101,7 @@ function ouvrirCompta() {
   var tous = S.cfg.compta && S.cfg.compta.tous;
   if (!S.cpt.pid) S.cpt.pid = tous && !tous.some(function (p) { return p.id === S.me.id; }) ? '*' : S.me.id; // Maxime et Hervé : d'abord leur propre mois, jour par jour
   if (!tous) S.cpt.vue = 'mois';
+  else if (!S.cpt.vue) S.cpt.vue = 'annuel'; // Maxime et Hervé : le facturé de l'année, praticien par praticien
   if ((!tous && !S.cpt.choixP) || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : le mois en cours, sauf période choisie parmi celles autorisées
   rendreCompta(); chargerCompta();
 }
@@ -4232,13 +4272,14 @@ function totauxMois(mois) {
   return { f: t.nf ? t.f : null, e: t.ne ? t.e : null, x: t.nx ? t.x : null };
 }
 /** Détail jour par jour du facturé (repliable par jour : montants par mode). */
-function joursCompta(d, c) {
+function joursCompta(d, c, sansModes) {
   var jours = d.jours || [], max = Math.max.apply(null, jours.map(function (j) { return j.n; }).concat([1]));
   var actifs = jours.filter(function (j) { return j.n > 0; }), liste = c.tousJours ? jours : actifs;
   var h = '<div class="cp-s"><h2>Facturé jour par jour</h2>' + (jours.length > actifs.length ? '<button class="lk" id="cpTous">' + (c.tousJours ? 'Jours travaillés seulement' : 'Afficher tous les jours') + '</button>' : '') + '</div>';
   h += liste.length ? '<div class="cp-l">' + liste.map(function (j) {
     var k = j.date, o = !!(c.ouverts || {})[k];
-    return '<div class="cp-j' + (o ? ' open' : '') + '" data-j="' + esc(k) + '"><button><span class="d">' + esc(j.date) + '</span><span class="t' + (j.n ? '' : ' cp-zero') + '">' + esc(j.total) + '</span>' + CHEV + '</button>' +
+    if (sansModes) o = false;
+    return '<div class="cp-j' + (o ? ' open' : '') + (sansModes ? ' fixe' : '') + '" data-j="' + esc(k) + '"><button' + (sansModes ? ' tabindex="-1"' : '') + '><span class="d">' + esc(j.date) + '</span><span class="t' + (j.n ? '' : ' cp-zero') + '">' + esc(j.total) + '</span>' + (sansModes ? '' : CHEV) + '</button>' +
       (j.n ? '<div class="bar" title="' + esc(j.date + ' : ' + j.total) + '"><i style="width:' + Math.round(j.n / max * 100) + '%"></i></div>' : '') +
       (o ? '<div class="cp-md">' + (d.modes || []).map(function (m, x) { return euros(j.modes[x]) ? '<span>' + esc(m) + ' ' + esc(j.modes[x]) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
   }).join('') + '</div>' : '<div class="empty">Aucune journée remplie pour l’instant ce mois-ci.</div>';
@@ -4286,7 +4327,7 @@ function rendreCompta() {
   var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous;
   if (tous && c.vue === 'annuel') return rendreAnnuel();
   var d = c.data && !c.data.erreur && (!tous || (c.data.annee === c.annee && c.data.mois === c.mois)) ? c.data : null;
-  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires facturé et encaissé de chaque praticien et du cabinet, mois par mois. ' : d && d.regles ? 'Les périodes et les montants que Dr Maxime Berdugo ou Dr Hervé Berdugo vous ont ouverts. ' : 'Votre chiffre d’affaires facturé du mois en cours. ') +
+  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires facturé du mois, praticien par praticien et pour tout le cabinet. ' : d && d.regles ? 'Les périodes et les montants que Dr Maxime Berdugo ou Dr Hervé Berdugo vous ont ouverts. ' : 'Votre chiffre d’affaires facturé du mois en cours. ') +
     'Les chiffres viennent des classeurs Google Sheets : on continue de les remplir là-bas.</p></div></div>';
   if (!tous && d && d.regles) h += comptaRegles(d, c); // ── Praticien avec autorisations réglées par Maxime ou Hervé ──
   else if (!tous) {
@@ -4307,17 +4348,18 @@ function rendreCompta() {
     h += '<div class="cp-pr"><button data-pp="*" class="' + (c.pid === '*' ? 'on' : '') + '">Tous les praticiens</button>' + tous.map(function (p) { return '<button data-pp="' + esc(p.id) + '" class="' + (p.id === c.pid ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
     h += selPeriode(c, true);
     var an = c.an && c.an.cle === '*:' + c.annee && !c.an.erreur ? c.an : null, mi = c.mois - 1;
-    var bandeau = '<button class="cp-ann" id="cpAnn">' + ico('compta', 'cp-ann-i') + '<span><b>Chiffre d’affaires annuel</b><small>' + c.annee + ' · tous les praticiens · facturé, encaissé et écart</small></span>' + CHEV + '</button>';
+    h = h.replace('<div class="ph"><div class="ph-t">', '<div class="ph"><div class="ph-t"><button class="ph-ret" id="cpRet">‹ Année ' + c.annee + ' · tous les praticiens</button>');
+    var bandeau = '';
     if (c.pid === '*') {
       if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
       else if (!an) h += sq('table', 'Lecture de la synthèse…');
       else {
         var tf = 0, te = 0, af = false, ae = false;
         var lignes = an.praticiens.map(function (p) { var m = p.mois[mi]; if (m.f !== null) { tf += m.f; af = true; } if (m.e !== null) { te += m.e; ae = true; }
-          return '<tr class="clic" data-vp="' + esc(p.id) + '"><td><span class="m-l">' + esc(p.nom) + '</span><span class="m-c">' + esc(p.prenom) + '</span> <span class="cp-go">›</span></td><td>' + eurT(m.f) + '</td><td>' + eurT(m.e) + '</td></tr>'; }).join('');
-        h += '<div class="cp-k cp-k2"><div class="ca"><small>Facturé · ' + MOIS_NOMS[mi] + ' ' + c.annee + ' · cabinet</small><b>' + (af ? eur(tf) : '—') + '</b></div><div><small>Encaissé · cabinet</small><b>' + (ae ? eur(te) : '—') + '</b></div></div>' + bandeau;
-        h += '<h2>' + MOIS_NOMS[mi] + ' ' + c.annee + ' · par praticien</h2><div class="cp-l cp-sc"><table class="cp-t cp-an"><thead><tr><th>Praticien</th><th>Facturé</th><th>Encaissé</th></tr></thead><tbody>' + lignes +
-          '</tbody><tfoot><tr><td>Total cabinet</td><td>' + (af ? eur(tf) : '—') + '</td><td>' + (ae ? eur(te) : '—') + '</td></tr></tfoot></table></div><p class="hint">Touchez un praticien pour voir son détail du mois.</p>';
+          return '<tr class="clic" data-vp="' + esc(p.id) + '"><td><span class="m-l">' + esc(p.nom) + '</span><span class="m-c">' + esc(p.prenom) + '</span> <span class="cp-go">›</span></td><td>' + eurT(m.f) + '</td></tr>'; }).join('');
+        h += '<div class="cp-k cp-k1"><div class="ca"><small>Facturé · ' + MOIS_NOMS[mi] + ' ' + c.annee + ' · cabinet</small><b>' + (af ? eur(tf) : '—') + '</b></div></div>';
+        h += '<h2>' + MOIS_NOMS[mi] + ' ' + c.annee + ' · par praticien</h2><div class="cp-l cp-sc"><table class="cp-t cp-an"><thead><tr><th>Praticien</th><th>Facturé</th></tr></thead><tbody>' + lignes +
+          '</tbody><tfoot><tr><td>Total cabinet</td><td>' + (af ? eur(tf) : '—') + '</td></tr></tfoot></table></div><p class="hint">Touchez un praticien pour voir ses journées du mois.</p>';
         h += sourceAnnuel(an);
       }
     } else {
@@ -4327,18 +4369,10 @@ function rendreCompta() {
         h += '<h2 class="cp-h">' + esc(d.praticien.nom) + ' · ' + esc(d.libelle) + '</h2>';
         if (!d.trouve) h += '<div class="empty">Pas de classeur « ' + esc(d.fichier) + ' » dans Google Drive.</div>' + bandeau;
         else {
-          var lp = an ? an.praticiens.filter(function (p) { return p.id === c.pid; })[0] : null;
-          var encM = lp ? lp.mois[mi].e : null;
-          if (encM === null && d.totalEncaisse) encM = d.totalEncaisse;
           h += '<div class="cp-k"><div class="ca"><small>Chiffre d’affaires facturé</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div>' +
-            '<div><small>Encaissé</small><b>' + eurT(encM) + '</b></div>' +
             (d.joursTravailles ? '<div><small>Jours travaillés</small><b>' + esc(d.joursTravailles) + '</b></div>' : '') +
-            (d.moyenne ? '<div><small>Moyenne / jour</small><b>' + esc(d.moyenne) + '</b></div>' : '') + '</div>' + bandeau;
-          if (d.encaisse && d.encaisse.length) h += '<h2>Facturé et encaissé par mode de paiement</h2><div class="cp-l cp-sc"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th><th>Encaissé</th></tr></thead><tbody>' +
-            d.encaisse.map(function (x) { return '<tr><td>' + esc(x.mode) + '</td><td>' + esc(x.facture || '—') + '</td><td>' + esc(x.encaisse || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
-          else if (d.total && d.total.modes && d.total.modes.length) h += '<h2>Facturé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th></tr></thead><tbody>' +
-            (d.modes || []).map(function (m, x) { return '<tr><td>' + esc(m) + '</td><td>' + esc(d.total.modes[x] || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
-          h += joursCompta(d, c);
+            (d.moyenne ? '<div><small>Moyenne / jour</small><b>' + esc(d.moyenne) + '</b></div>' : '') + '</div>';
+          h += joursCompta(d, c, true);
         }
         h += '<div class="cp-o">' + (d.url ? '<a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir le classeur du mois</a>' : '') + '</div>';
       }
@@ -4354,47 +4388,114 @@ function selPeriode(c, avecMois) {
     '<label>Année<select id="cpA">' + ans.map(function (y) { return '<option' + (y === c.annee ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select></label>' +
     (avecMois ? '<button id="cpP" aria-label="Mois précédent">‹</button><button id="cpN" aria-label="Mois suivant">›</button>' : '') + '<button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
 }
-/** Page « Chiffre d'affaires annuel » (Maxime et Hervé) : tous les praticiens, puis le détail mois par mois d'un praticien. */
+/** Page « Chiffre d'affaires facturé » (Maxime et Hervé) : le cabinet puis chaque praticien — total de l'année, courbe et montant de chaque mois. */
 function rendreAnnuel() {
   var c = S.cpt, an = c.an && c.an.cle === '*:' + c.annee && !c.an.erreur ? c.an : null;
-  var h = '<div class="ph"><div class="ph-t"><button class="ph-ret" id="cpRet">‹ Chiffre d’affaires du mois</button><h1>Chiffre d’affaires annuel</h1><p class="ph-g">Tous les praticiens, du 1er janvier au dernier mois disponible, d’après la synthèse Google Sheets. Touchez un praticien pour son détail mois par mois.</p></div></div>';
+  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires facturé</h1><p class="ph-g">Le facturé de chaque praticien sur l’année, mois par mois, d’après la synthèse Google Sheets. Touchez un mois pour voir ses journées.</p></div></div>';
   h += selPeriode(c, false);
   if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
   else if (!an) h += sq('table', 'Lecture de la synthèse…');
-  else if (!c.anP) {
-    var T = { f: null, e: null, x: null }, plus = function (k, v) { if (v !== null) T[k] = (T[k] || 0) + v; };
-    var lignes = an.praticiens.map(function (p) { var t = totauxMois(p.mois); plus('f', t.f); plus('e', t.e); plus('x', t.x);
-      return '<tr class="clic" data-ap="' + esc(p.id) + '"><td><span class="m-l">' + esc(p.nom) + '</span><span class="m-c">' + esc(p.prenom) + '</span> <span class="cp-go">›</span></td><td>' + eurC(t.f) + '</td><td>' + eurC(t.e) + '</td><td>' + eurC(t.x) + '</td></tr>'; }).join('');
-    h += '<div class="cp-k cp-k3"><div class="ca"><small>CA annuel facturé · cabinet · ' + c.annee + '</small><b>' + eurT(T.f) + '</b></div><div><small>CA annuel encaissé</small><b>' + eurT(T.e) + '</b></div><div><small>Écart</small><b>' + eurT(T.x) + '</b></div></div>';
-    h += '<h2>' + c.annee + ' · par praticien</h2><div class="cp-l cp-sc"><table class="cp-t cp-an cp-an4"><thead><tr><th>Praticien</th><th><span class="m-l">CA annuel facturé</span><span class="m-c">Facturé (€)</span></th><th><span class="m-l">CA annuel encaissé</span><span class="m-c">Encaissé (€)</span></th><th>Écart<span class="m-c"> (€)</span></th></tr></thead><tbody>' + lignes +
-      '</tbody><tfoot><tr><td><span class="m-l">TOTAL CABINET</span><span class="m-c">TOTAL</span></td><td>' + eurC(T.f) + '</td><td>' + eurC(T.e) + '</td><td>' + eurC(T.x) + '</td></tr></tfoot></table></div>' + noteEcart();
-    h += tableAnnuelle(an.mois, 'Mois par mois · tout le cabinet', c.annee);
+  else {
+    var cab = an.mois.map(function (m) { return m.f; });
+    h += carteCA({ id: '*', titre: 'Tout le cabinet', sous: an.praticiens.length + ' praticiens', mois: cab, annee: c.annee, cabinet: true });
+    an.praticiens.forEach(function (p) { h += carteCA({ id: p.id, titre: p.nom, mois: p.mois.map(function (m) { return m.f; }), annee: c.annee }); });
     h += sourceAnnuel(an);
-  } else {
-    var p = an.praticiens.filter(function (x) { return x.id === c.anP; })[0];
-    h += '<div class="cp-pr"><button data-anp="" >‹ Tous les praticiens</button>' + an.praticiens.map(function (x) { return '<button data-anp="' + esc(x.id) + '" class="' + (x.id === c.anP ? 'on' : '') + '">' + esc(x.prenom) + '</button>'; }).join('') + '</div>';
-    if (!p) h += '<div class="empty">Praticien introuvable.</div>';
-    else {
-      var t = totauxMois(p.mois);
-      h += '<h2 class="cp-h">' + esc(p.nom) + ' · ' + c.annee + '</h2>';
-      h += '<div class="cp-k cp-k3"><div class="ca"><small>CA annuel facturé</small><b>' + eurT(t.f) + '</b></div><div><small>CA annuel encaissé</small><b>' + eurT(t.e) + '</b></div><div><small>Écart</small><b>' + eurT(t.x) + '</b></div></div>';
-      h += tableAnnuelle(p.mois, 'Mois par mois', c.annee) + noteEcart() + '<p class="hint">Touchez un mois pour ouvrir son détail jour par jour.</p>';
-    }
-    h += sourceAnnuel(an);
+    h += '<p class="hint">Lu le ' + esc(dHeure(an.lu)) + '.</p>';
   }
-  if (an) h += '<p class="hint">Lu le ' + esc(dHeure(an.lu)) + '.</p>';
   $('#main').innerHTML = h;
   brancherCompta();
+  dessinerCourbesCA();
 }
+/** Une carte : bandeau bleu marine (nom + total facturé de l'année), courbe d'évolution, puis le montant de chaque mois. */
+function carteCA(o) {
+  var vals = o.mois.filter(function (v) { return v !== null && v !== undefined; });
+  var total = vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) : null;
+  var faits = o.mois.map(function (v, i) { return v !== null && v !== undefined && !moisFutur(o.annee, i + 1) ? v : null; }).filter(function (v) { return v !== null; });
+  var moy = faits.length ? faits.reduce(function (a, b) { return a + b; }, 0) / faits.length : null;
+  var max = faits.length ? Math.max.apply(null, faits) : null;
+  var auj = Number(S.today.slice(0, 4)) === o.annee ? Number(S.today.slice(5, 7)) : 0;
+  var h = '<section class="ca-c' + (o.cabinet ? ' ca-cab' : '') + '">' +
+    '<div class="ca-b"><div class="ca-n"><b>' + esc(o.titre) + '</b><small>' + (o.sous ? esc(o.sous) + ' · ' : '') + 'facturé ' + o.annee + '</small></div>' +
+    '<div class="ca-t"><small>Total de l’année</small><b>' + eurT(total) + '</b>' + (moy !== null ? '<span>Moyenne ' + eur(moy) + ' / mois</span>' : '') + '</div></div>' +
+    '<div class="ca-g" data-courbe="' + esc(o.id) + '" data-vals="' + esc(JSON.stringify(o.mois)) + '" data-an="' + o.annee + '" role="img" aria-label="' + esc('Évolution du facturé ' + o.annee + ' : ' + o.titre) + '"></div>' +
+    '<div class="ca-m">' + o.mois.map(function (v, i) {
+      var fut = moisFutur(o.annee, i + 1), vide = v === null || v === undefined;
+      return '<button class="ca-mo' + (fut ? ' fut' : '') + (i + 1 === auj ? ' cur' : '') + (!vide && v === max ? ' top' : '') + '" data-cam="' + (i + 1) + '" data-cap="' + esc(o.id) + '"' + (fut ? ' disabled' : '') + '>' +
+        '<small>' + MOIS_COURTS[i] + '</small><b>' + (fut ? '—' : vide ? '—' : eur(v)) + '</b></button>';
+    }).join('') + '</div></section>';
+  return h;
+}
+/** Courbes dessinées à la largeur réelle de la carte (texte net sur téléphone comme sur ordinateur), avec survol mois par mois. */
+function dessinerCourbesCA() {
+  $$('.ca-g[data-courbe]').forEach(function (z) {
+    var vals = JSON.parse(z.getAttribute('data-vals')), annee = Number(z.getAttribute('data-an'));
+    var W = Math.max(260, z.clientWidth), H = W < 480 ? 150 : 180, pl = W < 480 ? 44 : 56, pr = 14, pt = 18, pb = 26;
+    var pts = vals.map(function (v, i) { return v === null || v === undefined || moisFutur(annee, i + 1) ? null : v; });
+    var connus = pts.filter(function (v) { return v !== null; });
+    if (!connus.length) { z.innerHTML = '<div class="ca-vide">Pas encore de chiffre pour ' + annee + '.</div>'; return; }
+    var vmax = Math.max.apply(null, connus), pas = arrondiPas(vmax / 3), top = Math.max(pas * 3, pas);
+    var x = function (i) { return pl + (W - pl - pr) * i / 11; }, y = function (v) { return pt + (H - pt - pb) * (1 - v / top); };
+    var g = '';
+    for (var k = 0; k <= 3; k++) { var yy = y(pas * k); g += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy + '" y2="' + yy + '" class="ca-gr"/><text x="' + (pl - 8) + '" y="' + (yy + 4) + '" class="ca-ax" text-anchor="end">' + kEur(pas * k) + '</text>'; }
+    var lettres = W < 480 ? ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'] : MOIS_COURTS;
+    lettres.forEach(function (m, i) { g += '<text x="' + x(i) + '" y="' + (H - 6) + '" class="ca-ax" text-anchor="middle">' + m + '</text>'; });
+    // segments continus de mois connus, courbe lissée sans dépassement (monotone)
+    var seg = [], cur = [];
+    pts.forEach(function (v, i) { if (v === null) { if (cur.length) seg.push(cur); cur = []; } else cur.push([x(i), y(v), i]); });
+    if (cur.length) seg.push(cur);
+    seg.forEach(function (sg) {
+      var d = cheminLisse(sg);
+      if (sg.length > 1) g += '<path d="' + d + ' L' + sg[sg.length - 1][0] + ',' + y(0) + ' L' + sg[0][0] + ',' + y(0) + 'Z" class="ca-aire"/>';
+      g += '<path d="' + d + '" class="ca-ligne"/>';
+    });
+    var imax = pts.indexOf(vmax);
+    pts.forEach(function (v, i) { if (v !== null) g += '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="4" class="ca-pt' + (i === imax ? ' max' : '') + '"/>'; });
+    // étiquette directe sur le meilleur mois seulement
+    var lx = Math.min(Math.max(x(imax), pl + 30), W - pr - 30);
+    g += '<text x="' + lx + '" y="' + (y(vmax) - 10) + '" class="ca-lab" text-anchor="middle">' + kEur(vmax, true) + '</text>';
+    g += '<line class="ca-cr" x1="0" x2="0" y1="' + pt + '" y2="' + y(0) + '" style="display:none"/><circle class="ca-hv" r="6" style="display:none"/>';
+    z.innerHTML = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + g + '<rect class="ca-hit" x="' + pl + '" y="0" width="' + (W - pl - pr) + '" height="' + H + '"/></svg><div class="ca-tip" role="status"></div>';
+    var svg = z.firstChild, tip = z.lastChild, cr = svg.querySelector('.ca-cr'), hv = svg.querySelector('.ca-hv');
+    var montrer = function (ev) {
+      var r = svg.getBoundingClientRect(), mx = ev.clientX - r.left, best = -1, d0 = 1e9;
+      pts.forEach(function (v, i) { if (v !== null && Math.abs(x(i) - mx) < d0) { d0 = Math.abs(x(i) - mx); best = i; } });
+      if (best < 0) return;
+      cr.setAttribute('x1', x(best)); cr.setAttribute('x2', x(best)); cr.style.display = '';
+      hv.setAttribute('cx', x(best)); hv.setAttribute('cy', y(pts[best])); hv.style.display = '';
+      tip.innerHTML = '<small>' + MOIS_NOMS[best] + ' ' + annee + '</small><b>' + eur(pts[best]) + '</b>';
+      tip.style.display = 'block';
+      var tx = Math.min(Math.max(x(best) - tip.offsetWidth / 2, 0), W - tip.offsetWidth);
+      tip.style.left = tx + 'px'; tip.style.top = Math.max(y(pts[best]) - tip.offsetHeight - 14, 0) + 'px';
+    };
+    var cacher = function () { cr.style.display = 'none'; hv.style.display = 'none'; tip.style.display = 'none'; };
+    svg.addEventListener('pointermove', montrer); svg.addEventListener('pointerdown', montrer); svg.addEventListener('pointerleave', cacher);
+  });
+}
+function arrondiPas(v) { if (!(v > 0)) return 1000; var e = Math.pow(10, Math.floor(Math.log10(v))), n = v / e; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * e; }
+function kEur(v, precis) { if (v >= 1000) { var k = v / 1000; return (precis ? k.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) : Math.round(k).toLocaleString('fr-FR')) + ' k€'; } return Math.round(v) + ' €'; }
+/** Courbe passant par les points, lissée sans dépasser les valeurs (interpolation monotone). */
+function cheminLisse(p) {
+  if (p.length === 1) return 'M' + p[0][0] + ',' + p[0][1];
+  var n = p.length, dx = [], m = [], t = [];
+  for (var i = 0; i < n - 1; i++) { dx.push(p[i + 1][0] - p[i][0]); m.push((p[i + 1][1] - p[i][1]) / dx[i]); }
+  t[0] = m[0]; t[n - 1] = m[n - 2];
+  for (i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+  for (i = 0; i < n - 1; i++) { if (m[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; } var a = t[i] / m[i], b = t[i + 1] / m[i], h2 = a * a + b * b; if (h2 > 9) { var k = 3 / Math.sqrt(h2); t[i] = k * a * m[i]; t[i + 1] = k * b * m[i]; } }
+  var d = 'M' + p[0][0] + ',' + p[0][1];
+  for (i = 0; i < n - 1; i++) d += ' C' + (p[i][0] + dx[i] / 3) + ',' + (p[i][1] + t[i] * dx[i] / 3) + ' ' + (p[i + 1][0] - dx[i] / 3) + ',' + (p[i + 1][1] - t[i + 1] * dx[i] / 3) + ' ' + p[i + 1][0] + ',' + p[i + 1][1];
+  return d;
+}
+window.addEventListener('resize', function () { clearTimeout(S.tCourbe); S.tCourbe = setTimeout(function () { if (S.vue === 'compta' && $('.ca-g[data-courbe]')) dessinerCourbesCA(); }, 150); });
 function brancherCompta() {
   var c = S.cpt;
   $('#cpR').onclick = function () { chargerCompta(true); };
-  if ($('#cpRet')) $('#cpRet').onclick = function () { c.vue = 'mois'; rendreCompta(); chargerCompta(); window.scrollTo(0, 0); };
+  if ($('#cpRet')) $('#cpRet').onclick = function () { c.vue = 'annuel'; rendreCompta(); window.scrollTo(0, 0); };
   if ($('#cpAnn')) $('#cpAnn').onclick = function () { c.vue = 'annuel'; c.anP = ''; rendreCompta(); window.scrollTo(0, 0); };
   $$('[data-pp]').forEach(function (b) { b.onclick = function () { c.pid = b.getAttribute('data-pp'); c.ouverts = {}; chargerCompta(true); }; });
   $$('[data-vp]').forEach(function (b) { b.onclick = function () { c.pid = b.getAttribute('data-vp'); c.ouverts = {}; chargerCompta(true); window.scrollTo(0, 0); }; });
   $$('[data-ap]').forEach(function (b) { b.onclick = function () { c.anP = b.getAttribute('data-ap'); rendreCompta(); window.scrollTo(0, 0); }; });
   $$('[data-anp]').forEach(function (b) { b.onclick = function () { c.anP = b.getAttribute('data-anp'); rendreCompta(); window.scrollTo(0, 0); }; });
+  $$('[data-cam]').forEach(function (b) { b.onclick = function () { c.mois = Number(b.getAttribute('data-cam')); c.pid = b.getAttribute('data-cap'); c.vue = 'mois'; c.ouverts = {}; c.data = null; chargerCompta(); window.scrollTo(0, 0); }; });
   $$('tr[data-am]').forEach(function (b) { b.onclick = function () { c.mois = Number(b.getAttribute('data-am')); if (c.vue === 'annuel') { c.pid = c.anP || '*'; c.vue = 'mois'; } c.ouverts = {}; c.data = null; chargerCompta(); window.scrollTo(0, 0); }; });
   if ($('#cpA')) $('#cpA').onchange = function () { c.annee = Number(this.value); c.ouverts = {}; c.data = null; chargerCompta(); };
   if ($('#cpM')) {
@@ -4810,7 +4911,7 @@ var ANIM = (function () {
   var indPlus = function () { A.indicateur(); setTimeout(A.indicateur, 320); };
 
   // ── 5 · compteurs : les grands chiffres montent jusqu'à leur valeur exacte (une seule fois par carte) ──
-  var CIBLES = '#stats .stat b, .ps-c b, .cp-k > div > b, .sv-sum > b, .pro-k b';
+  var CIBLES = '#stats .stat b, .ps-c b, .cp-k > div > b, .sv-sum > b, .pro-k b, .ca-t b';
   function lireNombre(t) {
     var m = String(t).match(/^([^\d−-]*)([−-]?\d[\d\s  ]*(?:,\d+)?)(.*)$/);
     if (!m) return null;
