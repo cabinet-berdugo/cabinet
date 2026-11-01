@@ -3516,17 +3516,15 @@ function rendrePlanning() {
         return inter(pers, 8) + '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' +
           p.jours.map(function (j, i) {
             var x = infoCase(p, pers.id, i), inner, cls = 'cell';
-            var aff = avecQui(pers.id, j).map(function (a) { return '<div class="a">' + esc(a.dentisteNom) + (a.salleNom ? ' · ' + esc(a.salleNom) : '') + '</div>'; }).join('');
-            if (x.conge) { cls += ' cg'; inner = 'Congé' + (aff ? '<div class="s">Affectée malgré le congé :</div>' + aff : ''); }
-            else if (!x.c) inner = (ed ? '<span class="plus">+</span>' : '<span style="color:var(--ink3)">—</span>') + aff;
-            else if (x.c.statut === 'Repos') { cls += ' rep'; inner = 'Repos' + (aff ? '<div class="s">Affectée malgré le repos :</div>' + aff : ''); }
-            else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + (x.c.pauseDebut && x.c.pauseFin ? '<div class="pz">Pause ' + esc(hm(x.c.pauseDebut)) + ' – ' + esc(hm(x.c.pauseFin)) + '</div>' : '') + aff +
-              (x.c.heuresSup ? '<div class="s">+' + esc(x.c.heuresSup) + ' sup</div>' : '') +
-              (x.c.note ? '<div class="a" style="font-style:italic">' + esc(x.c.note) + '</div>' : '');
+            // seulement ses heures et sa pause (les praticiens et salles sont dans « Par salle »)
+            if (x.conge) { cls += ' cg'; inner = 'Congé'; }
+            else if (!x.c) inner = ed ? '<span class="plus">+</span>' : '<span style="color:var(--ink3)">—</span>';
+            else if (x.c.statut === 'Repos') { cls += ' rep'; inner = 'Repos'; }
+            else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + (x.c.pauseDebut && x.c.pauseFin ? '<div class="pz">Pause ' + esc(hm(x.c.pauseDebut)) + ' – ' + esc(hm(x.c.pauseFin)) + '</div>' : '<div class="pz">Sans pause</div>');
             return '<td><button class="' + cls + '" data-e="' + esc(pers.id) + '" data-i="' + i + '"' + (ed ? '' : ' tabindex="-1"') + '>' + inner + '</button></td>';
           }).join('') + '</tr>';
       }).join('') + '</tbody></table></div>' +
-      '<div class="hint" style="margin-top:8px">' + (ed ? 'Cliquez sur une case pour saisir les horaires. ' : '') + 'Les praticiens et salles viennent des affectations (vue « Par salle »). Les congés acceptés s’affichent automatiquement.</div>' +
+      '<div class="hint" style="margin-top:8px">' + (ed ? 'Cliquez sur une case pour corriger des horaires. ' : '') + 'Les horaires des assistantes se remplissent d’après la vue « Par salle ». Les congés acceptés s’affichent automatiquement.</div>' +
       tableauHeures(p, moi);
   }
   $('#main').innerHTML = h;
@@ -3619,7 +3617,7 @@ function editerCase(email, i) {
     '<div class="fld"><label for="cH">Heures sup</label><input type="text" id="cH" placeholder="1h30" value="' + esc(c.heuresSup || '') + '"></div></div>' +
     '<div class="fld"><label for="cN">Note</label><input type="text" id="cN" maxlength="200" placeholder="Stérilisation le matin" value="' + esc(c.note || '') + '"></div>' +
     '<div class="hint">Les praticiens et les salles se renseignent dans la vue « Par salle ».</div><div class="err" id="cErr"></div>';
-  tiroir('Horaires', corps, (x.c ? '<button class="btn ko" id="cDel">Vider la case</button><span class="sp"></span>' : '') + '<button class="btn" id="cAnn">Annuler</button><button class="btn pri" id="cOk">Enregistrer</button>');
+  tiroir('Horaires', corps, (x.c ? '<button class="btn ko" id="cDel">Supprimer</button><span class="sp"></span>' : '') + '<button class="btn" id="cAnn">Annuler</button><button class="btn pri" id="cOk">Enregistrer</button>');
   var statut = c.statut === 'Repos' ? 'Repos' : 'Travail';
   var maj = function () { $$('#cSt button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-s') === statut); }); $('#cTr').classList.toggle('hidden', statut === 'Repos'); };
   maj();
@@ -3635,10 +3633,20 @@ function editerCase(email, i) {
   ['#cD', '#cF', '#cPD', '#cPF'].forEach(function (k) { $(k).addEventListener('input', eff); });
   eff();
   $('#cAnn').onclick = fermer;
+  var appliquer = function (r) { S.planning = r; if (S.semCache[S.semaine]) S.semCache[S.semaine].pl = r; for (var k = 0; k < 7; k++) delete S.jourCache[ajout(S.semaine, k)]; sauverCache(); if (S.vue === 'planning' && S.plVue === 'horaires') rendrePlanning(); };
   var envoyer = function (d) {
-    api('enregistrerCreneau', S.semaine, email, i, d).then(function (r) { S.planning = r; if (S.semCache[S.semaine]) S.semCache[S.semaine].pl = r; for (var k = 0; k < 7; k++) delete S.jourCache[ajout(S.semaine, k)]; sauverCache(); fermer(); rendrePlanning(); toast(d.effacer ? 'Case vidée' : 'Horaires enregistrés'); }).catch(function (e) { $('#cErr').textContent = msgErr(e); });
+    $$('.dr-f .btn').forEach(function (b) { b.disabled = true; }); // pendant l'enregistrement : aucun second clic possible
+    api('enregistrerCreneau', S.semaine, email, i, d).then(function (r) { fermer(); appliquer(r); toast('Horaires enregistrés'); })
+      .catch(function (e) { $$('.dr-f .btn').forEach(function (b) { b.disabled = false; }); $('#cErr').textContent = msgErr(e); });
   };
-  if ($('#cDel')) $('#cDel').onclick = function () { envoyer({ effacer: true }); };
+  // Supprimer : la case disparaît tout de suite, retour au planning ; le serveur confirme derrière (en cas d'échec, tout revient)
+  if ($('#cDel')) $('#cDel').onclick = function () {
+    var sem = S.semaine, avant = S.planning;
+    S.planning = Object.assign({}, avant, { creneaux: avant.creneaux.filter(function (c) { return !(c.email === email && c.jour === i); }) });
+    fermer(); rendrePlanning(); toast('Horaires supprimés');
+    apiFond('enregistrerCreneau', sem, email, i, { effacer: true }).then(function (r) { if (S.semaine === sem) appliquer(r); })
+      .catch(function (e) { if (S.semaine === sem) { S.planning = avant; rendrePlanning(); } toast('Suppression non enregistrée : ' + msgErr(e), true); });
+  };
   $('#cOk').onclick = function () {
     var d = { statut: statut, debut: $('#cD').value, fin: $('#cF').value, heuresSup: $('#cH').value.trim(), note: $('#cN').value.trim(), pauseDebut: $('#cPD').value, pauseFin: $('#cPF').value };
     if (statut === 'Travail' && (!d.debut || !d.fin)) { $('#cErr').textContent = 'Indiquez l’heure de début et de fin.'; return; }
