@@ -1535,6 +1535,10 @@ table.pl{border-collapse:separate;border-spacing:0}
   .pt-dt tr{border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}.pt-dt tr:first-child{border-top:0}
   .pt-dt td{border:0;padding:0}.pt-dt .pt-num{grid-row:span 2}.pt-dt td:nth-child(4),.pt-dt td:nth-child(5),.pt-dt td:nth-child(3){grid-column:2}
 }
+.btn.sv-act{gap:7px}.btn.sv-act svg{width:17px;height:17px;flex:none}
+.btn.sv-act.tourne{pointer-events:none;opacity:.85}.btn.sv-act.tourne svg{animation:svTourne .9s linear infinite}
+@keyframes svTourne{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.btn.sv-act.tourne svg{animation:none}}
 </style>
 </head>
 <body>
@@ -4622,7 +4626,7 @@ function chargerSuivi(discret, frais) {
     rendreSuivi(S.vue);
   }
   var avant = JSON.stringify(connu || null);
-  (discret ? apiFond : api)('getSuiviCompta', pid, !!frais).then(function (r) {
+  return (discret ? apiFond : api)('getSuiviCompta', pid, !!frais).then(function (r) {
     S.sv.parPid[pid] = r;
     if (S.sv.attente !== pid) return;
     var change = avant !== JSON.stringify(r) || S.sv.dataPid !== pid || frais;
@@ -4645,7 +4649,8 @@ function rendreSuivi(v) {
   var h = '<div class="ph"><div class="ph-t"><h1>' + (imp ? 'Impayés' : 'Relances de devis') + '</h1><p class="ph-g">' + (imp
     ? 'Les patients qui doivent encore un montant, d’après les journées remplies dans Google Sheets. Touchez un patient pour noter un règlement ou corriger le reste dû.'
     : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div>' +
-    '<div class="ph-a"><button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter une relance') + '</button></div></div>';
+    '<div class="ph-a"><button class="btn sv-act" id="svAct"' + (d && d.lu ? ' title="Dernière lecture : ' + esc(dHeure(d.lu)) + '"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg>Actualiser</button>' +
+    '<button class="btn pri" id="svAj">+ ' + (imp ? 'Ajouter un impayé' : 'Ajouter une relance') + '</button></div></div>';
   if (tous) h += '<div class="cp-pr"><button data-sp="*" class="' + (S.sv.pid === '*' ? 'on' : '') + '">Tous</button>' + tous.map(function (p) { return '<button data-sp="' + esc(p.id) + '" class="' + (S.sv.pid === p.id || (S.sv.pid === '' && p.id === S.me.id) ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
   if (!d) h += sq('liste', 'Lecture des fichiers…');
   else if (d.erreur) h += '<div class="err">' + esc(d.erreur) + '</div>';
@@ -4673,12 +4678,16 @@ function rendreSuivi(v) {
     });
     var urls = ps.filter(function (p) { return p.url; });
     if (urls.length === 1) h += '<div class="cp-o"><a class="btn" href="' + esc(urls[0].url) + '" target="_blank" rel="noopener">Ouvrir dans Google Sheets</a></div>';
-    h += '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. <button class="lk" id="svR">Actualiser</button></p>';
+    h += '<p class="hint">Lu dans les fichiers Google Sheets le ' + esc(dHeure(d.lu)) + '. « Actualiser » relit tout immédiatement.</p>';
   }
   $('#main').innerHTML = h;
   brancherSegCompta();
   $$('[data-sp]').forEach(function (b) { b.onclick = function () { var x = b.getAttribute('data-sp'); S.sv.pid = x === S.me.id ? '' : x; chargerSuivi(); }; });
-  if ($('#svR')) $('#svR').onclick = function () { this.disabled = true; this.textContent = 'Actualisation…'; chargerSuivi(true, true); };
+  $('#svAct').onclick = function () {
+    var b = this; if (b.classList.contains('tourne')) return;
+    b.classList.add('tourne'); b.lastChild.textContent = 'Actualisation…';
+    chargerSuivi(true, true).then(function () { if (b.isConnected) { b.classList.remove('tourne'); b.lastChild.textContent = 'Actualiser'; } });
+  };
   $('#svAj').onclick = function () { formAjoutSuivi(imp); };
   $$('.sv-c').forEach(function (b) { b.onclick = function () { ficheSuivi(imp, b.getAttribute('data-p'), b.getAttribute('data-k')); }; });
 }
