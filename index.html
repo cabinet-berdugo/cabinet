@@ -1761,7 +1761,11 @@ html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;o
 @media (max-width:760px){
   :root{--nav:54px}
   .bnav{bottom:0;padding:4px 6px max(6px, calc(env(safe-area-inset-bottom) - 16px));background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border-top:1px solid var(--line)}
-  /* iOS 26 (application installée) : le bas de l'écran est une bande dessinée par iOS ; la barre s'arrête juste au-dessus, sans marge en plus */
+  /* iPhone/iPad : la page ne défile pas, la barre est accrochée au bas de la page (et non « fixée » à l'écran,
+     ce qu'iOS 26 place trop haut dans l'application installée) */
+  html.ios-defil{position:relative}
+  html.ios-defil .bnav{position:absolute;bottom:0}
+  /* si la page elle-même s'arrête avant le bas de l'écran : barre compacte, sans marge en plus */
   html.ecart-ios .bnav{padding-bottom:4px}
   .bnav button{padding:5px 0 4px;margin:0 3px;font-size:10.5px;border-radius:12px;line-height:1.25}
   .bnav button svg{width:22px;height:22px;margin-bottom:1px}
@@ -1830,7 +1834,12 @@ function ecartBas() {
     }
   } catch (e) { g = 0; }
   document.documentElement.style.setProperty('--ecart-bas', Math.round(g) + 'px');
-  document.documentElement.classList.toggle('ecart-ios', g > 0);
+  var court = false;
+  if (g > 0) { // la page atteint-elle le vrai bas de l'écran ?
+    var portrait2 = innerHeight > innerWidth, sh2 = portrait2 ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width);
+    court = document.documentElement.getBoundingClientRect().height < sh2 - 2;
+  }
+  document.documentElement.classList.toggle('ecart-ios', court);
 }
 ecartBas();
 window.addEventListener('resize', ecartBas);
