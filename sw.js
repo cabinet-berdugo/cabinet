@@ -13,7 +13,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
-  if (r.mode === 'navigate') {
+  if (r.mode === 'navigate' && /\/(index\.html)?$/.test(new URL(r.url).pathname)) {
     // ouverture instantanée : la page vient de la mémoire du téléphone ; une nouvelle version arrive avec un nouveau service worker
     const reseau = fetch(r).then(rep => {
       if (rep.ok) { const c = rep.clone(); caches.open(VERSION).then(x => x.put('./index.html', c)); }
