@@ -19,9 +19,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <style>
 :root{
-  --bg:#f5f4f0; --card:#ffffff; --line:#e3e1da; --line2:#cfccc2;
-  --ink:#1c2a2c; --ink2:#55636a; --ink3:#8a969b;
-  --acc:#0f6e64; --acc2:#0b564e; --accbg:#e3f0ed;
+  --bg:#F1F5FB; --card:#FFFFFF; --line:#DCE5F2; --line2:#C3D1E6;
+  --ink:#0B1736; --ink2:#55657F; --ink3:#7C8AA5;
+  --acc:#0047D9; --acc2:#123B82; --accbg:#E8EFFE;
   --red:#b42318; --redbg:#fdecea; --amb:#8a5a00; --ambbg:#fdf3dc;
   --grn:#1d6b38; --grnbg:#e5f4e9; --blu:#1f5c99; --blubg:#e6eff9;
   --r:10px; --nav:64px;
@@ -1135,7 +1135,7 @@ html.mode-auth header{display:none}
 .auth .btn.pri{background:var(--btn-grad)}
 /* Maxime et Hervé : Tâches, Planning, Matériel, Comptabilité, Impayés, Relances, Congés, Personnel */
 html.ordre-admin .tab[data-v=taches]{order:1}html.ordre-admin .tab[data-v=planning]{order:2}html.ordre-admin .tab[data-v=materiel]{order:3}html.ordre-admin .tab[data-v=compta]{order:4}
-html.ordre-admin .tab[data-v=impayes]{order:5}html.ordre-admin .tab[data-v=relances]{order:6}html.ordre-admin .tab[data-v=conges]{order:7}html.ordre-admin .tab[data-v=personnel]{order:8}
+html.ordre-admin .tab[data-v=impayes]{order:5}html.ordre-admin .tab[data-v=relances]{order:6}html.ordre-admin .tab[data-v=conges]{order:7}html.ordre-admin .tab[data-v=protheses]{order:8}html.ordre-admin .tab[data-v=personnel]{order:9}
 /* ───── Chiffre d'affaires annuel ───── */
 .cp-ann{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin:0 0 18px;padding:16px 18px;border:0;border-radius:var(--r);cursor:pointer;color:#fff;font:inherit;
   background:linear-gradient(105deg,#0047D9 0%,#125BFF 60%,#3B7BFF 100%);box-shadow:0 8px 22px rgba(0,71,217,.30);transition:transform .18s,box-shadow .18s}
@@ -1422,6 +1422,45 @@ table.pl{border-collapse:separate;border-spacing:0}
 .sbtn.br{box-shadow:0 0 0 2px rgba(18,91,255,.35)}
 .cell .pz{display:inline-block;margin-top:5px;font-size:12px;font-weight:600;color:#5A6B8C;background:#F1F4F9;border-radius:999px;padding:2px 8px;white-space:nowrap}
 @media (max-width:760px){html.anim #drawer.entre .dr{animation-duration:260ms}}
+.vr{display:flex;justify-content:center;padding:24px 0 40px}
+.vr-c{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 24px 22px;box-shadow:0 10px 30px rgba(6,27,66,.08);text-align:center}
+.vr-i{display:inline-grid;place-items:center;width:56px;height:56px;border-radius:16px;background:#EAF1FF;color:var(--acc);margin-bottom:10px}
+.vr-i svg{width:28px;height:28px}
+.vr-c h2{font-family:var(--f-titre);font-size:20px;margin:4px 0 6px;color:var(--ink)}
+.vr-c p{color:var(--ink2);font-size:14px;margin:0 0 16px}
+.vr-c .fld{text-align:left}
+.vr-c .btn.pri{width:100%;justify-content:center;padding:12px 14px;font-size:15px;margin-top:4px}
+.vr-c .err{min-height:18px;text-align:left}
+.vr-c .hint{margin:14px 0 0;font-size:12.5px}
+/* ───── Prothèses ───── */
+.pro-k{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.pro-k button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--sh);font:inherit;cursor:pointer;text-align:left}
+.pro-k small{font-size:12.5px;color:var(--ink2);font-weight:600}
+.pro-k b{font-family:var(--f-titre);font-size:24px;color:var(--ink)}
+.pro-k button.on{border-color:var(--acc);box-shadow:0 0 0 2px rgba(0,71,217,.18),var(--sh)}
+.pro-k button.r b{color:var(--red)}
+.pro-f{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pro-t{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.pro-h,.pro-r{display:grid;grid-template-columns:1.1fr 1.1fr 1.6fr .9fr 1.1fr auto;gap:12px;align-items:center;padding:12px 16px}
+.pro-h{background:#F3F6FC;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:#5A6B8C;font-weight:600}
+.pro-r{border-top:1px solid var(--line);cursor:pointer;font-size:14px}
+.pro-r:hover{background:#FAFCFF}
+.pro-r.ret{box-shadow:inset 3px 0 0 var(--red)}
+.pro-r small{display:block;color:var(--ink3);font-size:12px;margin-top:2px}
+.pro-l{color:var(--ink2)}
+.pro-r.ret .pro-l{color:var(--red);font-weight:600}
+.pill.pro-exp{background:#EAF1FF;color:var(--acc)}
+.pill.pro-ann{background:#F1F4F8;color:#8A99B2}
+@media (max-width:1100px){.pro-k{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){
+  .pro-f select{display:block}.pro-f #proR,.pro-f .btn{grid-column:auto}
+  .pro-k{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pro-h{display:none}
+  .pro-t{background:none;border:0;box-shadow:none;display:flex;flex-direction:column;gap:10px}
+  .pro-r{grid-template-columns:1fr auto;grid-template-areas:'d s' 'w w' 'p l' 'a a';background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);gap:6px 10px}
+  .pro-r .pro-d{grid-area:d}.pro-r>span:nth-child(4){grid-area:s;justify-self:end}.pro-r .pro-w{grid-area:w}.pro-r .pro-p{grid-area:p;color:var(--ink2);font-size:13px}.pro-r .pro-l{grid-area:l;justify-self:end;font-size:13px}.pro-r .pro-a{grid-area:a}
+  .pro-r .pro-a .btn{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -1437,6 +1476,7 @@ table.pl{border-collapse:separate;border-spacing:0}
       <button class="tab hidden" data-v="compta" id="tabCpt" title="Comptabilité"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Comptabilité</span></button>
       <button class="tab hidden" data-v="impayes" id="tabImp" title="Impayés"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.3V18"/></svg><span class="tl">Impayés</span></button>
       <button class="tab hidden" data-v="relances" id="tabRel" title="Relances"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3 14.5 21l-4-7.5L3 9.5z"/></svg><span class="tl">Relances</span></button>
+      <button class="tab hidden" data-v="protheses" id="tabPro" title="Prothèses"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 5h13l-1.6 7H7.1z"/><path d="M8 12v3.5c0 2.2 1 4.3 2.3 4.5M16 12v3.5c0 2.2-1 4.3-2.3 4.5"/><path d="M9.5 8.5h5"/></svg><span class="tl">Prothèses</span></button>
       <button class="tab hidden" data-v="personnel" id="tabPers" title="Personnel"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg><span class="tl">Personnel</span></button>
     </nav>
     <span class="sp"></span>
@@ -1456,6 +1496,7 @@ table.pl{border-collapse:separate;border-spacing:0}
   <button data-v="personnel" class="hidden" id="bnPers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg>Personnel</button>
   <button data-v="impayes" class="hidden" id="bnImp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.3V18"/></svg>Impayés</button>
   <button data-v="relances" class="hidden" id="bnRel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5"/><path d="M21 3 14.5 21l-4-7.5L3 9.5z"/></svg>Relances</button>
+  <button data-v="protheses" class="hidden" id="bnPro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5h13l-1.6 7H7.1z"/><path d="M8 12v3.5c0 2.2 1 4.3 2.3 4.5M16 12v3.5c0 2.2-1 4.3-2.3 4.5"/><path d="M9.5 8.5h5"/></svg>Prothèses</button>
   <button class="hidden" id="bnPlus" aria-label="Autres rubriques"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Plus<span class="cnt-p hidden" id="bnPlusN"></span></button>
 </nav>
 <div id="drawer"></div>
@@ -1532,6 +1573,7 @@ function appel(fn, args) {
 /** Appel authentifié : ajoute le jeton de session ; renvoie vers la connexion si la session a expiré. */
 function api(fn) {
   var args = Array.prototype.slice.call(arguments, 1);
+  if (/Affectation|Creneau|Planning|Conge|Absence/.test(fn) && !/^get/.test(fn)) S.semCache = {}; // une modification invalide les semaines déjà lues
   return appel(fn, [K].concat(args)).catch(function (e) {
     if (msgErr(e).indexOf('SESSION_EXPIREE') >= 0) { sessionPerdue(); throw new Error('Votre session a expiré. Reconnectez-vous.'); }
     throw e;
@@ -1630,6 +1672,7 @@ function appliquerDemarrage(d) {
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
     ['#tabCpt', '#bnCpt'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
+    ['#tabPro', '#bnPro'].forEach(function (x) { $(x).classList.toggle('hidden', !ongletOuvert('protheses')); });
     ['#tabImp', '#tabRel', '#bnImp', '#bnRel'].forEach(function (x) { $(x).classList.toggle('hidden', !ongletOuvert('impayes')); });
     document.documentElement.classList.toggle('ordre-admin', S.me.role === 'Administrateur');
     ['taches', 'planning', 'conges', 'materiel'].forEach(function (o) { $$('#tabs [data-v="' + o + '"], #bnav [data-v="' + o + '"]').forEach(function (b) { b.classList.toggle('hidden', !ongletOuvert(o)); }); });
@@ -1938,7 +1981,7 @@ function sessionPerdue() {
 function seDeconnecter() {
   var j = K; K = ''; garderJeton('');
   if (push.dispo()) push.abonnement().then(function (a) { if (a) { var ep = a.endpoint; a.unsubscribe(); appel('supprimerAppareil', [j, ep]).catch(function () { }); } }).catch(function () { });
-  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null;
+  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } }; S.cptOuvert = false;
   apiPublic('deconnexion', j).catch(function () { });
   ecranConnexion('Vous êtes déconnecté.');
 }
@@ -2034,8 +2077,8 @@ function ecranNouveauMdp(message) {
 }
 
 /** Téléphone : 5 boutons au plus en bas ; au-delà, les 4 premiers et « Plus » (les autres rubriques). */
-var BNAV_ORDRE = ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'relances', 'personnel'];
-var BNAV_ORDRE_ADMIN = ['taches', 'planning', 'materiel', 'compta', 'impayes', 'relances', 'conges', 'personnel']; // Maxime et Hervé
+var BNAV_ORDRE = ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'relances', 'protheses', 'personnel'];
+var BNAV_ORDRE_ADMIN = ['taches', 'planning', 'materiel', 'compta', 'impayes', 'relances', 'conges', 'protheses', 'personnel']; // Maxime et Hervé
 function majBnav() {
   if (!$('#bnPlus') || !S.cfg) return;
   var ordre = S.me && S.me.role === 'Administrateur' ? BNAV_ORDRE_ADMIN : BNAV_ORDRE;
@@ -2050,7 +2093,7 @@ function majBnav() {
   S.bnCaches = caches;
 }
 function menuPlus() {
-  var lib = { taches: 'Tâches', planning: 'Planning', conges: 'Congés', materiel: 'Matériel', compta: 'Comptabilité', impayes: 'Impayés', relances: 'Relances', personnel: 'Personnel' };
+  var lib = { taches: 'Tâches', planning: 'Planning', conges: 'Congés', materiel: 'Matériel', compta: 'Comptabilité', impayes: 'Impayés', relances: 'Relances', protheses: 'Prothèses', personnel: 'Personnel' };
   tiroir('Autres rubriques', '<div class="mplus">' + (S.bnCaches || []).map(function (v) {
     var b = $('#bnav [data-v="' + v + '"]'), ic = b ? b.querySelector('svg').outerHTML : '', c = b && b.querySelector('.cnt:not(.hidden)');
     return '<button data-mp="' + v + '" class="' + (S.vue === v ? 'on' : '') + '">' + ic + '<span>' + lib[v] + '</span>' + (c ? '<span class="cnt">' + esc(c.textContent) + '</span>' : '') + '</button>';
@@ -2065,9 +2108,10 @@ function ongletOuvert(v) {
   if (v === 'impayes' || v === 'relances') return !!(S.cfg && (S.cfg.suivi || (S.cfg.suivi === undefined && S.cfg.compta)));
   return o[v] !== false;
 }
-function premierOnglet() { return ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'personnel'].filter(ongletOuvert)[0] || 'taches'; }
+function premierOnglet() { return ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'protheses', 'personnel'].filter(ongletOuvert)[0] || 'taches'; }
 function aller(v) {
   if (!ongletOuvert(v)) v = premierOnglet();
+  if (S.vue === 'compta' && v !== 'compta') verrouillerCompta(); // on quitte la comptabilité : elle se referme
   S.vue = v;
   $$('[data-v]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
   window.scrollTo(0, 0);
@@ -2076,8 +2120,9 @@ function aller(v) {
   if (v === 'conges') { rendreConges(); rafraichirConges(); }
   if (v === 'personnel') chargerPersonnel();
   if (v === 'materiel') { rendreMateriel(); chargerMateriel(); }
-  if (v === 'compta') ouvrirCompta();
+  if (v === 'compta') ouvrirComptaProtegee();
   if (v === 'impayes' || v === 'relances') ouvrirSuivi(v);
+  if (v === 'protheses') ouvrirProtheses();
   majBnav();
 }
 
@@ -2153,7 +2198,7 @@ function majAujourdhui() {
     return '<span class="ajd-l"><b>' + esc(assistante ? a.dentisteNom : nomSalle(a)) + '</b> · ' + hm(a.debut) + '–' + hm(a.fin) + ' · ' +
       esc(assistante ? nomSalle(a) : (a.assistantes.length ? 'avec ' + a.assistantes.map(function (y) { return y.nom; }).join(', ') : 'assistante à affecter')) + '</span>';
   }).join('') + '<span class="ajd-v">Voir mon planning ›</span></button>';
-  $('#ajdB').onclick = function () { S.plVue = 'moi'; aller('planning'); };
+  $('#ajdB').onclick = function () { S.plVue = 'personne'; S.cibleP = S.me.id; aller('planning'); };
 }
 
 function filtrerPortee(l) {
@@ -2455,13 +2500,13 @@ function afficherTache(t) {
         (sv ? '' : '<span class="d">' + esc(info) + '</span>') +
         (t.peutGerer && p.id !== moi ? boutonsStatut(t, p.id, true) : '') + (sv ? traceTache(sv, p.id === t.creePar) : '') + '</div>';
     }).join('') + '</div>' +
-    (t.peutGerer && t.participations.some(function (p) { return p.id !== moi; }) ? '<div class="hint">Administrateur : vous pouvez changer le statut des autres personnes ; votre intervention est enregistrée dans l’historique.</div>' : '') +
+    (t.peutGerer && t.participations.some(function (p) { return p.id !== moi; }) ? '<div class="hint">Vous pouvez changer le statut des autres personnes ; votre intervention est enregistrée dans l’historique.</div>' : '') +
     '<div class="sec">Commentaires</div>' +
     (enAttente ? '<div class="no-t">Chargement…</div>' : t.commentaires.length ? t.commentaires.map(function (c) { return '<div class="com"><b>' + esc(c.nom) + '</b> <small>' + esc(dHeure(c.date)) + '</small><p>' + esc(c.texte) + '</p></div>'; }).join('') : '<div class="no-t">Aucun commentaire.</div>') +
     '<div class="fld" style="margin-top:10px"><textarea id="com" placeholder="Écrire un commentaire… (enregistré avec « Valider »)" style="min-height:64px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:9px 11px"></textarea></div>' +
     '<details style="margin-top:10px"><summary class="sec" style="cursor:pointer;margin:0">Historique complet</summary><div class="hist">' +
     (enAttente ? '<div>Chargement…</div>' : t.historique.map(function (h) { return '<div>' + esc(dHeure(h.date)) + ' — <b>' + esc(h.nom) + '</b> · ' + esc(h.action === 'Ouverture' ? 'a ouvert la tâche' : h.action) + (h.detail ? ' : ' + esc(h.detail) : '') + '</div>'; }).join('')) + '</div></details>' +
-    (t.peutModifier ? '<div class="row" style="margin-top:22px"><button class="btn sm" id="mod">Modifier</button><span class="sp"></span><button class="btn sm ko" id="sup">Supprimer</button></div>' : '');
+    (t.peutModifier ? '<div class="row" style="margin-top:22px"><button class="btn sm" id="mod">Modifier</button><span class="sp"></span>' + (t.peutSupprimer !== false ? '<button class="btn sm ko" id="sup">Supprimer</button>' : '') + '</div>' : '');
 
   var brouillon = $('#com') ? $('#com').value : '';
   if (S.brId !== t.id) { S.brId = t.id; S.brSt = {}; }
@@ -2626,18 +2671,21 @@ function formTache(t) {
 // ───────── Planning ─────────
 function vuesPlanning() {
   var v = [['jour', 'Par salle']];
-  if (S.cfg.estDentiste || S.cfg.dansPlanning) v.push(['moi', 'Mon planning']);
   v.push(['personne', 'Par personne']);
   v.push(['horaires', 'Horaires']);
   return v;
 }
 function ouvrirPlanning() {
-  if (!S.plVue) S.plVue = (S.cfg.estDentiste && !S.cfg.estDirection) || S.cfg.dansPlanning ? 'moi' : 'jour';
+  if (!S.plVue || S.plVue === 'moi') S.plVue = S.cfg.estDentiste || S.cfg.dansPlanning ? 'personne' : 'jour';
   if (!S.jour) S.jour = S.today;
   if (S.plVue === 'jour') chargerJour(S.jour);
-  else if (S.plVue === 'moi') { S.cible = { id: S.me.id, assistante: S.cfg.dansPlanning }; chargerMoi(S.semaine); }
   else if (S.plVue === 'personne') {
-    if (!S.cibleP) { var d0 = S.users.filter(function (u) { return u.fonction === S.cfg.fonctionDentiste; })[0]; S.cibleP = d0 ? d0.id : ''; }
+    // par défaut : son propre planning (praticien ou assistante) ; sinon le premier praticien
+    if (!S.cibleP) {
+      var moiDans = S.cfg.estDentiste || S.cfg.dansPlanning;
+      var d0 = S.users.filter(function (u) { return u.fonction === S.cfg.fonctionDentiste; })[0];
+      S.cibleP = moiDans ? S.me.id : (d0 ? d0.id : '');
+    }
     var u0 = S.users.filter(function (u) { return u.id === S.cibleP; })[0];
     S.cible = { id: S.cibleP, assistante: !!u0 && S.cfg.fonctionsAssistantes.indexOf(u0.fonction) >= 0 };
     chargerMoi(S.semaine);
@@ -2749,13 +2797,21 @@ function rendreJour() {
 }
 
 // ── Mon planning (praticien ou assistante) ──
+S.semCache = {};
 function chargerMoi(sem) {
   S.semaine = lundi(sem || S.today);
-  attentePlanning();
-  var fin = ajout(S.semaine, 6);
-  var vue = S.plVue;
-  Promise.all([api('getAffectations', S.semaine, fin), S.cible.assistante ? api('getPlanning', S.semaine) : Promise.resolve(null)])
-    .then(function (x) { S.moiAff = x[0]; S.moiPl = x[1]; if (S.vue === 'planning' && S.plVue === vue) rendreMoi(); }).catch(echec);
+  var semaine = S.semaine, fin = ajout(semaine, 6), vue = S.plVue, c = S.semCache[semaine];
+  // déjà en mémoire : affichage immédiat (changement de personne ou de semaine déjà vue), mise à jour discrète ensuite
+  if (c && (c.pl || !S.cible.assistante)) { S.moiAff = c.aff; S.moiPl = c.pl; rendreMoi(); }
+  else attentePlanning();
+  Promise.all([api('getAffectations', semaine, fin), api('getPlanning', semaine).catch(function () { return null; })])
+    .then(function (x) {
+      var avant = JSON.stringify(S.semCache[semaine] || null);
+      S.semCache[semaine] = { aff: x[0], pl: x[1] };
+      if (S.vue !== 'planning' || S.plVue !== vue || S.semaine !== semaine) return;
+      if (JSON.stringify(S.semCache[semaine]) === avant && c) return; // rien de nouveau : pas de redessin
+      S.moiAff = x[0]; S.moiPl = x[1]; rendreMoi();
+    }).catch(echec);
 }
 
 function rendreMoi() {
@@ -2806,6 +2862,12 @@ function rendreMoi() {
   $('#main').innerHTML = h;
   brancherEnTete();
   if ($('#pCible')) $('#pCible').onchange = function () { S.cibleP = this.value; ouvrirPlanning(); };
+  // les semaines voisines sont préparées en arrière-plan : la navigation est immédiate
+  [-7, 7].forEach(function (k) {
+    var w = ajout(S.semaine, k);
+    if (S.semCache[w]) return;
+    Promise.all([api('getAffectations', w, ajout(w, 6)), api('getPlanning', w).catch(function () { return null; })]).then(function (x) { S.semCache[w] = { aff: x[0], pl: x[1] }; }).catch(function () { });
+  });
   $('#mPrev').onclick = function () { chargerMoi(ajout(S.semaine, -7)); };
   $('#mNext').onclick = function () { chargerMoi(ajout(S.semaine, 7)); };
   $('#mNow').onclick = function () { chargerMoi(S.today); };
@@ -3037,7 +3099,7 @@ function rendrePlanning() {
 }
 
 function editerCase(email, i) {
-  var p = S.planning, x = infoCase(p, email, i), c = x.c || { statut: 'Travail', debut: '09:00', fin: '18:00', avec: '', heuresSup: '', note: '' };
+  var p = S.planning, x = infoCase(p, email, i), c = x.c || { statut: 'Travail', debut: '09:00', fin: '18:00', avec: '', heuresSup: '', note: '', pauseDebut: '13:00', pauseFin: '14:00' }; // nouvelle journée : pause proposée 13h00 – 14h00 ; une journée déjà enregistrée garde la sienne
   var corps = '<p style="margin-top:0"><b>' + esc(nom(email)) + '</b> · ' + JOURS[i] + ' ' + dLong(p.jours[i]) + '</p>' +
     (x.conge ? '<p class="pill p-att" style="display:inline-block;margin-bottom:12px">Congé accepté ce jour</p>' : '') +
     '<div class="fld"><label>Type</label><div class="seg" id="cSt"><button data-s="Travail"' + (c.statut !== 'Repos' ? ' class="on"' : '') + '>Travail</button><button data-s="Repos"' + (c.statut === 'Repos' ? ' class="on"' : '') + '>Repos</button></div></div>' +
@@ -3095,6 +3157,7 @@ var ICO = {
   conges: '<path d="M12 3a7 7 0 0 1 7 7H5a7 7 0 0 1 7-7Z"/><path d="M12 10v10M8 20h8"/>',
   materiel: '<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>',
   compta: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  prothese: '<path d="M5.5 5h13l-1.6 7H7.1z"/><path d="M8 12v3.5c0 2.2 1 4.3 2.3 4.5M16 12v3.5c0 2.2-1 4.3-2.3 4.5"/><path d="M9.5 8.5h5"/>',
   groupe: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/>',
   dent: '<path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/>',
   couronne: '<path d="m3 8 4.5 4L12 5l4.5 7L21 8l-2 11H5z"/>',
@@ -3107,7 +3170,7 @@ var ICO = {
   points: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>'
 };
 function ico(k, cls) { return '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICO[k] || '') + '</svg>'; }
-var ONGLET_ICO = { ongletTaches: 'taches', ongletPlanning: 'planning', ongletConges: 'conges', ongletMateriel: 'materiel', ongletCompta: 'compta' };
+var ONGLET_ICO = { ongletTaches: 'taches', ongletPlanning: 'planning', ongletConges: 'conges', ongletMateriel: 'materiel', ongletCompta: 'compta', ongletProtheses: 'prothese' };
 var ROLE_ICO = { 'Secrétaire': 'groupe', 'Assistante dentaire': 'dent', 'Assistante responsable': 'couronne', 'Chirurgien-dentiste': 'dent', 'Administrateur': 'roue' };
 
 function rendrePersonnel() {
@@ -3820,6 +3883,59 @@ function ouvrirCompta() {
   if ((!tous && !S.cpt.choixP) || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : le mois en cours, sauf période choisie parmi celles autorisées
   rendreCompta(); chargerCompta();
 }
+// ───────── Comptabilité protégée : mot de passe à chaque ouverture, verrouillage automatique ─────────
+S.cptOuvert = false;
+var CADENAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg>';
+function ouvrirComptaProtegee() { if (S.cptOuvert) { ouvrirCompta(); armerInactiviteCompta(); } else afficherVerrouCompta(); }
+function oublierCompta() { S.cpt.data = null; S.cpt.an = null; S.cpt.charge = null; S.cpt.chargeA = null; }
+function verrouillerCompta() {
+  var etait = S.cptOuvert; S.cptOuvert = false; oublierCompta(); clearTimeout(S.tCpt);
+  if (etait) api('verrouillerCompta').catch(function () { });
+}
+function verrouCompta(e) { // le serveur a refermé l'accès (délai dépassé) : on redemande le mot de passe
+  if (msgErr(e).indexOf('COMPTA_VERROU') < 0) return false;
+  S.cptOuvert = false; oublierCompta();
+  if (S.vue === 'compta') afficherVerrouCompta('Par sécurité, la comptabilité s’est refermée. Saisissez à nouveau votre mot de passe.');
+  return true;
+}
+function afficherVerrouCompta(msg) {
+  oublierCompta(); fermer();
+  $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Comptabilité</h1><p class="ph-g">Protégée par votre mot de passe, redemandé à chaque ouverture.</p></div></div>' +
+    '<div class="vr"><form class="vr-c" id="vrF" autocomplete="on"><span class="vr-i">' + CADENAS + '</span><h2>Comptabilité protégée</h2>' +
+    '<p>Pour afficher les chiffres, confirmez qu’il s’agit bien de vous : saisissez le mot de passe de votre compte, ' + esc(S.me.nom) + '.</p>' +
+    '<input type="email" name="username" autocomplete="username" value="' + esc(S.me.mail || '') + '" class="vh" tabindex="-1" aria-hidden="true">' +
+    '<div class="fld"><label for="vrP">Mot de passe</label><input type="password" id="vrP" name="password" autocomplete="current-password" required></div>' +
+    '<div class="err" id="vrE">' + esc(msg || '') + '</div><button class="btn pri" id="vrO" type="submit">Déverrouiller</button>' +
+    '<p class="hint">La comptabilité se referme quand vous quittez l’onglet, quand l’application passe en arrière-plan ou après 3 minutes sans activité.</p></form></div>';
+  setTimeout(function () { if ($('#vrP')) $('#vrP').focus(); }, 60);
+  $('#vrF').onsubmit = function (ev) {
+    ev.preventDefault();
+    var mdp = $('#vrP').value; if (!mdp) return;
+    var b = $('#vrO'); b.disabled = true; b.textContent = 'Vérification…'; $('#vrE').textContent = '';
+    api('deverrouillerCompta', mdp).then(function () {
+      if ($('#vrP')) $('#vrP').value = '';
+      S.cptOuvert = true;
+      if (S.vue === 'compta') { ouvrirCompta(); armerInactiviteCompta(); }
+    }).catch(function (e) {
+      if (!$('#vrO')) return;
+      b.disabled = false; b.textContent = 'Déverrouiller'; $('#vrE').textContent = msgErr(e); $('#vrP').value = ''; $('#vrP').focus();
+    });
+  };
+}
+var INACTIVITE_COMPTA = 3 * 60 * 1000;
+function armerInactiviteCompta() {
+  clearTimeout(S.tCpt);
+  if (!S.cptOuvert) return;
+  S.tCpt = setTimeout(function () {
+    if (!S.cptOuvert) return;
+    verrouillerCompta();
+    if (S.vue === 'compta') afficherVerrouCompta('Refermée après 3 minutes sans activité.');
+  }, INACTIVITE_COMPTA);
+}
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { if (S.cptOuvert && S.vue === 'compta') armerInactiviteCompta(); }, { passive: true, capture: true }); });
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden && S.cptOuvert) { verrouillerCompta(); if (S.vue === 'compta') afficherVerrouCompta('Refermée pendant que l’application était en arrière-plan.'); }
+});
 /** Données annuelles (Maxime et Hervé) : tous les praticiens d'une année, depuis la Synthèse. */
 function chargerAnnuel(annee, force) {
   var c = S.cpt, cle = '*:' + annee;
@@ -3828,7 +3944,7 @@ function chargerAnnuel(annee, force) {
   api('getComptaAnnuel', '*', annee).then(function (r) {
     if (c.chargeA !== cle) return;
     r.cle = cle; c.an = r; if (S.vue === 'compta') rendreCompta();
-  }).catch(function (e) { if (c.chargeA === cle) { c.an = { cle: cle, erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
+  }).catch(function (e) { if (verrouCompta(e)) return; if (c.chargeA === cle) { c.an = { cle: cle, erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
 }
 function chargerCompta(force) {
   var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous, cle = c.pid + ':' + c.annee + '-' + c.mois;
@@ -3841,7 +3957,7 @@ function chargerCompta(force) {
     if (c.charge !== cle) return; // l'utilisateur a changé de mois ou de praticien entre-temps
     if (!tous && r.regles) { c.annee = r.annee; c.mois = r.mois; c.charge = c.pid + ':' + c.annee + '-' + c.mois; }
     c.data = r; if (S.vue === 'compta') rendreCompta();
-  }).catch(function (e) { if (c.charge === cle) { c.data = { erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
+  }).catch(function (e) { if (verrouCompta(e)) return; if (c.charge === cle) { c.data = { erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
 }
 var MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 var MOIS_COURTS = ['Janv.', 'Févr.', 'Mars', 'Avr.', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
@@ -4039,6 +4155,119 @@ function sourceAnnuel(an) {
     (an.source === 'classeurs' ? '<p class="hint">Pas de synthèse pour ' + an.annee + ' : facturé lu dans les classeurs du mois ; encaissé non disponible.</p>' : '');
 }
 function euros(t) { var n = parseFloat(String(t || '').replace(/[^\d,.-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
+// ───────── Prothèses : suivi des travaux de laboratoire (référence de dossier, jamais de nom de patient) ─────────
+S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } };
+function ouvrirProtheses() { rendreProtheses(); chargerProtheses(); }
+function chargerProtheses(force) {
+  if (force && $('#proR')) { $('#proR').disabled = true; $('#proR').textContent = 'Actualisation…'; }
+  return api('getProtheses').then(function (r) { S.pro.data = r; if (S.vue === 'protheses') rendreProtheses(); if (force) toast('Suivi des prothèses à jour'); })
+    .catch(function (e) { if (S.vue === 'protheses' && $('#proR')) { $('#proR').disabled = false; $('#proR').textContent = '↻ Actualiser'; } echec(e); });
+}
+var PRO_SUIVANT = { 'Commandée': 'En fabrication', 'En fabrication': 'Expédiée', 'Expédiée': 'Reçue' };
+function proActif(x) { return x.statut !== 'Reçue' && x.statut !== 'Annulée'; }
+function proRetard(x, auj) { return proActif(x) && x.livraisonPrevue && x.livraisonPrevue < auj; }
+function proSemaine(x, auj) { var l = lundi(auj); return x.livraisonPrevue >= l && x.livraisonPrevue <= ajout(l, 6); }
+function clsPro(st) { return { 'Commandée': 'st-todo', 'En fabrication': 'st-cours', 'Expédiée': 'pro-exp', 'Reçue': 'st-fin', 'Annulée': 'pro-ann' }[st] || ''; }
+function rendreProtheses() {
+  var d = S.pro.data, f = S.pro.f;
+  var h = '<div class="ph"><div class="ph-t"><h1>Prothèses</h1><p class="ph-g">Les travaux commandés au laboratoire, leur statut et leurs livraisons. Une référence de dossier suffit : jamais de nom de patient.</p></div>' +
+    '<div class="ph-a"><button class="btn pri" id="proNv">+ Nouveau travail</button></div></div>';
+  if (!d) { $('#main').innerHTML = h + sq('stats', 'Lecture du suivi…'); $('#proNv').onclick = function () { fichePro(null); }; return; }
+  var auj = d.aujourdhui, l = d.liste;
+  var nb = function (fn) { return l.filter(fn).length; };
+  var cartes = [
+    ['actifs', 'En cours', nb(function (x) { return x.statut === 'Commandée' || x.statut === 'En fabrication'; })],
+    ['Expédiée', 'Expédiés', nb(function (x) { return x.statut === 'Expédiée'; })],
+    ['auj', 'Livraison aujourd’hui', nb(function (x) { return proActif(x) && x.livraisonPrevue === auj; })],
+    ['semaine', 'Cette semaine', nb(function (x) { return proActif(x) && proSemaine(x, auj); })],
+    ['retard', 'En retard', nb(function (x) { return proRetard(x, auj); })],
+    ['Reçue', 'Reçus', nb(function (x) { return x.statut === 'Reçue'; })]
+  ];
+  h += '<div class="pro-k">' + cartes.map(function (c) {
+    var on = (c[0] === 'auj' || c[0] === 'semaine' || c[0] === 'retard') ? f.liv === c[0] : f.statut === c[0] && !f.liv;
+    return '<button class="' + (on ? 'on' : '') + (c[0] === 'retard' && c[2] ? ' r' : '') + '" data-pk="' + c[0] + '"><small>' + c[1] + '</small><b>' + c[2] + '</b></button>';
+  }).join('') + '</div>';
+  h += '<div class="filters pro-f"><select id="proP" aria-label="Praticien"><option value="">Tous les praticiens</option>' + d.praticiens.map(function (p) { return '<option value="' + esc(p.id) + '"' + (f.prat === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select>' +
+    '<select id="proS" aria-label="Statut"><option value="actifs"' + (f.statut === 'actifs' ? ' selected' : '') + '>Non reçus</option><option value="tous"' + (f.statut === 'tous' ? ' selected' : '') + '>Tous les statuts</option>' + d.statuts.map(function (x) { return '<option' + (f.statut === x ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select>' +
+    '<select id="proL" aria-label="Livraison"><option value="">Toutes les livraisons</option><option value="auj"' + (f.liv === 'auj' ? ' selected' : '') + '>Aujourd’hui</option><option value="semaine"' + (f.liv === 'semaine' ? ' selected' : '') + '>Cette semaine</option><option value="retard"' + (f.liv === 'retard' ? ' selected' : '') + '>En retard</option></select>' +
+    '<button class="btn" id="proR">↻ Actualiser</button>' + (d.lien ? '<a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir le service du prothésiste</a>' : '') +
+    (d.peutLien ? '<button class="btn" id="proLien">' + (d.lien ? 'Modifier le lien' : 'Lien vers le service') + '</button>' : '') + '</div>';
+  var v = l.filter(function (x) {
+    if (f.prat && x.praticien !== f.prat) return false;
+    if (f.statut === 'actifs' && !proActif(x)) return false;
+    if (f.statut !== 'actifs' && f.statut !== 'tous' && x.statut !== f.statut) return false;
+    if (f.liv === 'auj' && !(proActif(x) && x.livraisonPrevue === auj)) return false;
+    if (f.liv === 'semaine' && !(proActif(x) && proSemaine(x, auj))) return false;
+    if (f.liv === 'retard' && !proRetard(x, auj)) return false;
+    return true;
+  }).sort(function (a, b) { return (a.livraisonPrevue || '9999') < (b.livraisonPrevue || '9999') ? -1 : (a.livraisonPrevue || '9999') > (b.livraisonPrevue || '9999') ? 1 : 0; });
+  if (!l.length) h += '<div class="empty">Aucun travail suivi pour l’instant. Ajoutez le premier avec « Nouveau travail ».<div class="hint" style="margin-top:6px">Le service du prothésiste n’est pas relié automatiquement : les travaux se saisissent ici, avec une référence de dossier.</div></div>';
+  else if (!v.length) h += '<div class="empty">Aucun travail ne correspond à ces filtres.</div>';
+  else h += '<div class="pro-t"><div class="pro-h"><span>Dossier</span><span>Praticien</span><span>Travail</span><span>Statut</span><span>Livraison prévue</span><span></span></div>' + v.map(function (x) {
+    var ret = proRetard(x, auj), suiv = PRO_SUIVANT[x.statut];
+    return '<div class="pro-r' + (ret ? ' ret' : '') + '" data-pr="' + esc(x.id) + '" role="button" tabindex="0"><span class="pro-d"><b>' + esc(x.dossier) + '</b><small>' + esc(x.laboratoire || '') + '</small></span>' +
+      '<span class="pro-p">' + esc(x.praticienNom) + '</span><span class="pro-w">' + esc(x.travail) + (x.note ? '<small>' + esc(x.note) + '</small>' : '') + '</span>' +
+      '<span><span class="pill ' + clsPro(x.statut) + '">' + esc(x.statut) + '</span></span>' +
+      '<span class="pro-l">' + (x.statut === 'Reçue' ? 'Reçu le ' + esc(joursFr(x.recueLe) || '—') : x.livraisonPrevue ? esc(joursFr(x.livraisonPrevue)) + (x.livraisonPrevue === auj ? ' · aujourd’hui' : '') + (ret ? ' · en retard' : '') : '—') + '</span>' +
+      '<span class="pro-a">' + (suiv ? '<button class="btn sm" data-av="' + esc(x.id) + '">→ ' + esc(suiv) + '</button>' : '') + '</span></div>';
+  }).join('') + '</div>';
+  h += '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. Le service du prothésiste n’est pas relié automatiquement (aucune intégration officielle connue à ce jour).</p>';
+  $('#main').innerHTML = h;
+  $('#proNv').onclick = function () { fichePro(null); };
+  $('#proR').onclick = function () { chargerProtheses(true); };
+  $('#proP').onchange = function () { f.prat = this.value; rendreProtheses(); };
+  $('#proS').onchange = function () { f.statut = this.value; rendreProtheses(); };
+  $('#proL').onchange = function () { f.liv = this.value; rendreProtheses(); };
+  $$('[data-pk]').forEach(function (b) { b.onclick = function () { var k = b.getAttribute('data-pk'); if (k === 'auj' || k === 'semaine' || k === 'retard') { f.liv = f.liv === k ? '' : k; f.statut = 'actifs'; } else { f.statut = k; f.liv = ''; } rendreProtheses(); }; });
+  if ($('#proLien')) $('#proLien').onclick = lienPro;
+  $$('[data-pr]').forEach(function (r) {
+    var ouvrir = function (ev) { if (ev && ev.target.closest('[data-av]')) return; fichePro(d.liste.filter(function (x) { return x.id === r.getAttribute('data-pr'); })[0]); };
+    r.onclick = ouvrir; r.onkeydown = function (e) { if (e.key === 'Enter') ouvrir(); };
+  });
+  $$('[data-av]').forEach(function (b) {
+    b.onclick = function (ev) {
+      ev.stopPropagation();
+      var x = d.liste.filter(function (y) { return y.id === b.getAttribute('data-av'); })[0]; if (!x) return;
+      b.disabled = true;
+      api('enregistrerProthese', Object.assign({}, x, { statut: PRO_SUIVANT[x.statut] })).then(function (r) { S.pro.data = r; rendreProtheses(); toast(x.dossier + ' : ' + PRO_SUIVANT[x.statut]); }).catch(function (e) { b.disabled = false; echec(e); });
+    };
+  });
+}
+function fichePro(x) {
+  var d = S.pro.data, nv = !x;
+  x = x || { praticien: S.cfg.estDentiste ? S.me.id : '', statut: 'Commandée', commandeLe: S.today };
+  var labos = {}; (d ? d.liste : []).forEach(function (y) { if (y.laboratoire) labos[y.laboratoire] = 1; });
+  var corps = '<div class="fld"><label for="pfP">Praticien</label><select id="pfP"><option value="">Choisir…</option>' + (d ? d.praticiens : []).map(function (p) { return '<option value="' + esc(p.id) + '"' + (x.praticien === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="fld"><label for="pfD">Référence du dossier</label><input type="text" id="pfD" maxlength="40" placeholder="D-2026-118" value="' + esc(x.dossier || '') + '"><div class="hint">Numéro de dossier ou de bon : jamais de nom de patient.</div></div>' +
+    '<div class="fld"><label for="pfW">Travail</label><input type="text" id="pfW" maxlength="120" placeholder="Couronne zircone 26" value="' + esc(x.travail || '') + '"></div>' +
+    '<div class="fld"><label for="pfL">Laboratoire</label><input type="text" id="pfL" maxlength="80" list="pfLl" value="' + esc(x.laboratoire || '') + '"><datalist id="pfLl">' + Object.keys(labos).map(function (k) { return '<option value="' + esc(k) + '">'; }).join('') + '</datalist></div>' +
+    '<div class="fld"><label for="pfS">Statut</label><select id="pfS">' + (d ? d.statuts : []).map(function (s0) { return '<option' + (x.statut === s0 ? ' selected' : '') + '>' + esc(s0) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="two"><div class="fld"><label for="pfC">Commandé le</label><input type="date" id="pfC" value="' + esc(x.commandeLe || '') + '"></div><div class="fld"><label for="pfV">Livraison prévue</label><input type="date" id="pfV" value="' + esc(x.livraisonPrevue || '') + '"></div></div>' +
+    '<div class="fld" id="pfRw"><label for="pfR">Reçu le</label><input type="date" id="pfR" value="' + esc(x.recueLe || '') + '"></div>' +
+    '<div class="fld"><label for="pfN">Note</label><input type="text" id="pfN" maxlength="300" placeholder="Teinte A2, essayage prévu…" value="' + esc(x.note || '') + '"></div>' +
+    (x.majLe ? '<p class="hint">Modifié le ' + esc(dHeure(x.majLe)) + (x.majParNom ? ' par ' + esc(x.majParNom) : '') + '.</p>' : '') + '<div class="err" id="pfE"></div>';
+  tiroir(nv ? 'Nouveau travail' : 'Travail ' + esc(x.dossier), corps, '<button class="btn" id="pfA">Annuler</button><span class="sp"></span><button class="btn pri" id="pfO">Enregistrer</button>');
+  var maj = function () { $('#pfRw').classList.toggle('hidden', $('#pfS').value !== 'Reçue'); };
+  $('#pfS').onchange = maj; maj();
+  $('#pfA').onclick = fermer;
+  $('#pfO').onclick = function () {
+    var b = this; b.disabled = true; $('#pfE').textContent = '';
+    var o = { id: x.id || '', praticien: $('#pfP').value, dossier: $('#pfD').value, travail: $('#pfW').value, laboratoire: $('#pfL').value, statut: $('#pfS').value, commandeLe: $('#pfC').value, livraisonPrevue: $('#pfV').value, recueLe: $('#pfR').value, note: $('#pfN').value };
+    api('enregistrerProthese', o).then(function (r) { S.pro.data = r; fermer(); if (S.vue === 'protheses') rendreProtheses(); toast(nv ? 'Travail ajouté' : 'Travail enregistré'); })
+      .catch(function (e) { b.disabled = false; $('#pfE').textContent = msgErr(e); });
+  };
+}
+function lienPro() {
+  var d = S.pro.data;
+  tiroir('Lien vers le service du prothésiste', '<p class="hint" style="margin-top:0">Adresse du site du prothésiste (elle s’ouvrira dans un nouvel onglet ; chacun s’y connecte avec son propre compte). Aucune donnée n’est récupérée automatiquement.</p>' +
+    '<div class="fld"><label for="plU">Adresse</label><input type="url" id="plU" placeholder="https://…" value="' + esc(d.lien || '') + '"></div><div class="err" id="plE"></div>',
+    '<button class="btn" id="plA">Annuler</button><span class="sp"></span><button class="btn pri" id="plO">Enregistrer</button>');
+  $('#plA').onclick = fermer;
+  $('#plO').onclick = function () {
+    api('enregistrerLienProtheses', $('#plU').value).then(function (r) { S.pro.data = r; fermer(); rendreProtheses(); toast('Lien enregistré'); }).catch(function (e) { $('#plE').textContent = msgErr(e); });
+  };
+}
+
 // ───────── Impayés et relances de devis (modifiables depuis l'application) ─────────
 S.sv = { pid: null, data: null };
 function segCompta(v) {
@@ -4226,7 +4455,7 @@ var ANIM = (function () {
   var indPlus = function () { A.indicateur(); setTimeout(A.indicateur, 320); };
 
   // ── 5 · compteurs : les grands chiffres montent jusqu'à leur valeur exacte (une seule fois par carte) ──
-  var CIBLES = '#stats .stat b, .ps-c b, .cp-k > div > b, .sv-sum > b';
+  var CIBLES = '#stats .stat b, .ps-c b, .cp-k > div > b, .sv-sum > b, .pro-k b';
   function lireNombre(t) {
     var m = String(t).match(/^([^\d−-]*)([−-]?\d[\d\s  ]*(?:,\d+)?)(.*)$/);
     if (!m) return null;
