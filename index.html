@@ -1586,7 +1586,6 @@ table.pl{border-collapse:separate;border-spacing:0}
 .ca-seul .ca-t b{font-size:30px}
 @media (max-width:760px){.ca-seul .ca-t b{font-size:24px}}
 
-.ht-h{margin:26px 0 10px}
 table.pl.ht td{padding:10px;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);white-space:nowrap}
 table.pl.ht td small{display:block;font-weight:500;font-size:11.5px;color:var(--amb)}
 table.pl.ht td.ht-x{color:var(--ink3);font-weight:500}
@@ -1595,8 +1594,33 @@ table.pl.ht th.ht-s{color:var(--acc)}
 table.pl.ht tfoot td{border-top:2px solid var(--line);background:#F8FAFD;font-weight:700}
 table.pl.ht tfoot td.nm{position:sticky;left:0;z-index:1}
 table.pl.ht tbody tr:hover td.ht-s{background:#EAF0FF}
-table.pl.ht .ht-s{position:sticky;right:0;z-index:1;box-shadow:-1px 0 0 var(--line)}
-table.pl.ht th.ht-s{z-index:3;background:#EEF3FF}
+table.pl.ht .ht-k{position:sticky;right:0;z-index:1;box-shadow:-1px 0 0 var(--line)}
+table.pl.ht th.ht-k{z-index:3;background:#EEF3FF}
+table.pl.ht td.ht-e{background:#fff}
+table.pl.ht tfoot td.ht-e{background:#F8FAFD}
+table.pl.ht th.ht-e{color:var(--acc)}
+.ht-plus{color:#B45309;font-weight:700}.ht-moins{color:#1D4ED8;font-weight:700}.ht-eg{color:#15803D;font-weight:600}
+table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
+.ht-t{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 10px}.ht-t .ht-h{margin:0;flex:1}
+.ct-r .ct-i{display:flex;align-items:center;gap:8px}.ct-r .ct-i input{max-width:110px}.ct-r .ct-i span{color:var(--ink2);font-size:14px}
+
+/* fiche d'affectation simplifiée */
+.af-sl{display:flex;flex-direction:column;gap:8px}
+.af-et small{display:block;font-size:12px;color:var(--ink2);font-weight:600;margin-bottom:5px}
+.af-hab{margin-top:8px}.af-hab .chk2{font-size:13.5px;color:var(--ink)}
+.af-j{display:flex;flex-wrap:wrap;gap:6px}
+.af-j .pch{min-height:38px;padding:0 12px;font-size:14px}
+.af-j .pch.ici{opacity:1;cursor:default;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.hz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--soft,#F8FAFD)}
+.hz-n{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.hz-n b{font-size:14.5px}
+.hz-t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.hz-t label{display:flex;flex-direction:column;font-size:11.5px;color:var(--ink2);gap:3px;font-weight:600}
+.hz-t input{width:100%;min-width:0}
+@media (max-width:520px){.hz-t{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sl-h{font-size:15px;margin:22px 0 4px}
+.slh{padding:10px 0;border-top:1px solid var(--line)}.slh b{display:block;font-size:14px;margin-bottom:6px}
+.slh .pch{min-height:36px;padding:0 12px;font-size:13.5px}
 </style>
 </head>
 <body>
@@ -2957,7 +2981,7 @@ function rendreJour() {
   var h = enTetePlanning() +
     '<div class="wk"><button class="btn sm" id="dPrev" aria-label="Jour précédent">‹</button><span class="nm">' + esc(dJour(date)) + (date === S.today ? ' · aujourd’hui' : '') + '</span>' +
     '<button class="btn sm" id="dNext" aria-label="Jour suivant">›</button><button class="btn sm" id="dNow">Aujourd’hui</button><input type="date" id="dPick" value="' + esc(date) + '" class="btn sm" style="padding:4px 8px" aria-label="Choisir une date"><span class="sp"></span>' +
-    (ed ? '<button class="btn sm" id="dSalles">Salles</button><button class="btn sm" id="dCopy">Reprendre ' + esc(dJour(ajout(date, -7)).toLowerCase()) + '</button><button class="btn sm pri" id="dAdd">+ Affectation</button>' : '') + '</div>';
+    (ed ? '<button class="btn sm" id="dSalles">Salles</button><button class="btn sm" id="dCopy">Reprendre ' + esc(dJour(ajout(date, -7)).toLowerCase()) + '</button><button class="btn sm" id="dCopyW">Copier la semaine précédente</button><button class="btn sm pri" id="dAdd">+ Affectation</button>' : '') + '</div>';
   if (r.conflits.length) {
     h += '<div class="alerte" role="status"><b>' + r.conflits.length + ' point' + (r.conflits.length > 1 ? 's' : '') + ' à vérifier</b>' +
       r.conflits.map(function (c) { return '<div>' + (c.type === 'absence' ? 'Attention : ' : 'Conflit : ') + esc(c.message) + '</div>'; }).join('') + '</div>';
@@ -3010,8 +3034,16 @@ function rendreJour() {
   if (ed) {
     $('#dAdd').onclick = function () { formAffectation(null, ''); };
     $('#dSalles').onclick = formSalles;
+    $('#dCopyW').onclick = function () {
+      var lun = lundi(date);
+      if (!confirm('Recopier toute la semaine du ' + dCourt(ajout(lun, -7)) + ' sur la semaine du ' + dCourt(lun) + ' (affectations et horaires des assistantes) ? Ce qui est déjà saisi cette semaine n’est pas modifié.')) return;
+      api('copierSemaineAffectations', lun, date).then(function (x) {
+        S.aff = x; oublierSemaine(date); rendreJour();
+        toast(x.copies || x.horairesCopies ? x.copies + ' affectation(s) et ' + (x.horairesCopies || 0) + ' journée(s) d’horaires recopiées' : 'Rien à recopier (semaine déjà remplie ou semaine précédente vide)');
+      }).catch(echec);
+    };
     $('#dCopy').onclick = function () {
-      api('copierAffectationsJour', date).then(function (x) { S.aff = x; rendreJour(); toast(x.copies ? x.copies + ' affectation(s) reprise(s) de la semaine précédente' : 'Rien à reprendre (déjà saisi ou jour précédent vide)'); }).catch(echec);
+      api('copierAffectationsJour', date).then(function (x) { S.aff = x; oublierSemaine(date); rendreJour(); toast(x.copies ? x.copies + ' affectation(s) reprise(s) de la semaine précédente' : 'Rien à reprendre (déjà saisi ou jour précédent vide)'); }).catch(echec);
     };
     $$('[data-add]').forEach(function (b) { b.onclick = function () { formAffectation(null, b.getAttribute('data-add')); }; });
     $$('.af.ed').forEach(function (c) {
@@ -3101,55 +3133,74 @@ function rendreMoi() {
 }
 
 // ── Éditeur d'affectation ──
+/**
+ * Fiche d'affectation : praticien, salle(s) (habituelles proposées d'office), créneau, assistantes avec leurs horaires,
+ * et recopie sur d'autres jours de la semaine — tout en un seul enregistrement, sans repasser par l'onglet Horaires.
+ */
 function formAffectation(a, salleInit) {
-  var r = S.aff, ed = !!a;
-  a = a || { id: '', date: S.jour, dentiste: '', salle: salleInit || '', debut: S.cfg.creneaux.journee[0], fin: S.cfg.creneaux.journee[1], assistantes: [], note: '' };
+  var r = S.aff, ed = !!a, C = S.cfg.creneaux, hab = r.habituelles || {};
+  a = a || { id: '', date: S.jour, dentiste: '', salle: salleInit || '', debut: C.journee[0], fin: C.journee[1], assistantes: [], note: '' };
   var choisisIds = a.assistantes.filter(function (y) { return !y.independante; }).map(function (y) { return y.cle; });
   var externes = a.assistantes.filter(function (y) { return y.independante; }).map(function (y) { return 'ext:' + y.nom; });
+  var salles = a.salle ? [a.salle] : [], sallesTouchees = ed || !!salleInit;
+  var jours = [], hz = {}; // jours où recopier ; horaires saisis à la main (par assistante)
   var etages = [];
   r.salles.filter(function (s) { return s.active || s.id === a.salle; }).forEach(function (s) {
     var e = etages.filter(function (x) { return x.nom === s.etage; })[0];
     if (!e) { e = { nom: s.etage, s: [] }; etages.push(e); }
     e.s.push(s);
   });
-  var optSalles = '<option value="">Salle à définir</option>' + etages.map(function (e) {
-    return '<optgroup label="' + esc(e.nom || 'Sans étage') + '">' + e.s.map(function (s) { return '<option value="' + esc(s.id) + '"' + (s.id === a.salle ? ' selected' : '') + '>' + esc(s.nom) + '</option>'; }).join('') + '</optgroup>';
-  }).join('');
   var optDent = '<option value="">Choisir…</option>' + r.dentistes.map(function (d) { return '<option value="' + esc(d.id) + '"' + (d.id === a.dentiste ? ' selected' : '') + '>' + esc(d.nom) + '</option>'; }).join('');
-  var C = S.cfg.creneaux;
   var preset = a.debut === C.journee[0] && a.fin === C.journee[1] ? 'journee' : a.debut === C.matin[0] && a.fin === C.matin[1] ? 'matin' : a.debut === C.apresMidi[0] && a.fin === C.apresMidi[1] ? 'apresMidi' : 'autre';
   var corps =
     '<div class="two"><div class="fld"><label for="eD">Date</label><input type="date" id="eD" value="' + esc(a.date) + '"></div>' +
     '<div class="fld"><label for="eP">Praticien *</label><select id="eP">' + optDent + '</select></div></div>' +
-    '<div class="fld"><label for="eS">Cabinet ou bloc</label><select id="eS">' + optSalles + '</select></div>' +
+    '<div class="fld"><label>Cabinet ou bloc <span class="meta">(un ou plusieurs)</span></label><div id="eS" class="af-sl"></div><div class="hint af-hab" id="eSH"></div></div>' +
     '<div class="fld"><label>Créneau</label><div class="seg" id="eC">' +
     [['journee', 'Journée'], ['matin', 'Matin'], ['apresMidi', 'Après-midi'], ['autre', 'Autre']].map(function (x) { return '<button type="button" data-c="' + x[0] + '"' + (x[0] === preset ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
-    '</div><div class="two" style="margin-top:8px"><div><label for="eH1" class="sr">Début</label><input type="time" id="eH1" step="900" value="' + esc(a.debut) + '" aria-label="Début"></div><div><input type="time" id="eH2" step="900" value="' + esc(a.fin) + '" aria-label="Fin"></div></div>' +
+    '</div><div class="two" style="margin-top:8px"><div><input type="time" id="eH1" step="900" value="' + esc(a.debut) + '" aria-label="Début"></div><div><input type="time" id="eH2" step="900" value="' + esc(a.fin) + '" aria-label="Fin"></div></div>' +
     '<label class="chk2" id="eSplitL" style="margin-top:10px;font-size:14px;color:var(--ink)"><input type="checkbox" id="eSplit"> Assistante différente le matin et l’après-midi</label></div>' +
     '<div class="fld"><label id="eAL">Assistantes</label><div id="eA"></div><div class="chips" id="eX" style="margin-top:8px"></div>' +
     '<div class="indep"><input type="text" id="eI" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante"><button type="button" class="btn sm" id="eIAdd">+ Assistante indépendante</button></div></div>' +
     '<div class="fld hidden" id="eB2"><label id="eAL2">Assistantes de l’après-midi</label><div id="eA2"></div><div class="chips" id="eX2" style="margin-top:8px"></div>' +
     '<div class="indep"><input type="text" id="eI2" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante de l’après-midi"><button type="button" class="btn sm" id="eIAdd2">+ Assistante indépendante</button></div></div>' +
-    '<div class="hint" style="margin:-6px 0 14px">Sans assistante, l’affectation apparaît « Assistante à affecter ». Une assistante déjà prévue ailleurs sur ce créneau reste sélectionnable (assistante partagée).</div>' +
+    (r.peutHoraires ? '<div class="fld hidden" id="eHz"><label>Horaires des assistantes</label><div id="eHzL"></div><div class="hint">Remplis d’après le créneau, modifiables. Ils s’enregistrent aussi dans l’onglet Horaires : rien à ressaisir.</div></div>' : '') +
+    '<div class="fld"><label>Recopier sur d’autres jours de la semaine</label><div class="af-j" id="eJ"></div><div class="hint" id="eJH"></div></div>' +
     '<div class="fld"><label for="eN">Note</label><input type="text" id="eN" maxlength="200" placeholder="Chirurgie implantaire" value="' + esc(a.note || '') + '"></div>' +
     (ed && a.majParNom ? '<div class="hint">Modifié par ' + esc(a.majParNom) + (a.majLe ? ' le ' + esc(dHeure(a.majLe)) : '') + '</div>' : '') +
     '<div class="err" id="eErr"></div>';
   tiroir(ed ? 'Modifier l’affectation' : 'Nouvelle affectation', corps,
     (ed ? '<button class="btn ko" id="eDel">Supprimer</button><span class="sp"></span>' : '') + '<button class="btn" id="eAnn">Annuler</button><button class="btn pri" id="eOk">Enregistrer</button>');
 
-  var dispoTexte = function (email) {
-    var d = r.dispo[email + '|' + $('#eD').value];
-    if (!d) return '';
-    if (d.statut === 'Congé') return 'en congé';
-    if (d.statut === 'Repos') return 'repos';
-    return d.debut && d.fin ? hm(d.debut) + '–' + hm(d.fin) : '';
+  // ── salles : boutons à cocher, salles habituelles du praticien proposées d'office ──
+  var memeListe = function (x, y) { return x.slice().sort().join('|') === (y || []).slice().sort().join('|'); };
+  var nomSalleId = function (id) { var s = r.salles.filter(function (x) { return x.id === id; })[0]; return s ? s.nom : id; };
+  var rendreSalles = function () {
+    $('#eS').innerHTML = etages.map(function (e) {
+      return '<div class="af-et"><small>' + esc(e.nom || 'Sans étage') + '</small><div class="chips">' + e.s.map(function (s) {
+        var on = salles.indexOf(s.id) >= 0;
+        return '<button type="button" class="pch' + (on ? ' on' : '') + '" data-sl="' + esc(s.id) + '" aria-pressed="' + on + '">' + esc(s.nom) + '</button>';
+      }).join('') + '</div></div>';
+    }).join('');
+    $$('#eS [data-sl]').forEach(function (b) { b.onclick = function () { var id = b.getAttribute('data-sl'), i = salles.indexOf(id); if (i >= 0) salles.splice(i, 1); else salles.push(id); sallesTouchees = true; rendreSalles(); }; });
+    var dent = $('#eP').value, h = hab[dent] || [], nomD = dent ? $('#eP').selectedOptions[0].textContent : '';
+    var txt = !dent ? '' : !salles.length ? 'Aucune salle cochée : « salle à définir ».' : '';
+    if (dent && salles.length && !memeListe(salles, h)) txt = '<label class="chk2"><input type="checkbox" id="eHab"> Retenir ' + esc(salles.map(nomSalleId).join(' + ')) + ' comme salle' + (salles.length > 1 ? 's' : '') + ' habituelle' + (salles.length > 1 ? 's' : '') + ' de ' + esc(nomD) + '</label>';
+    else if (dent && salles.length) txt = 'Salle' + (salles.length > 1 ? 's' : '') + ' habituelle' + (salles.length > 1 ? 's' : '') + ' de ' + esc(nomD) + '. Cochez ou décochez pour changer.';
+    $('#eSH').innerHTML = txt;
   };
+  $('#eP').onchange = function () { if (!sallesTouchees) salles = (hab[this.value] || []).slice(); rendreSalles(); };
+  if (!ed && !salleInit && a.dentiste) salles = (hab[a.dentiste] || []).slice();
+  rendreSalles();
+
+  // ── assistantes ──
+  var dispoDe = function (id) { return r.dispo[id + '|' + $('#eD').value] || null; };
+  var dispoTexte = function (id) { var d = dispoDe(id); return !d ? '' : d.statut === 'Congé' ? 'en congé' : d.statut === 'Repos' ? 'repos' : ''; };
   var choisis2 = [], externes2 = [];
-  /** Sélecteur d'assistantes + indépendantes (utilisé une fois, ou deux fois pour matin / après-midi). */
   var bloc = function (suf, ids, ext) {
     var sel = null;
     var rendre = function () {
-      if (!sel) sel = selecteurPersonnes($('#eA' + suf), { personnes: r.assistantes, choisis: ids, info: dispoTexte });
+      if (!sel) sel = selecteurPersonnes($('#eA' + suf), { personnes: r.assistantes, choisis: ids, info: dispoTexte, onChange: rendreHoraires });
       else sel.redessiner();
       $('#eX' + suf).innerHTML = ext.map(function (k) {
         return '<span class="chip on ext">' + esc(k.slice(4)) + ' · indépendante <button type="button" class="x-ext" data-k="' + esc(k) + '" aria-label="Retirer ' + esc(k.slice(4)) + '">×</button></span>';
@@ -3159,7 +3210,6 @@ function formAffectation(a, salleInit) {
     $('#eIAdd' + suf).onclick = function () {
       var n = $('#eI' + suf).value.trim().replace(/\|/g, ' ');
       if (!n) {
-        // numérotation des indépendantes non identifiées, pour distinguer plusieurs présentes le même jour
         var pris = {};
         r.affectations.forEach(function (x) { if (x.date === $('#eD').value) x.assistantes.forEach(function (y) { if (y.independante) pris[y.nom] = 1; }); });
         externes.concat(externes2).forEach(function (k) { pris[k.slice(4)] = 1; });
@@ -3173,6 +3223,37 @@ function formAffectation(a, salleInit) {
     rendre();
     return rendre;
   };
+
+  // ── horaires de chaque assistante choisie : proposés d'après le créneau (et ses horaires déjà saisis ce jour-là) ──
+  var split = function () { return $('#eSplit') && $('#eSplit').checked; };
+  var defaut = function (id) {
+    var h1 = $('#eH1').value, h2 = $('#eH2').value, deb = null, fin = null;
+    var mat = choisisIds.indexOf(id) >= 0, apm = split() && choisis2.indexOf(id) >= 0;
+    if (mat) { deb = h1; fin = split() ? C.matin[1] : h2; }
+    if (apm) { deb = deb && deb < C.apresMidi[0] ? deb : C.apresMidi[0]; fin = h2; }
+    var d = dispoDe(id);
+    if (d && d.statut === 'Travail' && d.debut && d.fin) { if (d.debut < deb) deb = d.debut; if (d.fin > fin) fin = d.fin; }
+    var pd = d && d.statut === 'Travail' && d.pauseDebut ? d.pauseDebut : '', pf = pd ? d.pauseFin : '';
+    if (!pd && deb && fin && deb <= '13:00' && fin >= '14:00') { pd = '13:00'; pf = '14:00'; }
+    return { debut: deb || '', fin: fin || '', pauseDebut: pd, pauseFin: pf };
+  };
+  var ordre = function () { var v = choisisIds.slice(); if (split()) choisis2.forEach(function (x) { if (v.indexOf(x) < 0) v.push(x); }); return v; };
+  var rendreHoraires = function () {
+    if (!$('#eHz')) return;
+    var ids = ordre();
+    $('#eHz').classList.toggle('hidden', !ids.length);
+    $('#eHzL').innerHTML = ids.map(function (id) {
+      var u = r.assistantes.filter(function (x) { return x.id === id; })[0] || { nom: id, prenom: id }, v = hz[id] || defaut(id), d = dispoDe(id);
+      var info = d && d.statut === 'Congé' ? '<span class="tag t-warn">en congé ce jour-là</span>' : d && d.statut === 'Repos' ? '<span class="meta">prévue en repos : passera en travail</span>' : '';
+      return '<div class="hz" data-hz="' + esc(id) + '"><div class="hz-n"><b>' + esc(u.prenom || u.nom) + '</b>' + info + '</div><div class="hz-t">' +
+        '<label>De<input type="time" step="900" data-k="debut" value="' + esc(v.debut) + '"></label><label>à<input type="time" step="900" data-k="fin" value="' + esc(v.fin) + '"></label>' +
+        '<label>Pause<input type="time" step="300" data-k="pauseDebut" value="' + esc(v.pauseDebut) + '"></label><label>à<input type="time" step="300" data-k="pauseFin" value="' + esc(v.pauseFin) + '"></label></div></div>';
+    }).join('');
+    $$('#eHzL .hz').forEach(function (z) {
+      var id = z.getAttribute('data-hz');
+      $$('input', z).forEach(function (x) { x.oninput = function () { var v = hz[id] || defaut(id); v[x.getAttribute('data-k')] = x.value; hz[id] = v; }; });
+    });
+  };
   var rendreChips = bloc('', choisisIds, externes);
   var rendreChips2 = null;
   var majSplit = function () {
@@ -3184,14 +3265,29 @@ function formAffectation(a, salleInit) {
     $('#eAL').textContent = on ? 'Assistantes du matin (' + hm($('#eH1').value) + '–' + hm(C.matin[1]) + ')' : 'Assistantes';
     $('#eAL2').textContent = 'Assistantes de l’après-midi (' + hm(C.apresMidi[0]) + '–' + hm($('#eH2').value) + ')';
     if (on && !rendreChips2) {
-      // l'après-midi démarre avec les mêmes assistantes que le matin : il suffit de changer celle qui diffère
       choisisIds.forEach(function (x) { choisis2.push(x); }); externes.forEach(function (x) { externes2.push(x); });
       rendreChips2 = bloc('2', choisis2, externes2);
     }
+    rendreHoraires();
   };
   $('#eSplit').onchange = majSplit;
   majSplit();
-  $('#eD').onchange = function () { rendreChips(); if (rendreChips2) rendreChips2(); };
+
+  // ── recopie sur d'autres jours de la même semaine ──
+  var rendreJours = function () {
+    var date = $('#eD').value; if (!date) { $('#eJ').innerHTML = ''; return; }
+    var lun = lundi(date), noms = ['Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.', 'Dim.'];
+    jours = jours.filter(function (j) { return lundi(j) === lun && j !== date; });
+    $('#eJ').innerHTML = noms.map(function (n, i) {
+      var j = ajout(lun, i), ici = j === date, on = ici || jours.indexOf(j) >= 0;
+      return '<button type="button" class="pch' + (on ? ' on' : '') + (ici ? ' ici' : '') + '" data-j="' + j + '"' + (ici ? ' disabled title="Jour de cette fiche"' : '') + ' aria-pressed="' + on + '">' + n + ' ' + Number(j.slice(8, 10)) + '</button>';
+    }).join('');
+    $$('#eJ [data-j]:not([disabled])').forEach(function (b) { b.onclick = function () { var j = b.getAttribute('data-j'), i = jours.indexOf(j); if (i >= 0) jours.splice(i, 1); else jours.push(j); rendreJours(); }; });
+    $('#eJH').textContent = jours.length ? 'Même praticien, mêmes salles, mêmes assistantes et mêmes horaires aussi le ' + jours.slice().sort().map(function (j) { return dJour(j).toLowerCase(); }).join(', ') + '.' : 'Cochez les jours où ce praticien est dans les mêmes conditions : la fiche y sera recopiée.';
+  };
+  rendreJours();
+
+  $('#eD').onchange = function () { hz = {}; rendreChips(); if (rendreChips2) rendreChips2(); rendreHoraires(); rendreJours(); };
   $$('#eC button').forEach(function (b) {
     b.onclick = function () {
       var k = b.getAttribute('data-c');
@@ -3204,32 +3300,59 @@ function formAffectation(a, salleInit) {
   $('#eAnn').onclick = fermer;
   if ($('#eDel')) $('#eDel').onclick = function () {
     if (!confirm('Supprimer cette affectation ? Les autres affectations ne changent pas.')) return;
-    api('supprimerAffectation', a.id).then(function (x) { S.aff = x; fermer(); rendreJour(); toast('Affectation supprimée'); }).catch(echec);
+    api('supprimerAffectation', a.id).then(function (x) { S.aff = x; oublierSemaine(a.date); fermer(); rendreJour(); toast('Affectation supprimée'); }).catch(echec);
   };
   $('#eOk').onclick = function () {
-    var d = { id: a.id, date: $('#eD').value, dentiste: $('#eP').value, salle: $('#eS').value, debut: $('#eH1').value, fin: $('#eH2').value, assistantes: choisisIds.concat(externes), note: $('#eN').value.trim() };
+    var d = { id: a.id, date: $('#eD').value, dentiste: $('#eP').value, salles: salles.slice(), debut: $('#eH1').value, fin: $('#eH2').value, assistantes: choisisIds.concat(externes), note: $('#eN').value.trim(), jours: jours.slice() };
     var err = function (m) { $('#eErr').textContent = m; };
     if (!d.date) return err('Indiquez la date.');
     if (!d.dentiste) return err('Choisissez le praticien.');
     if (!d.debut || !d.fin) return err('Indiquez l’heure de début et de fin.');
     if (d.fin <= d.debut) return err('L’heure de fin doit être après l’heure de début.');
-    var b = this; b.disabled = true;
-    var fin = function (x, n) {
-      S.aff = x; S.jour = d.date; fermer(); rendreJour();
-      var e = x.enregistre;
-      if (e && (e.conflits.length || e.alertes.length)) toast('Enregistré, mais à vérifier : ' + (e.conflits[0] || e.alertes[0]), true);
-      else toast(n > 1 ? 'Matin et après-midi enregistrés' : 'Affectation enregistrée');
+    var horairesDe = function (ids) {
+      if (!r.peutHoraires) return undefined;
+      var o = {}, pb = '';
+      ids.forEach(function (id) {
+        var dd = dispoDe(id); if (dd && dd.statut === 'Congé') return; // en congé : ses horaires ne sont pas touchés
+        var v = hz[id] || defaut(id), u = r.assistantes.filter(function (x) { return x.id === id; })[0], nm = u ? (u.prenom || u.nom) : id;
+        if (!v.debut || !v.fin || v.fin <= v.debut) pb = pb || 'Horaires de ' + nm + ' : l’heure de fin doit être après l’heure de début.';
+        else if (!!v.pauseDebut !== !!v.pauseFin) pb = pb || 'Horaires de ' + nm + ' : indiquez le début et la fin de la pause, ou laissez les deux vides.';
+        else if (v.pauseDebut && (v.pauseFin <= v.pauseDebut || v.pauseDebut < v.debut || v.pauseFin > v.fin)) pb = pb || 'Horaires de ' + nm + ' : la pause doit être comprise dans la journée.';
+        o[id] = { debut: v.debut, fin: v.fin, pauseDebut: v.pauseDebut, pauseFin: v.pauseFin };
+      });
+      if (pb) throw new Error(pb);
+      return o;
     };
-    if ($('#eSplit').checked) {
-      // deux créneaux : le matin (même fiche si elle existait) puis l'après-midi (nouvelle fiche)
-      var m = Object.assign({}, d, { fin: C.matin[1] });
-      var am = Object.assign({}, d, { id: '', debut: C.apresMidi[0], assistantes: choisis2.concat(externes2) });
-      api('enregistrerAffectation', m).then(function () { return api('enregistrerAffectation', am); })
-        .then(function (x) { fin(x, 2); }).catch(function (x) { b.disabled = false; err(msgErr(x)); });
-      return;
-    }
-    api('enregistrerAffectation', d).then(function (x) { fin(x, 1); }).catch(function (x) { b.disabled = false; err(msgErr(x)); });
+    var b = this, retenir = $('#eHab') && $('#eHab').checked;
+    var fin = function (x) {
+      S.aff = x; S.jour = d.date; oublierSemaine(d.date); fermer(); rendreJour();
+      if (retenir) { var m = Object.assign({}, hab); m[d.dentiste] = d.salles.slice(); apiFond('enregistrerSallesHabituelles', m).then(function (h) { if (S.aff) S.aff.habituelles = h; }).catch(function () { }); }
+      var e = x.enregistre, n = x.nbJours || 1;
+      if (e && (e.conflits.length || e.alertes.length)) toast('Enregistré, mais à vérifier : ' + (e.conflits[0] || e.alertes[0]), true);
+      else toast(n > 1 ? 'Enregistré sur ' + n + ' jours' : 'Affectation enregistrée');
+    };
+    try {
+      if ($('#eSplit').checked) {
+        // deux créneaux : le matin (même fiche si elle existait) puis l'après-midi
+        var m = Object.assign({}, d, { fin: C.matin[1], horaires: horairesDe(choisisIds) });
+        var am = Object.assign({}, d, { id: '', debut: C.apresMidi[0], assistantes: choisis2.concat(externes2), horaires: horairesDe(choisis2.filter(function (x) { return choisisIds.indexOf(x) < 0; })) });
+        b.disabled = true;
+        api('enregistrerAffectation', m).then(function () { return api('enregistrerAffectation', am); })
+          .then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
+        return;
+      }
+      d.horaires = horairesDe(choisisIds);
+    } catch (x) { return err(x.message); }
+    b.disabled = true;
+    api('enregistrerAffectation', d).then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
   };
+}
+/** Une modification d'affectation ou d'horaires : la semaine gardée sur l'appareil est relue au prochain affichage. */
+function oublierSemaine(date) {
+  var lun = lundi(date); delete S.semCache[lun];
+  for (var i = 0; i < 7; i++) delete S.jourCache[ajout(lun, i)];
+  if (S.jourCache && S.aff) S.jourCache[S.aff.debut] = S.aff;
+  sauverCache();
 }
 
 // ── Gestion des salles (direction) ──
@@ -3248,15 +3371,28 @@ function formSalles() {
     $$('[data-up]').forEach(function (b) { b.onclick = function () { var i = +b.getAttribute('data-up'); liste.splice(i - 1, 0, liste.splice(i, 1)[0]); rendre(); }; });
     $$('[data-dn]').forEach(function (b) { b.onclick = function () { var i = +b.getAttribute('data-dn'); liste.splice(i + 1, 0, liste.splice(i, 1)[0]); rendre(); }; });
   };
+  var hab = JSON.parse(JSON.stringify(S.aff.habituelles || {}));
   tiroir('Salles du cabinet', '<p class="hint" style="margin-top:0">Renommez les salles, changez leur étage ou leur ordre. Une salle désactivée n’apparaît plus dans les choix, mais ses affectations passées sont conservées.</p><div id="slL"></div>' +
-    '<button type="button" class="btn sm" id="slAdd" style="margin-top:10px">+ Ajouter une salle</button><div class="err" id="slErr"></div>',
+    '<button type="button" class="btn sm" id="slAdd" style="margin-top:10px">+ Ajouter une salle</button>' +
+    '<h3 class="sl-h">Salles habituelles des praticiens</h3><p class="hint" style="margin-top:0">Proposées d’office dans chaque nouvelle affectation ; toujours modifiables dans la fiche.</p><div id="slH"></div><div class="err" id="slErr"></div>',
     '<button class="btn" id="slAnn">Annuler</button><button class="btn pri" id="slOk">Enregistrer</button>');
   rendre();
+  var rendreHab = function () {
+    $('#slH').innerHTML = S.aff.dentistes.map(function (d) {
+      var l = hab[d.id] || [];
+      return '<div class="slh"><b>' + esc(d.nom) + '</b><div class="chips">' + S.aff.salles.filter(function (x) { return x.active; }).map(function (x) {
+        var on = l.indexOf(x.id) >= 0;
+        return '<button type="button" class="pch' + (on ? ' on' : '') + '" data-hd="' + esc(d.id) + '" data-hs="' + esc(x.id) + '" aria-pressed="' + on + '">' + esc(x.nom) + '</button>';
+      }).join('') + '</div></div>';
+    }).join('');
+    $$('#slH [data-hd]').forEach(function (b) { b.onclick = function () { var d = b.getAttribute('data-hd'), x = b.getAttribute('data-hs'), l = hab[d] = hab[d] || [], i = l.indexOf(x); if (i >= 0) l.splice(i, 1); else l.push(x); rendreHab(); }; });
+  };
+  rendreHab();
   $('#slAdd').onclick = function () { liste.push({ id: '', nom: '', etage: (liste[liste.length - 1] || {}).etage || '', active: true }); rendre(); var x = $$('#slL input[data-f="nom"]'); x[x.length - 1].focus(); };
   $('#slAnn').onclick = fermer;
   $('#slOk').onclick = function () {
     if (liste.some(function (s) { return !String(s.nom).trim(); })) { $('#slErr').textContent = 'Chaque salle doit avoir un nom.'; return; }
-    api('enregistrerSalles', liste).then(function () { fermer(); toast('Salles enregistrées'); chargerJour(S.jour); }).catch(function (e) { $('#slErr').textContent = msgErr(e); });
+    api('enregistrerSalles', liste).then(function () { return JSON.stringify(hab) === JSON.stringify(S.aff.habituelles || {}) ? null : api('enregistrerSallesHabituelles', hab); }).then(function () { fermer(); toast('Salles enregistrées'); delete S.jourCache[S.jour]; chargerJour(S.jour); }).catch(function (e) { $('#slErr').textContent = msgErr(e); });
   };
 }
 
@@ -3321,9 +3457,10 @@ function rendrePlanning() {
   $('#wPrev').onclick = function () { chargerPlanning(ajout(S.semaine, -7)); };
   $('#wNext').onclick = function () { chargerPlanning(ajout(S.semaine, 7)); };
   $('#wNow').onclick = function () { chargerPlanning(S.today); };
+  if ($('#htC')) $('#htC').onclick = formContrats;
   if (ed) {
     $('#wCopy').onclick = function () {
-      api('copierSemainePrecedente', S.semaine).then(function (r) { S.planning = r; rendrePlanning(); toast(r.copies ? r.copies + ' créneau(x) copié(s) depuis la semaine précédente' : 'Rien à copier (cases déjà remplies ou semaine précédente vide)'); }).catch(echec);
+      api('copierSemainePrecedente', S.semaine).then(function (r) { S.planning = r; if (S.semCache[S.semaine]) S.semCache[S.semaine].pl = r; sauverCache(); rendrePlanning(); toast(r.copies ? r.copies + ' créneau(x) copié(s) depuis la semaine précédente' : 'Rien à copier (cases déjà remplies ou semaine précédente vide)'); }).catch(echec);
     };
     $('#wMail').onclick = function () {
       if (!confirm('Envoyer par e-mail à chaque assistante ses horaires et ses praticiens, et à chaque praticien ses salles, pour la ' + titreSem.toLowerCase() + ' ?')) return;
@@ -3349,29 +3486,58 @@ function minutesSup(t) {
   m = t.match(/^(\d+(?:\.\d+)?)$/); return m ? Math.round(Number(m[1]) * 60) : 0;
 }
 function hMin(n) { return Math.floor(n / 60) + 'h' + ('0' + n % 60).slice(-2); }
-/** Sous l'agenda des assistantes : heures de chaque assistante, jour par jour, et total de la semaine (pauses déduites). */
+/** Sous l'agenda des assistantes : heures de chaque assistante, jour par jour, total de la semaine (pauses déduites),
+ *  et, pour qui gère les horaires, l'écart avec les heures prévues au contrat (heures sup ou heures en moins). */
 function tableauHeures(p, moi) {
-  var totJ = p.jours.map(function () { return 0; }), totSem = 0, totSup = 0;
+  var ct = p.contrats || null, totJ = p.jours.map(function () { return 0; }), totSem = 0, totSup = 0, totCt = 0, totPlus = 0, totMoins = 0, avecCt = false;
+  var ecartTxt = function (n) { return n === 0 ? '<span class="ht-eg">= contrat</span>' : n > 0 ? '<span class="ht-plus">+' + hMin(n) + '</span><small class="ht-l">heures sup</small>' : '<span class="ht-moins">−' + hMin(-n) + '</span><small class="ht-l">en moins</small>'; };
   var lignes = p.personnes.map(function (pers) {
-    var sem = 0, sup = 0;
+    var sem = 0, sup = 0, cg = 0;
     var cases = p.jours.map(function (j, i) {
       var x = infoCase(p, pers.id, i);
-      if (x.conge) return '<td class="ht-x">Congé</td>';
+      if (x.conge) { cg++; return '<td class="ht-x">Congé</td>'; }
       if (x.c && x.c.statut === 'Repos') return '<td class="ht-x">Repos</td>';
       var n = minutesJour(x.c);
       if (n === null) return '<td class="ht-x">—</td>';
-      var s = minutesSup(x.c.heuresSup);
-      sem += n; sup += s; totJ[i] += n;
-      return '<td>' + hMin(n) + (s ? '<small>+' + hMin(s) + ' sup</small>' : '') + '</td>';
+      var s2 = minutesSup(x.c.heuresSup);
+      sem += n; sup += s2; totJ[i] += n;
+      return '<td>' + hMin(n) + (s2 ? '<small>+' + hMin(s2) + ' sup</small>' : '') + '</td>';
     }).join('');
     totSem += sem; totSup += sup;
-    return '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases +
-      '<td class="ht-s">' + (sem ? hMin(sem) : '—') + (sup ? '<small>+' + hMin(sup) + ' sup</small>' : '') + '</td></tr>';
+    var fin = '<td class="ht-s' + (ct ? '' : ' ht-k') + '">' + (sem ? hMin(sem) : '—') + (sup ? '<small>+' + hMin(sup) + ' sup</small>' : '') + '</td>';
+    if (ct) {
+      var c = ct[pers.id];
+      if (c === undefined || c === null) fin += '<td class="ht-x">—</td><td class="ht-e ht-k ht-x">—</td>';
+      else {
+        var cm = Math.round(c * 60), ec = sem - cm; avecCt = true; totCt += cm; if (ec > 0) totPlus += ec; else totMoins -= ec;
+        fin += '<td>' + hMin(cm) + '</td><td class="ht-e ht-k">' + ecartTxt(ec) + (cg ? '<small class="ht-l">dont ' + cg + ' j de congé</small>' : '') + '</td>';
+      }
+    }
+    return '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases + fin + '</tr>';
   }).join('');
-  return '<h2 class="ht-h">Total d’heures de la semaine</h2><div class="grid"><table class="pl ht"><thead><tr><th>Assistante</th>' +
-    p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + '<th class="ht-s">Semaine</th></tr></thead><tbody>' + lignes + '</tbody>' +
-    (p.personnes.length > 1 ? '<tfoot><tr><td class="nm">Total équipe</td>' + totJ.map(function (n) { return '<td>' + (n ? hMin(n) : '—') + '</td>'; }).join('') + '<td class="ht-s">' + (totSem ? hMin(totSem) : '—') + (totSup ? '<small>+' + hMin(totSup) + ' sup</small>' : '') + '</td></tr></tfoot>' : '') +
-    '</table></div><div class="hint" style="margin-top:8px">Heures de présence, pauses déduites. Les heures sup saisies dans une case sont indiquées à part.</div>';
+  var tete = '<th class="ht-s' + (ct ? '' : ' ht-k') + '">Semaine</th>' + (ct ? '<th>Contrat</th><th class="ht-e ht-k">Écart</th>' : '');
+  var pied = '<td class="ht-s' + (ct ? '' : ' ht-k') + '">' + (totSem ? hMin(totSem) : '—') + (totSup ? '<small>+' + hMin(totSup) + ' sup</small>' : '') + '</td>' +
+    (ct ? '<td>' + (avecCt ? hMin(totCt) : '—') + '</td><td class="ht-e ht-k">' + (!avecCt ? '—' : (totPlus ? '<span class="ht-plus">+' + hMin(totPlus) + '</span><small class="ht-l">heures sup</small>' : '') + (totMoins ? '<span class="ht-moins">−' + hMin(totMoins) + '</span><small class="ht-l">en moins</small>' : '') + (!totPlus && !totMoins ? '<span class="ht-eg">= contrat</span>' : '')) + '</td>' : '');
+  return '<div class="ht-t"><h2 class="ht-h">Total d’heures de la semaine</h2>' + (p.peutContrats ? '<button class="btn sm" id="htC">Heures prévues au contrat</button>' : '') + '</div>' +
+    '<div class="grid"><table class="pl ht"><thead><tr><th>Assistante</th>' +
+    p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + tete + '</tr></thead><tbody>' + lignes + '</tbody>' +
+    (p.personnes.length > 1 ? '<tfoot><tr><td class="nm">Total équipe</td>' + totJ.map(function (n) { return '<td>' + (n ? hMin(n) : '—') + '</td>'; }).join('') + pied + '</tr></tfoot>' : '') +
+    '</table></div><div class="hint" style="margin-top:8px">Heures de présence, pauses déduites. Les heures sup saisies dans une case sont indiquées à part.' +
+    (ct ? ' Écart = heures de la semaine − heures prévues au contrat (les jours de congé sont signalés, pas déduits).' : '') + '</div>';
+}
+/** Direction : heures hebdomadaires prévues au contrat de chaque assistante. */
+function formContrats() {
+  var p = S.planning, ct = p.contrats || {};
+  tiroir('Heures prévues au contrat', '<p class="hint" style="margin-top:0">Heures par semaine. Elles servent à calculer les heures sup ou les heures en moins sous le planning. Laissez vide si non concernée.</p>' +
+    p.personnes.map(function (u) { return '<div class="fld ct-r"><label for="ct_' + esc(u.id) + '">' + esc(u.nom) + '</label><div class="ct-i"><input type="text" inputmode="decimal" id="ct_' + esc(u.id) + '" data-ct="' + esc(u.id) + '" value="' + esc(ct[u.id] === undefined ? '' : String(ct[u.id]).replace('.', ',')) + '" placeholder="—"><span>h / semaine</span></div></div>'; }).join('') +
+    '<div class="err" id="ctErr"></div>', '<span class="sp"></span><button class="btn" id="ctAnn">Annuler</button><button class="btn pri" id="ctOk">Enregistrer</button>');
+  $('#ctAnn').onclick = fermer;
+  $('#ctOk').onclick = function () {
+    var m = {}; $$('[data-ct]').forEach(function (x) { m[x.getAttribute('data-ct')] = x.value.trim(); });
+    var b = this; b.disabled = true;
+    api('enregistrerHeuresContrat', m).then(function (r) { p.contrats = r; if (S.semCache[p.semaine] && S.semCache[p.semaine].pl) S.semCache[p.semaine].pl.contrats = r; fermer(); rendrePlanning(); toast('Heures prévues enregistrées'); })
+      .catch(function (e) { b.disabled = false; $('#ctErr').textContent = msgErr(e); });
+  };
 }
 
 function editerCase(email, i) {
@@ -3404,7 +3570,7 @@ function editerCase(email, i) {
   eff();
   $('#cAnn').onclick = fermer;
   var envoyer = function (d) {
-    api('enregistrerCreneau', S.semaine, email, i, d).then(function (r) { S.planning = r; fermer(); rendrePlanning(); }).catch(function (e) { $('#cErr').textContent = msgErr(e); });
+    api('enregistrerCreneau', S.semaine, email, i, d).then(function (r) { S.planning = r; if (S.semCache[S.semaine]) S.semCache[S.semaine].pl = r; for (var k = 0; k < 7; k++) delete S.jourCache[ajout(S.semaine, k)]; sauverCache(); fermer(); rendrePlanning(); toast(d.effacer ? 'Case vidée' : 'Horaires enregistrés'); }).catch(function (e) { $('#cErr').textContent = msgErr(e); });
   };
   if ($('#cDel')) $('#cDel').onclick = function () { envoyer({ effacer: true }); };
   $('#cOk').onclick = function () {
