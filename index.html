@@ -1415,6 +1415,13 @@ table.pl{border-collapse:separate;border-spacing:0}
 .ac-h div{background:#F8FAFE;border:1px solid #EBF0F8;border-radius:12px;padding:9px 12px;font-size:13px;display:flex;flex-direction:column;gap:3px}
 .ac-h span{color:var(--ink2)}
 .cp-per{margin-bottom:16px}
+/* Détail d'une tâche : bouton « Valider » */
+.br-n{font-size:12.5px;color:var(--acc);font-weight:600;align-self:center}
+#drawer .dr-f .err:empty{display:none}
+#drawer .dr-f .err{align-self:center;font-size:13px}
+.sbtn.br{box-shadow:0 0 0 2px rgba(18,91,255,.35)}
+.cell .pz{display:inline-block;margin-top:5px;font-size:12px;font-weight:600;color:#5A6B8C;background:#F1F4F9;border-radius:999px;padding:2px 8px;white-space:nowrap}
+@media (max-width:760px){html.anim #drawer.entre .dr{animation-duration:260ms}}
 </style>
 </head>
 <body>
@@ -1497,7 +1504,7 @@ var S = {
   f: { portee: 'tout', statut: 'ouvertes', cat: '', prio: '', pers: '', cre: '', q: '' },
   notifs: null, notifVues: null
 };
-var JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+var JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 var MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
 var PRIO = { 'Haute': 0, 'Normale': 1 };
 
@@ -1604,7 +1611,7 @@ function appliquerDemarrage(d) {
   {
     var init = d.init;
     S.me = init.me; S.users = init.users; S.cfg = init.config; S.today = init.aujourdhui;
-    S.taches = d.taches; S.charge = true; S.vT = d.vTaches; S.conges = d.conges; S.auj = d.auj; S.matAttente = d.matAttente || 0;
+    S.taches = d.taches; S.charge = true; S.vT = d.vTaches; prechargerDetails(); S.conges = d.conges; S.auj = d.auj; S.matAttente = d.matAttente || 0;
     S.notifs = d.notifs; S.notifVues = {}; d.notifs.liste.forEach(function (n) { S.notifVues[n.id] = 1; });
     S.semaine = lundi(S.today);
     $('header').classList.remove('hidden'); $('#bnav').classList.remove('hidden'); document.documentElement.classList.remove('mode-auth');
@@ -1697,6 +1704,7 @@ function verifierNotifs() {
 function remplacerTaches(l) {
   var avant = JSON.stringify(S.taches);
   S.taches = l; S.charge = true;
+  prechargerDetails();
   if (JSON.stringify(l) === avant) return;
   majCompteurs();
   if (S.vue === 'taches') rendreListe();
@@ -2344,21 +2352,44 @@ function tiroir(titre, corps, pied) {
   $('#ov').onclick = fermer; $('#xx').onclick = fermer;
   document.body.style.overflow = 'hidden';
 }
-function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; S.matTiroir = null; S.matListeOuverte = false; }
+function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; S.matTiroir = null; S.matListeOuverte = false; S.brSt = {}; S.brId = null; S.brBase = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#drawer').innerHTML) fermer(); });
 
 // ───────── Tâche : détail ─────────
 function ouvrirTache(id) {
-  // affichage immédiat avec ce qu'on a déjà ; commentaires et historique arrivent juste après
+  // affichage immédiat avec ce qu'on a déjà (liste + détail préchargé) ; la mise à jour arrive juste après, sans bloquer
   var local = (S.taches || []).filter(function (x) { return x.id === id; })[0];
+  var det = S.det && S.det[id];
+  if (S.brId !== id) { S.brId = id; S.brSt = {}; }
   S.detail = id;
-  if (local) afficherTache(Object.assign({}, local, { commentaires: null, historique: null }));
+  if (local) afficherTache(Object.assign({}, local, det ? { commentaires: det.commentaires, historique: det.historique, suivi: det.suivi || local.suivi } : { commentaires: null, historique: null }));
   else tiroir('Tâche ' + esc(id), sq('mini'));
   // ouvrir la tâche la marque comme lue (et ses notifications aussi)
   api('marquerLu', id).then(function (t) {
+    garderDetail(t);
     afficherSiOuvert(t);
     if (S.notifs) { S.notifs.liste.forEach(function (n) { if (n.tache === id) n.lue = true; }); S.notifs.nonLues = S.notifs.liste.filter(function (n) { return !n.lue; }).length; majCloche(); }
   }).catch(function (e) { if (S.detail === id && !local) fermer(); echec(e); });
+}
+/** Détail complet des tâches (commentaires, historique) gardé en mémoire, préchargé en un seul appel discret. */
+S.det = {};
+function garderDetail(t) { if (t && t.id && t.commentaires) S.det[t.id] = { commentaires: t.commentaires, historique: t.historique, suivi: t.suivi, sig: sigTache(t) }; }
+function sigTache(t) { return [t.majLe, t.nbCommentaires, t.statut, (t.participations || []).map(function (p) { return p.statut; }).join(',')].join('|'); }
+var tPrecharge = null, prechargeEnCours = false;
+function prechargerDetails() {
+  clearTimeout(tPrecharge);
+  tPrecharge = setTimeout(function () {
+    if (prechargeEnCours || !S.taches || !S.cfg || (S.cfg.onglets && S.cfg.onglets.taches === false)) return;
+    var l = S.taches.filter(function (t) { var d = S.det[t.id]; return !d || d.sig !== sigTache(t); })
+      .sort(function (a, b) { return (a.statut === 'Terminée') - (b.statut === 'Terminée'); }).slice(0, 60);
+    if (!l.length) return;
+    prechargeEnCours = true;
+    var sigs = {}; l.forEach(function (t) { sigs[t.id] = sigTache(t); });
+    api('getDetailsTaches', l.map(function (t) { return t.id; })).then(function (r) {
+      prechargeEnCours = false;
+      Object.keys(r || {}).forEach(function (id) { var x = r[id]; S.det[id] = { commentaires: x.commentaires, historique: x.historique, suivi: x.suivi, sig: sigs[id] }; });
+    }).catch(function () { prechargeEnCours = false; });
+  }, 400);
 }
 /** Une réponse arrive : on rafraîchit le panneau seulement s'il montre encore cette tâche (sinon on ne le rouvre pas). */
 function afficherSiOuvert(t) {
@@ -2427,18 +2458,18 @@ function afficherTache(t) {
     (t.peutGerer && t.participations.some(function (p) { return p.id !== moi; }) ? '<div class="hint">Administrateur : vous pouvez changer le statut des autres personnes ; votre intervention est enregistrée dans l’historique.</div>' : '') +
     '<div class="sec">Commentaires</div>' +
     (enAttente ? '<div class="no-t">Chargement…</div>' : t.commentaires.length ? t.commentaires.map(function (c) { return '<div class="com"><b>' + esc(c.nom) + '</b> <small>' + esc(dHeure(c.date)) + '</small><p>' + esc(c.texte) + '</p></div>'; }).join('') : '<div class="no-t">Aucun commentaire.</div>') +
-    '<div class="fld" style="margin-top:10px"><textarea id="com" placeholder="Écrire un commentaire…" style="min-height:64px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:9px 11px"></textarea>' +
-    '<div style="text-align:right;margin-top:6px"><button class="btn sm pri" id="envCom">Envoyer</button></div></div>' +
+    '<div class="fld" style="margin-top:10px"><textarea id="com" placeholder="Écrire un commentaire… (enregistré avec « Valider »)" style="min-height:64px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:9px 11px"></textarea></div>' +
     '<details style="margin-top:10px"><summary class="sec" style="cursor:pointer;margin:0">Historique complet</summary><div class="hist">' +
     (enAttente ? '<div>Chargement…</div>' : t.historique.map(function (h) { return '<div>' + esc(dHeure(h.date)) + ' — <b>' + esc(h.nom) + '</b> · ' + esc(h.action === 'Ouverture' ? 'a ouvert la tâche' : h.action) + (h.detail ? ' : ' + esc(h.detail) : '') + '</div>'; }).join('')) + '</div></details>' +
     (t.peutModifier ? '<div class="row" style="margin-top:22px"><button class="btn sm" id="mod">Modifier</button><span class="sp"></span><button class="btn sm ko" id="sup">Supprimer</button></div>' : '');
 
   var brouillon = $('#com') ? $('#com').value : '';
-  tiroir('Tâche ' + esc(t.id), corps);
+  if (S.brId !== t.id) { S.brId = t.id; S.brSt = {}; }
+  tiroir('Tâche ' + esc(t.id), corps, '<span class="br-n" id="tBr"></span><span class="err" id="tErr" style="margin:0"></span><span class="sp"></span><button class="btn" id="tFer">Fermer</button><button class="btn pri" id="tVal">Valider</button>');
   if (garde) $('#drb').scrollTop = garde;
   if (ouvertDetails && $('#drb details')) $('#drb details').open = true;
   if (brouillon && $('#com')) $('#com').value = brouillon; // un commentaire en cours de saisie n'est jamais perdu
-  brancherBoutonsStatut($('#drb'));
+  brancherBrouillon(t);
   var act = function (p) { return p.then(afficherSiOuvert).catch(echec); };
   $$('#drb [data-a]').forEach(function (b) {
     b.onclick = function () {
@@ -2447,11 +2478,7 @@ function afficherTache(t) {
       if (a === 'fin') { if (!confirm('Marquer la participation de toutes les personnes comme terminée ? Votre intervention sera enregistrée.')) { b.disabled = false; return; } act(api('changerStatut', t.id, 'Terminée')).then(function () { toast('Tâche terminée'); }); }
     };
   });
-  $('#envCom').onclick = function () {
-    var v = $('#com').value.trim(); if (!v) return;
-    var b = this; b.disabled = true; $('#com').value = '';
-    api('ajouterCommentaire', t.id, v).then(afficherSiOuvert).catch(function (e) { b.disabled = false; if ($('#com')) $('#com').value = v; echec(e); });
-  };
+  $('#com').addEventListener('input', function () { majBrouillon(); });
   $('#pj').onchange = function () {
     var fs = Array.prototype.slice.call(this.files);
     if (!fs.length) return;
@@ -2465,6 +2492,58 @@ function afficherTache(t) {
       S.taches = S.taches.filter(function (x) { return x.id !== t.id; }); fermer(); majCompteurs(); rendreListe(); toast('Tâche supprimée');
     }).catch(echec);
   };
+}
+
+/**
+ * Détail d'une tâche : les statuts choisis (le mien, et ceux des autres pour un administrateur) et le commentaire sont
+ * enregistrés ensemble avec « Valider » ; la fenêtre se ferme dès la confirmation et la liste se met à jour sans rechargement.
+ */
+function brancherBrouillon(t) {
+  var base = function (pour) { var p = t.participations.filter(function (x) { return x.id === (pour || S.me.id); })[0]; return p ? p.statut : 'À faire'; };
+  var cur = function (pour) { return S.brSt[pour] !== undefined ? S.brSt[pour] : base(pour); };
+  S.brBase = base;
+  $$('#drb .sbtn[data-st]').forEach(function (b) {
+    b.onclick = function (ev) {
+      ev.stopPropagation();
+      var pour = b.getAttribute('data-pour') || '', voulu = b.getAttribute('data-st');
+      var c = cur(pour) === voulu ? 'À faire' : voulu;
+      if (c === base(pour)) delete S.brSt[pour]; else S.brSt[pour] = c;
+      majBrouillon();
+    };
+  });
+  $('#tFer').onclick = fermer;
+  $('#tVal').onclick = function () { validerTache(t); };
+  majBrouillon();
+}
+function majBrouillon() {
+  if (!$('#drb') || !S.brBase) return;
+  var base = S.brBase;
+  $$('#drb .sbtn[data-st]').forEach(function (x) {
+    var pour = x.getAttribute('data-pour') || '', c = S.brSt[pour] !== undefined ? S.brSt[pour] : base(pour), on = x.getAttribute('data-st') === c;
+    x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); x.classList.toggle('br', S.brSt[pour] !== undefined);
+  });
+  var n = Object.keys(S.brSt).length + ($('#com') && $('#com').value.trim() ? 1 : 0);
+  if ($('#tBr')) $('#tBr').textContent = n ? n + ' modification' + (n > 1 ? 's' : '') + ' à valider' : '';
+}
+function validerTache(t) {
+  var b = $('#tVal'), id = t.id, com = $('#com') ? $('#com').value.trim() : '';
+  var changes = Object.keys(S.brSt).map(function (pour) { return { pour: pour, cible: S.brSt[pour] }; });
+  if (!changes.length && !com) { fermer(); return; }
+  b.disabled = true; b.textContent = 'Enregistrement…'; $('#tErr').textContent = '';
+  var dernier = null, chaine = Promise.resolve();
+  changes.forEach(function (c) { chaine = chaine.then(function () { return api('changerParticipation', id, c.cible, c.pour).then(function (r) { dernier = r; delete S.brSt[c.pour]; }); }); });
+  if (com) chaine = chaine.then(function () { return api('ajouterCommentaire', id, com).then(function (r) { dernier = r; if ($('#com') && S.detail === id) $('#com').value = ''; }); });
+  chaine.then(function () {
+    if (dernier) { garderDetail(dernier); majLocale(dernier); }
+    if (S.detail === id) fermer();
+    var fin = changes.filter(function (c) { return !c.pour && c.cible === 'Terminée'; }).length;
+    toast(fin && dernier && dernier.statut === 'Terminée' ? 'Tâche terminée ✓' : 'Tâche enregistrée ✓');
+    changes.forEach(function (c) { if (!c.pour) ANIM.statutOk(id, c.cible); });
+  }).catch(function (e) {
+    if (dernier) { garderDetail(dernier); majLocale(dernier); }
+    if ($('#tVal') && S.detail === id) { $('#tVal').disabled = false; $('#tVal').textContent = 'Valider'; $('#tErr').textContent = 'Non enregistré : ' + msgErr(e); majBrouillon(); }
+    else echec(e);
+  });
 }
 
 // ───────── Fichiers ─────────
@@ -2673,7 +2752,7 @@ function rendreJour() {
 function chargerMoi(sem) {
   S.semaine = lundi(sem || S.today);
   attentePlanning();
-  var fin = ajout(S.semaine, 5);
+  var fin = ajout(S.semaine, 6);
   var vue = S.plVue;
   Promise.all([api('getAffectations', S.semaine, fin), S.cible.assistante ? api('getPlanning', S.semaine) : Promise.resolve(null)])
     .then(function (x) { S.moiAff = x[0]; S.moiPl = x[1]; if (S.vue === 'planning' && S.plVue === vue) rendreMoi(); }).catch(echec);
@@ -2681,7 +2760,7 @@ function chargerMoi(sem) {
 
 function rendreMoi() {
   var r = S.moiAff, p = S.moiPl, moi = S.cible.id, assistante = S.cible.assistante, perso = S.plVue === 'personne';
-  var jours = [0, 1, 2, 3, 4, 5].map(function (i) { return ajout(S.semaine, i); });
+  var jours = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return ajout(S.semaine, i); }); // du lundi au dimanche
   var mes = r.affectations.filter(function (a) { return assistante ? a.assistantes.some(function (y) { return y.cle === moi; }) : a.dentiste === moi; });
   var ligne = function (a) {
     var moiA = a.assistantes.filter(function (y) { return y.cle === moi; })[0];
@@ -2709,7 +2788,7 @@ function rendreMoi() {
           : '<div class="auj-l"><span class="big">' + esc(nomSalle(a)) + '</span><span>' + hm(a.debut) + ' – ' + hm(a.fin) + ' · avec ' + (a.assistantes.length ? esc(a.assistantes.map(function (y) { return y.nom; }).join(', ')) : 'assistante à affecter') + '</span></div>';
       }).join('') : '<div class="auj-l"><span>' + (perso ? 'Aucune affectation aujourd’hui.' : assistante ? 'Aucun praticien ne vous est affecté aujourd’hui.' : 'Aucune salle ne vous est affectée aujourd’hui.') + '</span></div>') + '</div>';
   }
-  h += '<div class="wk"><button class="btn sm" id="mPrev" aria-label="Semaine précédente">‹</button><span class="nm">Semaine du ' + dCourt(jours[0]) + ' au ' + dCourt(jours[5]) + '</span>' +
+  h += '<div class="wk"><button class="btn sm" id="mPrev" aria-label="Semaine précédente">‹</button><span class="nm">Semaine du ' + dCourt(jours[0]) + ' au ' + dCourt(jours[6]) + '</span>' +
     '<button class="btn sm" id="mNext" aria-label="Semaine suivante">›</button><button class="btn sm" id="mNow">Cette semaine</button></div><div class="days">';
   jours.forEach(function (j, i) {
     var lst = mes.filter(function (a) { return a.date === j; });
@@ -2718,7 +2797,7 @@ function rendreMoi() {
       var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
       var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
       hor = cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
-        '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
+        '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + ' – ' + hm(c.pauseFin) : '') + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
     }
     h += '<div class="day' + (j === S.today ? ' td' : '') + (lst.length ? ' occ' : '') + '"><div class="d"><span class="d-n" aria-hidden="true">' + Number(j.slice(8, 10)) + '</span><span class="d-t"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></span></div><div class="c">' + hor +
       (lst.length ? lst.map(ligne).join('') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
@@ -2896,7 +2975,7 @@ function formSalles() {
 function chargerPlanning(sem) {
   S.semaine = lundi(sem);
   if (!S.planning || S.planning.semaine !== S.semaine) attentePlanning();
-  Promise.all([api('getPlanning', S.semaine), api('getAffectations', S.semaine, ajout(S.semaine, 5))])
+  Promise.all([api('getPlanning', S.semaine), api('getAffectations', S.semaine, ajout(S.semaine, 6))])
     .then(function (x) { S.planning = x[0]; S.semAff = x[1]; if (S.vue === 'planning' && S.plVue === 'horaires') rendrePlanning(); }).catch(echec);
 }
 
@@ -2910,7 +2989,7 @@ function infoCase(p, email, i) {
 function rendrePlanning() {
   var p = S.planning, moi = S.me.id;
   var ed = p.peutModifier;
-  var titreSem = 'Semaine du ' + dCourt(p.jours[0]) + ' au ' + dCourt(p.jours[5]);
+  var titreSem = 'Semaine du ' + dCourt(p.jours[0]) + ' au ' + dCourt(p.jours[p.jours.length - 1]);
   var avecQui = function (email, j) {
     if (!S.semAff) return [];
     return S.semAff.affectations.filter(function (a) { return a.date === j && a.assistantes.some(function (y) { return y.cle === email; }); });
@@ -2932,7 +3011,7 @@ function rendrePlanning() {
             if (x.conge) { cls += ' cg'; inner = 'Congé' + (aff ? '<div class="s">Affectée malgré le congé :</div>' + aff : ''); }
             else if (!x.c) inner = (ed ? '<span class="plus">+</span>' : '<span style="color:var(--ink3)">—</span>') + aff;
             else if (x.c.statut === 'Repos') { cls += ' rep'; inner = 'Repos' + (aff ? '<div class="s">Affectée malgré le repos :</div>' + aff : ''); }
-            else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + aff +
+            else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + (x.c.pauseDebut && x.c.pauseFin ? '<div class="pz">Pause ' + esc(hm(x.c.pauseDebut)) + ' – ' + esc(hm(x.c.pauseFin)) + '</div>' : '') + aff +
               (x.c.heuresSup ? '<div class="s">+' + esc(x.c.heuresSup) + ' sup</div>' : '') +
               (x.c.note ? '<div class="a" style="font-style:italic">' + esc(x.c.note) + '</div>' : '');
             return '<td><button class="' + cls + '" data-e="' + esc(pers.id) + '" data-i="' + i + '"' + (ed ? '' : ' tabindex="-1"') + '>' + inner + '</button></td>';
@@ -2964,6 +3043,9 @@ function editerCase(email, i) {
     '<div class="fld"><label>Type</label><div class="seg" id="cSt"><button data-s="Travail"' + (c.statut !== 'Repos' ? ' class="on"' : '') + '>Travail</button><button data-s="Repos"' + (c.statut === 'Repos' ? ' class="on"' : '') + '>Repos</button></div></div>' +
     '<div id="cTr"><div class="two"><div class="fld"><label for="cD">Début</label><input type="time" id="cD" value="' + esc(c.debut || '09:00') + '" step="900"></div>' +
     '<div class="fld"><label for="cF">Fin</label><input type="time" id="cF" value="' + esc(c.fin || '18:00') + '" step="900"></div></div>' +
+    '<div class="two"><div class="fld"><label for="cPD">Début de pause</label><input type="time" id="cPD" value="' + esc(c.pauseDebut || '') + '" step="300"></div>' +
+    '<div class="fld"><label for="cPF">Fin de pause</label><input type="time" id="cPF" value="' + esc(c.pauseFin || '') + '" step="300"></div></div>' +
+    '<p class="hint" id="cEff" style="margin:-4px 0 12px"></p>' +
     '<div class="fld"><label for="cH">Heures sup</label><input type="text" id="cH" placeholder="1h30" value="' + esc(c.heuresSup || '') + '"></div></div>' +
     '<div class="fld"><label for="cN">Note</label><input type="text" id="cN" maxlength="200" placeholder="Stérilisation le matin" value="' + esc(c.note || '') + '"></div>' +
     '<div class="hint">Les praticiens et les salles se renseignent dans la vue « Par salle ».</div><div class="err" id="cErr"></div>';
@@ -2972,15 +3054,27 @@ function editerCase(email, i) {
   var maj = function () { $$('#cSt button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-s') === statut); }); $('#cTr').classList.toggle('hidden', statut === 'Repos'); };
   maj();
   $$('#cSt button').forEach(function (b) { b.onclick = function () { statut = b.getAttribute('data-s'); maj(); }; });
+  // temps de travail effectif (pause déduite), affiché pendant la saisie
+  var mn = function (v) { var m = String(v || '').match(/^(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+  var eff = function () {
+    var d = mn($('#cD').value), f = mn($('#cF').value), pd = mn($('#cPD').value), pf = mn($('#cPF').value);
+    if (d === null || f === null || f <= d) { $('#cEff').textContent = 'Laissez les deux champs de pause vides s’il n’y a pas de pause.'; return; }
+    var t = f - d - (pd !== null && pf !== null && pf > pd ? pf - pd : 0);
+    $('#cEff').textContent = 'Temps de travail : ' + Math.floor(t / 60) + ' h ' + ('0' + t % 60).slice(-2) + (pd !== null && pf !== null && pf > pd ? ' (pause déduite)' : '') + '. Laissez la pause vide s’il n’y en a pas.';
+  };
+  ['#cD', '#cF', '#cPD', '#cPF'].forEach(function (k) { $(k).addEventListener('input', eff); });
+  eff();
   $('#cAnn').onclick = fermer;
   var envoyer = function (d) {
     api('enregistrerCreneau', S.semaine, email, i, d).then(function (r) { S.planning = r; fermer(); rendrePlanning(); }).catch(function (e) { $('#cErr').textContent = msgErr(e); });
   };
   if ($('#cDel')) $('#cDel').onclick = function () { envoyer({ effacer: true }); };
   $('#cOk').onclick = function () {
-    var d = { statut: statut, debut: $('#cD').value, fin: $('#cF').value, avec: c.avec || '', heuresSup: $('#cH').value.trim(), note: $('#cN').value.trim() };
+    var d = { statut: statut, debut: $('#cD').value, fin: $('#cF').value, avec: c.avec || '', heuresSup: $('#cH').value.trim(), note: $('#cN').value.trim(), pauseDebut: $('#cPD').value, pauseFin: $('#cPF').value };
     if (statut === 'Travail' && (!d.debut || !d.fin)) { $('#cErr').textContent = 'Indiquez l’heure de début et de fin.'; return; }
     if (statut === 'Travail' && d.fin <= d.debut) { $('#cErr').textContent = 'L’heure de fin doit être après l’heure de début.'; return; }
+    if (statut === 'Travail' && (!!d.pauseDebut !== !!d.pauseFin)) { $('#cErr').textContent = 'Indiquez le début et la fin de la pause, ou laissez les deux vides.'; return; }
+    if (statut === 'Travail' && d.pauseDebut && (d.pauseFin <= d.pauseDebut || d.pauseDebut < d.debut || d.pauseFin > d.fin)) { $('#cErr').textContent = 'La pause doit être comprise entre le début et la fin, et finir après avoir commencé.'; return; }
     envoyer(d);
   };
 }
