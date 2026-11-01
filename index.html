@@ -4305,7 +4305,7 @@ function chargerProtheses(force) {
 function ptzExpediee(l, d) { return l.statut === 'Expédiée' || (l.statut === 'En cours' && l.commandes.some(function (c) { return d.expedie.indexOf(c.statut) >= 0; })); }
 function ptzCategorie(l, d) { return l.statut === 'Livrée' ? 'livrees' : ptzExpediee(l, d) ? 'expediees' : l.statut === 'Annulée' ? 'autres' : 'encours'; }
 function ptzPill(st) {
-  var c = { 'Livrée': 'st-fin', 'Livré': 'st-fin', 'En cours': 'st-cours', 'Expédiée': 'pro-exp', 'Vers le cabinet': 'pro-exp', 'Au hub': 'pro-exp', 'Prêt à expédier': 'pro-exp', 'En production': 'st-todo', 'Rejeté': 'pro-ann', 'Empreinte inexploitable': 'pro-ann', 'Annulée': 'pro-ann' }[st] || 'st-todo';
+  var c = { 'Livrée': 'st-fin', 'Livré': 'st-fin', 'En cours': 'st-cours', 'Expédiée': 'pro-exp', 'Vers le cabinet': 'pro-exp', 'Vers le hub': 'pro-exp', 'Au hub': 'pro-exp', 'Prêt à expédier': 'pro-exp', 'En production': 'st-todo', 'Rejeté': 'pro-ann', 'Empreinte inexploitable': 'pro-ann', 'Annulée': 'pro-ann' }[st] || 'st-todo';
   return st ? '<span class="pill ' + c + '">' + esc(st) + '</span>' : '<span class="meta">—</span>';
 }
 function ptzJ(prevue, auj) {
