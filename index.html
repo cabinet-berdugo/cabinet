@@ -1720,67 +1720,39 @@ table.pl.ht{width:100%;table-layout:auto}
   .ph.ph-pl h1{font-size:26px}
   .ph.ph-pl .ph-g{display:none}
 }
-
-/* ───────── Navigation (barre du haut + menu latéral + barre du bas) ───────── */
-html.nav2 header,html.nav2 .bnav{display:none!important}
-html.nav2 body{padding-left:0!important}
-.tb,.bb{display:none}
-html.nav2 .tb{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:46;background:#0A2F8F;color:#fff;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top))}
-html.mode-auth .tb,html.mode-auth .bb{display:none!important}
-.tb-logo{display:flex;align-items:center;gap:10px;border:0;background:none;color:#fff;font:inherit;font-weight:700;font-size:17px;letter-spacing:-.01em;cursor:pointer;padding:4px 8px 4px 4px;border-radius:12px;transition:background .15s}
-.tb-logo:hover{background:rgba(255,255,255,.08)}
-.tb-logo i{width:36px;height:36px;border-radius:10px;background:#fff;color:#0A2F8F;display:grid;place-items:center;flex:none}
-.tb-logo i svg{width:21px;height:21px}
-.tb-ch{width:18px;height:18px;opacity:.75;transition:transform .2s}
-html.ml-on .tb-ch{transform:rotate(180deg)}
-.tb-sp{flex:1}
-.tb-me{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
-.tb-me:hover{background:rgba(255,255,255,.2)}
-@media (min-width:761px){html.nav2 .tb{padding:12px 32px;padding-top:calc(12px + env(safe-area-inset-top))}}
-/* menu latéral */
-.ml-ov{position:fixed;inset:0;top:var(--tbh,64px);background:rgba(6,27,66,.32);z-index:44;opacity:0;pointer-events:none;transition:opacity .2s ease}
-html.ml-on .ml-ov{opacity:1;pointer-events:auto}
-.ml{position:fixed;top:var(--tbh,64px);left:0;bottom:0;width:min(320px,86vw);z-index:45;background:#fff;box-shadow:12px 0 40px rgba(6,27,66,.18);transform:translateX(-102%);transition:transform .2s cubic-bezier(.2,.8,.2,1);visibility:hidden;display:flex;flex-direction:column}
-html.ml-on .ml{transform:none;visibility:visible}
-.ml-in{display:flex;flex-direction:column;height:100%;overflow:auto;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
-.ml-h{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#F4F7FD;color:var(--ink);border-bottom:1px solid var(--line)}
-.ml-av{width:42px;height:42px;border-radius:12px;background:#0047D9;color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
-.ml-who{display:flex;flex-direction:column;flex:1;min-width:0}.ml-who b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ml-who small{font-size:12.5px;color:var(--ink2)}
-.ml-x{width:38px;height:38px;border-radius:10px;border:0;background:#E8EEF8;color:var(--ink2);display:grid;place-items:center;cursor:pointer}.ml-x svg{width:20px;height:20px}
-.ml-b{padding:10px 10px 18px;display:flex;flex-direction:column;gap:4px}
-.ml-g{border-radius:12px}
-.ml-gt{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:10px 10px 6px;font:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6B7A95;cursor:pointer}
-.ml-gt svg{width:16px;height:16px;transition:transform .18s}
-.ml-g.ferme .ml-gt svg{transform:rotate(-90deg)}
-.ml-gl{display:grid;grid-template-rows:1fr;transition:grid-template-rows .18s ease}
-.ml-g.ferme .ml-gl{grid-template-rows:0fr}
-.ml-gl>div{overflow:hidden;display:flex;flex-direction:column;gap:2px}
-.ml-it{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:11px 12px;border-radius:12px;font:inherit;font-size:15.5px;font-weight:500;color:var(--ink);cursor:pointer;text-align:left;transition:background .12s,color .12s}
-.ml-it svg{width:21px;height:21px;color:#5B6B88;flex:none}
-.ml-it span:first-of-type{flex:1}
-.ml-it:hover{background:#F2F6FD}
-.ml-it.on{background:#EAF1FF;color:#0047D9;font-weight:600}.ml-it.on svg{color:#0047D9}
-.ml-it.sortie{color:#B42318}.ml-it.sortie svg{color:#B42318}
-.ml-c{min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:#0047D9;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
-/* barre du bas */
-html.nav2 .bb{display:flex;position:fixed;z-index:34;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(11,23,54,.06)}
-.bb button{flex:1;min-width:0;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 4px;color:#6B7A95;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;position:relative;z-index:1;transition:color .15s}
-.bb button:hover{color:#0047D9}
-.bb button.on{color:#0047D9}
-.bb-i{position:relative;display:grid;place-items:center}
-.bb-i svg{width:24px;height:24px}
-.bb-c{position:absolute;top:-6px;left:14px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
-.bb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.bb-ind{position:absolute;top:0;left:0;height:3px;border-radius:0 0 3px 3px;background:#0047D9;opacity:0;transition:transform .2s cubic-bezier(.2,.8,.2,1),width .2s cubic-bezier(.2,.8,.2,1),opacity .15s}
-html.nav2 main{padding-bottom:calc(var(--nav) + 30px + env(safe-area-inset-bottom))!important}
-@media (min-width:761px){
-  html.nav2 .bb{left:50%;right:auto;bottom:18px;transform:translateX(-50%);width:min(600px,calc(100% - 40px));border:1px solid var(--line);border-radius:18px;padding:6px;box-shadow:0 12px 32px rgba(11,23,54,.14)}
-  .bb button{flex-direction:row;justify-content:center;gap:8px;font-size:14px;padding:10px 8px;border-radius:12px}
-  .bb button:hover{background:#F2F6FD}
-  .bb-ind{top:auto;bottom:4px;border-radius:3px}
-  html.nav2 main{padding-bottom:110px!important}
-}
-@media (prefers-reduced-motion:reduce){.ml,.ml-ov,.bb-ind,.ml-gl,.tb-ch{transition:none}}
+/* ───────── Menu déroulant des notifications (cloche en haut à droite) ───────── */
+.nm{position:fixed;z-index:60;width:min(380px,calc(100vw - 24px));max-height:min(520px,calc(100vh - 96px));display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 44px rgba(11,23,54,.18);overflow:hidden;
+  opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top right;transition:opacity .16s ease,transform .16s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.nm.on{opacity:1;transform:none;pointer-events:auto}
+.nm-h{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.nm-h b{font-size:15px;color:var(--ink)}
+.nm-h .nm-n{font-size:12px;font-weight:700;color:#fff;background:var(--acc);border-radius:999px;min-width:20px;height:20px;padding:0 6px;display:inline-grid;place-items:center;white-space:nowrap}
+.nm-h .sp{flex:1}
+.nm-lk{border:0;background:none;color:var(--acc);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px 8px;border-radius:8px;white-space:nowrap}
+.nm-lk:hover{background:var(--accbg)}
+.nm-lk:disabled{color:var(--ink3);cursor:default;background:none}
+.nm-l{overflow:auto;overscroll-behavior:contain;padding:6px}
+.nm-i{display:flex;gap:10px;width:100%;text-align:left;border:0;background:none;font:inherit;color:var(--ink);padding:10px;border-radius:12px;cursor:pointer;transition:background .12s ease}
+.nm-i:hover,.nm-i:focus-visible{background:var(--soft2);outline:none}
+.nm-i .nm-d{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:transparent}
+.nm-i.nl .nm-d{background:var(--acc)}
+.nm-i .nm-c{min-width:0;flex:1}
+.nm-i .nm-t{display:block;font-size:14px;font-weight:500;line-height:1.3}
+.nm-i.nl .nm-t{font-weight:700}
+.nm-i .nm-x{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;color:var(--ink2);line-height:1.35;margin-top:2px}
+.nm-i .nm-m{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;font-size:12px;color:var(--ink3)}
+.nm-st{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;border:1px solid var(--line)}
+.nm-st.af{color:var(--acc);background:var(--accbg);border-color:var(--accline)}
+.nm-st.ec{color:var(--amb);background:var(--ambbg);border-color:var(--ambline)}
+.nm-st.fi{color:var(--grn);background:var(--grnbg);border-color:var(--grnline)}
+.nm-v{padding:28px 16px;text-align:center;color:var(--ink2);font-size:14px}
+.nm-f{border-top:1px solid var(--line);padding:6px}
+.nm-f button{width:100%;border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--acc);padding:10px;border-radius:10px;cursor:pointer}
+.nm-f button:hover{background:var(--accbg)}
+.bell[aria-expanded="true"]{background:rgba(255,255,255,.18)}
+/* élément ouvert depuis une notification : brièvement mis en évidence */
+.cg-c.cible{box-shadow:0 0 0 2px var(--acc),var(--sh);transition:box-shadow .3s ease}
+@media (prefers-reduced-motion:reduce){.nm{transition:none}}
 </style>
 </head>
 <body>
@@ -1806,11 +1778,6 @@ html.nav2 main{padding-bottom:calc(var(--nav) + 30px + env(safe-area-inset-botto
     <button class="replier" id="replier" aria-label="Réduire le menu" title="Réduire le menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
   </div>
 </header>
-<div class="tb" id="tb" aria-label="Barre principale">
-  <button class="tb-logo" id="tbLogo" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="ml"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.6 3.5c-2.4 0-4.1 1.9-4.1 4.6 0 2.3 1 3.6 1.6 5.6.6 2 .9 6.8 2.7 6.8 1.6 0 1.6-4.7 3.1-4.7h2.2c1.5 0 1.5 4.7 3.1 4.7 1.8 0 2.1-4.8 2.7-6.8.6-2 1.6-3.3 1.6-5.6 0-2.7-1.7-4.6-4.1-4.6-1.9 0-2.7 1.1-4.4 1.1S9.5 3.5 7.6 3.5z"/></svg></i><span id="tbNom">Cabinet Berdugo</span><svg class="tb-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></button>
-  <span class="tb-sp"></span>
-  <button class="tb-me" id="tbMe" aria-label="Mon compte"></button>
-</div>
 <main id="main"><div class="load sq sq-cartes" role="status" aria-live="polite"><span class="sq-txt">Chargement…</span><div class="sq-row sq-3"><i class="sq-k"></i><i class="sq-k"></i><i class="sq-k"></i></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:80%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:73%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div><div class="sq-card"><i class="sq-t"></i><i class="sq-l" style="width:66%"></i><div style="margin-top:12px"><i class="sq-pill"></i><i class="sq-pill"></i></div></div></div></main>
 <nav class="bnav" id="bnav">
   <button data-v="taches" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>Tâches<span class="cnt hidden" id="c1m"></span></button>
@@ -1824,9 +1791,6 @@ html.nav2 main{padding-bottom:calc(var(--nav) + 30px + env(safe-area-inset-botto
   <button data-v="protheses" class="hidden" id="bnPro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5h13l-1.6 7H7.1z"/><path d="M8 12v3.5c0 2.2 1 4.3 2.3 4.5M16 12v3.5c0 2.2-1 4.3-2.3 4.5"/><path d="M9.5 8.5h5"/></svg>Prothèses</button>
   <button class="hidden" id="bnPlus" aria-label="Autres rubriques"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Plus<span class="cnt-p hidden" id="bnPlusN"></span></button>
 </nav>
-<div class="ml-ov" id="mlOv"></div>
-<aside class="ml" id="ml" aria-label="Menu" aria-hidden="true"><div class="ml-in" id="mlIn"></div></aside>
-<nav class="bb" id="bb" aria-label="Navigation principale"><span class="bb-ind" id="bbInd" aria-hidden="true"></span></nav>
 <div id="drawer"></div>
 <div id="modal"></div>
 <div id="alerteN"></div>
@@ -1836,7 +1800,7 @@ html.nav2 main{padding-bottom:calc(var(--nav) + 30px + env(safe-area-inset-botto
 var AUTONOME = !!window.API_URL; // page publiée sur sa propre adresse (et non dans Google Apps Script)
 var PARAMS = AUTONOME ? (function () {
   var q = new URLSearchParams(location.search), net = function (v, n) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, n); };
-  var p = { t: net(q.get('t'), 20), v: net(q.get('v'), 20), k: net(q.get('k'), 64) };
+  var p = { t: net(q.get('t'), 20), v: net(q.get('v'), 20), c: net(q.get('c'), 30), s: net(q.get('s'), 10), k: net(q.get('k'), 64) };
   if (location.search) try { history.replaceState(null, '', location.pathname); } catch (e) { } // le lien de connexion ne reste pas dans la barre d'adresse
   return p;
 })() : {};
@@ -2040,7 +2004,7 @@ function appliquerDemarrage(d) {
       document.documentElement.classList.toggle('lat-r', r);
       $('#replier').onclick = function () { var v = !document.documentElement.classList.contains('lat-r'); document.documentElement.classList.toggle('lat-r', v); try { localStorage.setItem('cabinet_menu', v ? 'r' : ''); } catch (e) { } }; })();
     $('#who b').style.cursor = 'pointer'; $('#who b').onclick = monCompte;
-    $('#bell').classList.remove('hidden'); $('#bell').onclick = ouvrirNotifications;
+    $('#bell').classList.remove('hidden'); $('#bell').onclick = basculerMenuNotifs; $('#bell').setAttribute('aria-haspopup', 'dialog'); $('#bell').setAttribute('aria-expanded', 'false');
     majCloche();
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
@@ -2052,10 +2016,11 @@ function appliquerDemarrage(d) {
     $('#bnPlus').onclick = menuPlus;
     majBnav();
     S.f.portee = 'tout';
-    var v = PARAMS.v && ongletOuvert(PARAMS.v) ? PARAMS.v : premierOnglet();
-    aller(v);
-    if (PARAMS.t) ouvrirTache(PARAMS.t);
-    PARAMS.t = ''; PARAMS.v = '';
+    var cibleLien = PARAMS.t || PARAMS.v ? { t: PARAMS.t, v: PARAMS.v, c: PARAMS.c || '', s: PARAMS.s || '' } : null;
+    if (!(cibleLien && !cibleLien.t && cibleLien.v && ongletOuvert(cibleLien.v))) aller(premierOnglet());
+    if (cibleLien) ouvrirCible(cibleLien);
+    PARAMS.t = ''; PARAMS.v = ''; PARAMS.c = ''; PARAMS.s = '';
+    setTimeout(reprendreCibleNotif, 300);
     majCompteurs(); majAujourdhui();
     if (minuterie) clearInterval(minuterie);
     minuterie = setInterval(function () { if (K && document.visibilityState === 'visible') verifierNotifs(); }, 30000);
@@ -2142,21 +2107,131 @@ function alerteNotif(n, total) {
   el.onclick = function () { z.innerHTML = ''; ouvrirNotif(n); };
   setTimeout(function () { if (z.firstChild === el) z.innerHTML = ''; }, 9000);
 }
+/** Lien d'une notification → élément visé : 'T-12' (tâche), 'v=conges&c=C-3' (demande de congé), 'v=planning&s=2026-11-02' (semaine). */
+function cibleNotif(lien) {
+  var c = String(lien || '').replace(/^[?&]/, '');
+  if (!c) return null;
+  if (c.indexOf('=') < 0) return { t: c };
+  var q = new URLSearchParams(c);
+  return { t: q.get('t') || '', v: q.get('v') || '', c: q.get('c') || '', s: q.get('s') || '' };
+}
+/**
+ * Ouvre l'élément visé, depuis n'importe quelle rubrique. Les droits sont vérifiés par le serveur
+ * (une tâche non autorisée est refusée) ; une rubrique fermée à la personne n'est pas ouverte.
+ */
+function ouvrirCible(x) {
+  if (!x || !S.me) return;
+  fermerMenuNotifs();
+  if (x.t) { fermer(); ouvrirTache(x.t); return; }
+  var v = x.v;
+  if (!v) return;
+  if (!ongletOuvert(v)) { toast('Cette rubrique ne vous est pas accessible.', true); return; }
+  fermer();
+  if (v === 'planning' && /^\d{4}-\d\d-\d\d$/.test(x.s || '')) {
+    S.semaine = lundi(x.s);
+    if (S.cfg.estDentiste || S.cfg.dansPlanning) { S.plVue = 'personne'; S.cibleP = S.me.id; }
+    else S.jour = S.semaine;
+  }
+  if (v === 'conges' && x.c) S.cgCible = { id: x.c };
+  aller(v);
+}
+/** Ouvrir une notification la marque « lue » (et seulement lue : l'état de la tâche ne change pas). */
 function ouvrirNotif(n) {
   if (!n) return;
-  apiFond('marquerNotificationsLues', [n.id]).then(function (r) { S.notifs = r; majCloche(); }).catch(function () { });
-  var c = String(n.tache || '');
-  if (c.indexOf('v=') === 0) { fermer(); aller(c.slice(2) === 'planning' ? 'planning' : c.slice(2) === 'conges' ? 'conges' : 'taches'); }
-  else if (c) ouvrirTache(c);
+  if (!n.lue && S.notifs) { n.lue = true; S.notifs.nonLues = Math.max(0, (S.notifs.nonLues || 0) - 1); majCloche(); }
+  apiFond('marquerNotificationsLues', [n.id]).then(function (r) { S.notifs = r; majCloche(); if (menuNotifsOuvert()) dessinerMenuNotifs(); }).catch(function () { });
+  ouvrirCible(cibleNotif(n.tache));
 }
+/** État de la tâche liée (À faire / En cours / Terminée), distinct de « lue ». */
+function etatTacheNotif(n) {
+  var x = cibleNotif(n.tache); if (!x || !x.t) return '';
+  var t = (S.taches || []).filter(function (y) { return y.id === x.t; })[0];
+  if (!t) return '';
+  var st = t.jeParticipe && t.monStatut ? t.monStatut : t.statut;
+  var k = st === 'Terminée' ? 'fi' : st === 'En cours' ? 'ec' : 'af';
+  return '<span class="nm-st ' + k + '">' + esc(st === 'Terminée' ? 'Tâche terminée' : st) + '</span>';
+}
+function menuNotifsOuvert() { var m = $('#nMenu'); return !!(m && m.classList.contains('on')); }
+function placerMenuNotifs() {
+  var m = $('#nMenu'), b = $('#bell'); if (!m || !b) return;
+  var r = b.getBoundingClientRect();
+  if (r.bottom < 0 || !r.width) { fermerMenuNotifs(); return; }
+  m.style.top = Math.round(r.bottom + 8) + 'px';
+  var iw = document.documentElement.clientWidth || window.innerWidth, lw = m.offsetWidth || 380;
+  m.style.right = Math.max(12, Math.min(Math.round(iw - r.right), iw - lw - 12)) + 'px';
+}
+function dessinerMenuNotifs() {
+  var m = $('#nMenu'); if (!m) return;
+  var l = S.notifs ? S.notifs.liste.slice(0, 8) : null, nl = S.notifs ? S.notifs.nonLues : 0;
+  var corps = !l ? '<div class="nm-v">Chargement…</div>' : !l.length ? '<div class="nm-v">Aucune notification pour l’instant.</div>' :
+    l.map(function (n) {
+      return '<button type="button" class="nm-i' + (n.lue ? '' : ' nl') + '" data-n="' + esc(n.id) + '"><i class="nm-d" aria-hidden="true"></i><span class="nm-c">' +
+        '<span class="nm-t">' + esc(n.titre) + '</span><span class="nm-x">' + esc(n.texte) + '</span>' +
+        '<span class="nm-m">' + esc(dHeure(n.date)) + (n.lue ? '' : ' · <b style="color:var(--acc);font-weight:600">non lue</b>') + etatTacheNotif(n) + '</span></span></button>';
+    }).join('');
+  m.innerHTML = '<div class="nm-h"><b>Notifications</b>' + (nl ? '<span class="nm-n" title="' + nl + ' non lue' + (nl > 1 ? 's' : '') + '">' + (nl > 99 ? '99+' : nl) + '</span>' : '') +
+    '<span class="sp"></span><button type="button" class="nm-lk" id="nmTout"' + (nl ? '' : ' disabled') + '>Tout marquer comme lu</button></div>' +
+    '<div class="nm-l">' + corps + '</div><div class="nm-f"><button type="button" id="nmVoir">Voir toutes les notifications</button></div>';
+  $$('#nMenu .nm-i').forEach(function (d) {
+    d.onclick = function () { var id = d.getAttribute('data-n'); ouvrirNotif((S.notifs ? S.notifs.liste : []).filter(function (x) { return x.id === id; })[0]); };
+  });
+  $('#nmVoir').onclick = function () { fermerMenuNotifs(); ouvrirNotifications(); };
+  $('#nmTout').onclick = function () {
+    if (S.notifs) { S.notifs.liste.forEach(function (n) { n.lue = true; }); S.notifs.nonLues = 0; majCloche(); dessinerMenuNotifs(); }
+    api('marquerNotificationsLues', 'tout').then(function (r) { S.notifs = r; majCloche(); if (menuNotifsOuvert()) dessinerMenuNotifs(); }).catch(echec);
+  };
+}
+function ouvrirMenuNotifs() {
+  var m = $('#nMenu');
+  if (!m) { m = document.createElement('div'); m.id = 'nMenu'; m.className = 'nm'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Notifications'); document.body.appendChild(m); }
+  dessinerMenuNotifs(); placerMenuNotifs();
+  void m.offsetWidth; m.classList.add('on');
+  $('#bell').setAttribute('aria-expanded', 'true');
+  // liste à jour en arrière-plan (sans écran d'attente)
+  apiFond('getNotifications').then(function (r) {
+    S.notifs = r; S.notifVues = S.notifVues || {}; r.liste.forEach(function (n) { S.notifVues[n.id] = 1; });
+    majCloche(); if (menuNotifsOuvert()) dessinerMenuNotifs();
+  }).catch(function () { });
+}
+function fermerMenuNotifs() {
+  var m = $('#nMenu'); if (!m || !m.classList.contains('on')) return;
+  m.classList.remove('on'); if ($('#bell')) $('#bell').setAttribute('aria-expanded', 'false');
+}
+function basculerMenuNotifs(e) { if (e) e.stopPropagation(); if (menuNotifsOuvert()) fermerMenuNotifs(); else ouvrirMenuNotifs(); }
+document.addEventListener('pointerdown', function (e) {
+  if (!menuNotifsOuvert()) return;
+  if (e.target.closest && (e.target.closest('#nMenu') || e.target.closest('#bell'))) return;
+  fermerMenuNotifs();
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menuNotifsOuvert()) { e.stopPropagation(); fermerMenuNotifs(); if ($('#bell')) $('#bell').focus(); } }, true);
+window.addEventListener('resize', function () { if (menuNotifsOuvert()) placerMenuNotifs(); });
+window.addEventListener('scroll', function () { if (menuNotifsOuvert()) placerMenuNotifs(); }, { passive: true });
+/** Clic sur une notification du téléphone pendant que l'application était en veille : la cible est reprise au retour. */
+function reprendreCibleNotif() {
+  if (!S.me || !window.caches) return;
+  caches.open('cabinet-ouvrir').then(function (c) {
+    return c.match('./__ouvrir').then(function (r) {
+      if (!r) return;
+      return r.json().then(function (d) {
+        c.delete('./__ouvrir');
+        if (!d || d.n === S.dernCibleN || Date.now() - d.n > 5 * 60000) return;
+        S.dernCibleN = d.n; ouvrirCible(d); verifierNotifs();
+      });
+    });
+  }).catch(function () { });
+}
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') setTimeout(reprendreCibleNotif, 150); });
 function ouvrirNotifications() {
   var dessiner = function () {
     if (!$('#drb')) return;
     var l = S.notifs ? S.notifs.liste : [];
     $('#drb').innerHTML = l.length ? l.map(function (n) {
-      return '<div class="nt' + (n.lue ? '' : ' nl') + '" data-n="' + esc(n.id) + '"><i class="dot"></i><div><b>' + esc(n.titre) + '</b><span>' + esc(n.texte) + '</span><small>' + esc(dHeure(n.date)) + '</small></div></div>';
+      return '<div class="nt' + (n.lue ? '' : ' nl') + '" data-n="' + esc(n.id) + '" role="button" tabindex="0"><i class="dot"></i><div><b>' + esc(n.titre) + '</b><span>' + esc(n.texte) + '</span><small>' + esc(dHeure(n.date)) + (n.lue ? '' : ' · non lue') + ' ' + etatTacheNotif(n) + '</small></div></div>';
     }).join('') : '<div class="empty">Aucune notification pour l’instant.</div>';
-    $$('#drb .nt').forEach(function (d) { d.onclick = function () { ouvrirNotif(l.filter(function (x) { return x.id === d.getAttribute('data-n'); })[0]); }; });
+    $$('#drb .nt').forEach(function (d) {
+      d.onclick = function () { ouvrirNotif(l.filter(function (x) { return x.id === d.getAttribute('data-n'); })[0]); };
+      d.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); d.onclick(); } };
+    });
   };
   tiroir('Notifications', sq('mini'), '<button class="btn" id="nReg">Sur mon téléphone</button><span class="sp"></span><button class="btn" id="nTout">Tout marquer comme lu</button>');
   $('#nTout').onclick = function () { api('marquerNotificationsLues', 'tout').then(function (r) { S.notifs = r; majCloche(); dessiner(); }).catch(echec); };
@@ -2286,7 +2361,9 @@ if (AUTONOME && 'serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', function (e) {
     var d = e.data || {};
     if (d.type !== 'ouvrir' || !S.me) return;
-    if (d.t) ouvrirTache(d.t); else if (d.v) aller(d.v);
+    if (d.n && d.n === S.dernCibleN) return;
+    S.dernCibleN = d.n; if (window.caches) caches.open('cabinet-ouvrir').then(function (c) { c.delete('./__ouvrir'); }).catch(function () { });
+    ouvrirCible(d);
     verifierNotifs();
   });
 }
@@ -4221,7 +4298,7 @@ function rendreConges() {
   if (c.peutValider) {
     h += '<h2>À valider' + (c.aValider.length ? ' (' + c.aValider.length + ')' : '') + '</h2>' +
       (c.aValider.length ? c.aValider.map(function (x) {
-        return '<div class="cg-c" data-id="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + (x.fonction ? ' <span class="meta" style="font-weight:400">· ' + esc(x.fonction) + '</span>' : '') + '</div>' +
+        return '<div class="cg-c" data-id="' + esc(x.id) + '" data-cg="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + (x.fonction ? ' <span class="meta" style="font-weight:400">· ' + esc(x.fonction) + '</span>' : '') + '</div>' +
           '<div class="m" style="color:var(--ink);font-size:14px">' + esc(periode(x)) + (x.debut !== x.fin ? ' (inclus)' : '') + '</div>' +
           '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + '</div>' +
           (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') + traceConge(x) +
@@ -4230,7 +4307,7 @@ function rendreConges() {
       }).join('') : '<div class="empty">Aucune demande en attente.</div>');
   }
   h += '<h2>Mes demandes</h2>' + (c.miens.length ? c.miens.map(function (x) {
-    return '<div class="cg-c"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
+    return '<div class="cg-c" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
       '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) · demandée le ' + esc(dHeure(x.demandeLe)) + (x.traitePar && x.traiteLe ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : x.statut === 'Refusée' ? 'refusée' : 'annulée') + ' par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)) : '') + '</div>' +
       (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
       (x.reponse ? '<div class="m" style="margin-top:4px">Réponse : ' + esc(x.reponse) + '</div>' : '') +
@@ -4238,7 +4315,7 @@ function rendreConges() {
   }).join('') : '<div class="empty">Vous n’avez pas encore fait de demande.</div>');
   if (c.peutValider && c.equipe.length) {
     h += '<h2>Historique de l’équipe</h2>' + c.equipe.slice(0, 60).map(function (x) {
-      return '<div class="cg-c"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
+      return '<div class="cg-c" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
         '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · réponse : ' + esc(x.reponse) : '') + '</div>' + traceConge(x) +
         (x.statut === 'Acceptée' && x.fin >= S.today ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ce congé</button></div>' : '') + '</div>';
     }).join('');
@@ -4246,6 +4323,13 @@ function rendreConges() {
   $('#main').innerHTML = h;
   $('#cgNv').onclick = formConge;
   signalerVuesConges();
+  if (S.cgCible) {
+    var cib = $('.cg-c[data-cg="' + String(S.cgCible.id).replace(/"/g, '') + '"]');
+    if (cib) {
+      cib.classList.add('cible'); // gardée si la liste se redessine pendant la mise en évidence
+      if (!S.cgCible.vu) { S.cgCible.vu = true; cib.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { S.cgCible = null; $$('.cg-c.cible').forEach(function (e) { e.classList.remove('cible'); }); }, 3000); }
+    }
+  }
   $$('.cg-c[data-id]').forEach(function (card) {
     var id = card.getAttribute('data-id'), motif = $('input', card);
     $$('[data-d]', card).forEach(function (b) {
@@ -5569,100 +5653,6 @@ function sq(type, txt) {
 ANIM.brancher();
 
 demarrer();
-
-// ───────── Navigation : barre du bas (principales rubriques) + menu latéral ouvert par le logo de la dent ─────────
-var NAV = {
-  libelles: { taches: 'Tâches', planning: 'Planning', conges: 'Congés', materiel: 'Matériel', compta: 'Comptabilité', impayes: 'Impayés', relances: 'Relances', protheses: 'Prothèses', personnel: 'Personnel' },
-  bas: ['taches', 'planning', 'notifs', 'personnel'],
-  groupes: [['org', 'Organisation', ['taches', 'planning', 'conges', 'personnel']], ['ges', 'Gestion', ['materiel', 'compta', 'impayes', 'relances', 'protheses']], ['com', 'Communication', ['notifs']], ['cpt', 'Compte', ['compte', 'sortie']]]
-};
-var ICONE_CLOCHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg>';
-var ICONE_COMPTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>';
-var ICONE_SORTIE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4"/></svg>';
-function navIcone(v) { var b = $('#tabs [data-v="' + v + '"]'); return v === 'notifs' ? ICONE_CLOCHE : v === 'compte' ? ICONE_COMPTE : v === 'sortie' ? ICONE_SORTIE : b ? b.querySelector('svg').outerHTML.replace(' class="ti"', '') : ''; }
-/** Compteur affiché sur une rubrique (repris des compteurs existants : tâches non lues, congés à valider, matériel à commander, notifications). */
-function navCompteur(v) {
-  var src = { taches: '#c1', conges: '#c2', materiel: '#c3', notifs: '#bellN' }[v], e = src && $(src);
-  return e && !e.classList.contains('hidden') && e.textContent && e.textContent !== '0' ? e.textContent : '';
-}
-function navVisible(v) { return v === 'notifs' || v === 'compte' || v === 'sortie' ? true : ongletOuvert(v); }
-function navAction(v) {
-  fermerMenu();
-  if (v === 'notifs') return ouvrirNotifications();
-  if (v === 'compte') return monCompte();
-  if (v === 'sortie') return seDeconnecter();
-  aller(v);
-}
-/** Barre du bas : Tâches, Planning, Notifications, Personnel (selon les droits). */
-function majBarreBas() {
-  var bb = $('#bb'); if (!bb || !S.cfg) return;
-  var l = NAV.bas.filter(navVisible);
-  var html = l.map(function (v) {
-    var c = navCompteur(v);
-    return '<button data-nb="' + v + '" class="' + (S.vue === v ? 'on' : '') + '" aria-label="' + (v === 'notifs' ? 'Notifications' : NAV.libelles[v]) + (c ? ' (' + c + ')' : '') + '"' + (S.vue === v ? ' aria-current="page"' : '') + '>' +
-      '<span class="bb-i">' + navIcone(v) + (c ? '<span class="bb-c">' + esc(c) + '</span>' : '') + '</span><span class="bb-l">' + (v === 'notifs' ? 'Notifications' : NAV.libelles[v]) + '</span></button>';
-  }).join('');
-  if (bb.getAttribute('data-h') !== html) {
-    bb.innerHTML = '<span class="bb-ind" id="bbInd" aria-hidden="true"></span>' + html; bb.setAttribute('data-h', html);
-    $$('#bb [data-nb]').forEach(function (b) { b.onclick = function () { navAction(b.getAttribute('data-nb')); }; });
-  }
-  placerIndicateur();
-}
-function placerIndicateur() {
-  var ind = $('#bbInd'), b = $('#bb [data-nb].on');
-  if (!ind) return;
-  if (!b) { ind.style.opacity = '0'; return; }
-  var bb = $('#bb').getBoundingClientRect(), r = b.getBoundingClientRect();
-  ind.style.opacity = '1'; ind.style.width = Math.round(r.width - 24) + 'px'; ind.style.transform = 'translateX(' + Math.round(r.left - bb.left + 12) + 'px)';
-}
-/** Menu latéral : toutes les rubriques autorisées, par catégories repliables. */
-function majMenu() {
-  var z = $('#mlIn'); if (!z || !S.cfg) return;
-  var replies = {}; try { replies = JSON.parse(localStorage.getItem('cabinet_menu_groupes') || '{}') || {}; } catch (e) { }
-  var tete = '<div class="ml-h"><span class="ml-av" aria-hidden="true">' + esc(initiales(S.me)) + '</span><span class="ml-who"><b>' + esc(S.me.nom) + '</b><small>' + esc(S.me.role) + '</small></span>' +
-    '<button class="ml-x" id="mlX" aria-label="Fermer le menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';
-  var corps = NAV.groupes.map(function (g) {
-    var items = g[2].filter(navVisible);
-    if (!items.length) return '';
-    var ferme = !!replies[g[0]];
-    return '<section class="ml-g' + (ferme ? ' ferme' : '') + '" data-g="' + g[0] + '"><button class="ml-gt" aria-expanded="' + !ferme + '"><span>' + g[1] + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></button>' +
-      '<div class="ml-gl"><div>' + items.map(function (v) {
-        var c = navCompteur(v), lib = v === 'notifs' ? 'Notifications' : v === 'compte' ? 'Mon compte et réglages' : v === 'sortie' ? 'Se déconnecter' : NAV.libelles[v];
-        return '<button class="ml-it' + (S.vue === v ? ' on' : '') + (v === 'sortie' ? ' sortie' : '') + '" data-ml="' + v + '"' + (S.vue === v ? ' aria-current="page"' : '') + '>' + navIcone(v) + '<span>' + lib + '</span>' + (c ? '<span class="ml-c">' + esc(c) + '</span>' : '') + '</button>';
-      }).join('') + '</div></div></section>';
-  }).join('');
-  z.innerHTML = tete + '<div class="ml-b">' + corps + '</div>';
-  $('#mlX').onclick = fermerMenu;
-  $$('#ml [data-ml]').forEach(function (b) { b.onclick = function () { navAction(b.getAttribute('data-ml')); }; });
-  $$('#ml .ml-gt').forEach(function (b) {
-    b.onclick = function () {
-      var sct = b.parentNode, f = !sct.classList.contains('ferme'); sct.classList.toggle('ferme', f); b.setAttribute('aria-expanded', !f);
-      replies[sct.getAttribute('data-g')] = f; try { localStorage.setItem('cabinet_menu_groupes', JSON.stringify(replies)); } catch (e) { }
-    };
-  });
-}
-function hauteurBarre() { var t = $('#tb'); if (t) document.documentElement.style.setProperty('--tbh', t.getBoundingClientRect().height + 'px'); }
-function ouvrirMenu() { hauteurBarre(); majMenu(); document.documentElement.classList.add('ml-on'); $('#ml').setAttribute('aria-hidden', 'false'); $('#tbLogo').setAttribute('aria-expanded', 'true'); setTimeout(function () { var x = $('#ml .ml-it.on') || $('#ml .ml-it'); if (x) x.focus({ preventScroll: true }); }, 210); }
-function fermerMenu() { if (!document.documentElement.classList.contains('ml-on')) return; document.documentElement.classList.remove('ml-on'); $('#ml').setAttribute('aria-hidden', 'true'); $('#tbLogo').setAttribute('aria-expanded', 'false'); }
-function majNav() {
-  if (!S.me || !S.cfg) return;
-  document.documentElement.classList.add('nav2');
-  $('#tbNom').textContent = S.cfg.nomApp || 'Cabinet Berdugo';
-  $('#tbMe').textContent = initiales(S.me); $('#tbMe').setAttribute('aria-label', 'Mon compte : ' + S.me.nom);
-  majBarreBas();
-  if (document.documentElement.classList.contains('ml-on')) majMenu();
-}
-(function () {
-  $('#tbLogo').onclick = function () { if (document.documentElement.classList.contains('ml-on')) fermerMenu(); else ouvrirMenu(); };
-  $('#mlOv').onclick = fermerMenu;
-  $('#tbMe').onclick = function () { fermerMenu(); monCompte(); };
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.documentElement.classList.contains('ml-on')) { e.stopPropagation(); fermerMenu(); } }, true);
-  window.addEventListener('resize', function () { clearTimeout(S.tInd); S.tInd = setTimeout(function () { placerIndicateur(); hauteurBarre(); }, 80); });
-  // la navigation suit la rubrique ouverte et les compteurs existants
-  var a0 = aller; aller = function (v) { var r = a0.apply(this, arguments); majNav(); return r; };
-  var c0 = majCompteurs; majCompteurs = function () { var r = c0.apply(this, arguments); majNav(); return r; };
-  var n0 = majCloche; majCloche = function () { var r = n0.apply(this, arguments); majNav(); return r; };
-})();
 </script>
 </body>
 </html>

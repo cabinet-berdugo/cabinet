@@ -1,5 +1,5 @@
 // Service worker du Cabinet Berdugo : ouverture rapide, et notifications même application fermée.
-const VERSION = 'v-fdfbdb5250';
+const VERSION = 'v-dd369eba2a';
 const API = 'https://script.google.com/macros/s/AKfycbzbVH_ipWjDwJzQ2q7SCj0VqC5K9pI_4tovfU-ywQ0ez8i24ElDaF0t-nVsg6avISw/exec';
 const FICHIERS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -7,7 +7,7 @@ self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FICHIERS)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(l => Promise.all(l.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(l => Promise.all(l.filter(k => k !== VERSION && k !== 'cabinet-ouvrir').map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 // la page : d'abord le réseau (pour avoir toujours la dernière version), sinon la copie ; le reste : la copie
 self.addEventListener('fetch', e => {
@@ -66,9 +66,16 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   const url = (e.notification.data && e.notification.data.url) || './';
   const q = new URL(url, self.registration.scope).searchParams;
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(l => {
-    const ouvert = l[0];
-    if (ouvert) { ouvert.postMessage({ type: 'ouvrir', t: q.get('t') || '', v: q.get('v') || '' }); return ouvert.focus(); }
+  const cible = { type: 'ouvrir', t: q.get('t') || '', v: q.get('v') || '', c: q.get('c') || '', s: q.get('s') || '', n: Date.now() };
+  e.waitUntil((async () => {
+    // la cible est aussi gardée quelques instants : sur iPhone, l'application peut être en veille et ne pas recevoir le message
+    try { const c = await caches.open('cabinet-ouvrir'); await c.put('./__ouvrir', new Response(JSON.stringify(cible), { headers: { 'Content-Type': 'application/json' } })); } catch (err) { }
+    const l = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const ouvert = l.find(c => c.visibilityState === 'visible') || l[0];
+    if (ouvert) {
+      ouvert.postMessage(cible);
+      try { return await ouvert.focus(); } catch (err) { return; }
+    }
     return self.clients.openWindow(url);
-  }));
+  })());
 });
