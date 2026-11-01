@@ -1264,6 +1264,124 @@ html.anim .modal .box{animation:a-boite 210ms var(--ease-out) backwards}
 .dr-sortie .dr{transition:opacity 150ms var(--ease-io),transform 150ms var(--ease-io)}
 .dr-sortie.fin .ov{opacity:0}
 .dr-sortie.fin .dr{opacity:0;transform:translateY(8px) scale(.985)}
+/* iPhone et tablettes : pas d'état « survol » collé après un toucher ; coche sans décaler le texte ; fenêtres en feuille qui monte du bas */
+@media (hover:none){
+  .sbtn.c:hover:not(.on),.sbtn.f:hover:not(.on){background:var(--card)}
+  .tc .stb .sbtn{position:relative}
+  .tc .stb .sbtn .ck{position:absolute;left:12px;top:50%;margin:-7.5px 0 0}
+}
+@keyframes a-feuille{from{transform:translateY(100%)}to{transform:none}}
+@media (max-width:760px){
+  html.anim #drawer.entre .dr{animation:a-feuille 320ms cubic-bezier(.16,1,.3,1) backwards}
+  .dr-sortie .dr{transition:transform 240ms cubic-bezier(.45,0,.25,1)}
+  .dr-sortie.fin .dr{opacity:1;transform:translateY(100%)}
+}
+/* ═════════════ Planning : habillage moderne (mêmes données, mêmes actions) ═════════════ */
+#plSeg{display:inline-flex;background:#E7EDF8;border:0;border-radius:14px;padding:4px;gap:2px;box-shadow:inset 0 1px 2px rgba(6,27,66,.06)}
+#plSeg button{border-radius:10px;padding:8px 16px;font-weight:600;white-space:nowrap}
+#plSeg button.on{background:#fff;color:var(--acc);box-shadow:0 1px 2px rgba(6,27,66,.08),0 4px 12px rgba(6,27,66,.08)}
+.wk{background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:var(--sh);gap:6px;margin-bottom:18px}
+.wk .btn.sm{min-height:36px;border-radius:10px}
+.wk #wPrev,.wk #wNext,.wk #dPrev,.wk #dNext,.wk #mPrev,.wk #mNext{width:36px;padding:0;justify-content:center;font-size:20px;line-height:1;border:0;background:#F1F5FB;color:var(--acc);box-shadow:none}
+.wk #wPrev:hover,.wk #wNext:hover,.wk #dPrev:hover,.wk #dNext:hover,.wk #mPrev:hover,.wk #mNext:hover{background:#E3EBFA}
+.wk .nm{font-family:var(--f-titre);font-size:16px;font-weight:700;color:var(--ink);min-width:0;padding:0 10px}
+.wk #wNow,.wk #dNow,.wk #mNow{border-radius:999px;background:#EAF1FF;border-color:transparent;color:var(--acc);font-weight:600}
+.wk #dPick{border-radius:10px}
+h2.etage{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5A6B8C;margin:22px 0 10px}
+h2.etage::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.salles{gap:14px}
+.salle{padding:14px;gap:10px;border-radius:18px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(6,27,66,.04),0 8px 24px rgba(6,27,66,.06)}
+.salle .sh{display:flex;align-items:center;gap:8px}
+.salle .sh b{font-family:var(--f-titre);font-size:16px;font-weight:700;color:var(--ink)}
+.salle .sh .lk{margin-left:auto;font-weight:600}
+.sl-dot{width:9px;height:9px;border-radius:50%;background:#C5D0E2;flex:none}
+.salle.occ .sl-dot{background:#22B07D;box-shadow:0 0 0 3px rgba(34,176,125,.16)}
+.sl-n{font-size:12px;font-weight:600;color:#6B7A96;background:#F1F5FB;border-radius:999px;padding:2px 9px}
+.salle.occ .sl-n{color:var(--acc);background:#EAF1FF}
+.sl-tl{margin:0 0 2px}
+.sl-tr{position:relative;height:8px;border-radius:999px;background:#EEF2F9;overflow:hidden}
+.sl-tr i{position:absolute;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,#0047D9,#125BFF)}
+.sl-tr i.c{background:linear-gradient(90deg,#E04848,#F07070)}
+.sl-hs{display:flex;justify-content:space-between;font-size:11px;color:#8A99B2;margin-top:4px;font-variant-numeric:tabular-nums}
+.af{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;position:relative;transition:border-color .15s,box-shadow .15s,transform .15s}
+.af.ed:hover{border-color:#C9D7F2;box-shadow:0 6px 18px rgba(0,71,217,.10)}
+.af-c{background:#FFF6F6;border-color:#F3C9C9}
+.af-av{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--btn-grad);color:#fff;font-weight:700;font-size:13px;letter-spacing:.02em;box-shadow:0 4px 10px rgba(0,71,217,.25)}
+.af-c .af-av{background:linear-gradient(180deg,#F06262,#D93C3C);box-shadow:0 4px 10px rgba(217,60,60,.22)}
+.af-b{flex:1;min-width:0}
+.af-h{display:inline-block;font-size:12px;font-weight:700;color:var(--acc);background:#EAF1FF;border-radius:999px;padding:2px 9px}
+.af-c .af-h{color:#C03030;background:#FDE8E8}
+.af-d{font-size:15px;font-weight:700;color:var(--ink);margin:5px 0 6px}
+.af-a{gap:6px}
+.af-a .as{display:inline-flex;align-items:center;gap:6px;background:#F4F7FC;border:1px solid #E6ECF6;border-radius:999px;padding:3px 10px 3px 4px;font-size:13px}
+.af-a .as::before{content:"";width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#9DB8F2,#5E86E0);flex:none}
+.af-a .as b{font-weight:600}
+.af-n{margin-top:6px}
+.libre{display:flex;align-items:center;justify-content:center;min-height:64px;border:1.5px dashed #D5DEEC;border-radius:14px;color:#8A99B2;font-weight:600;background:repeating-linear-gradient(-45deg,#FAFBFE,#FAFBFE 8px,#F5F7FC 8px,#F5F7FC 16px)}
+/* « Mon planning » et « Par personne » */
+.auj{background:linear-gradient(120deg,#0047D9 0%,#125BFF 70%,#3B7BFF 100%);border:0;color:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 10px 26px rgba(0,71,217,.28)}
+.auj .auj-t{color:rgba(255,255,255,.85)}
+.auj .auj-l .big{color:#fff}
+.auj .auj-l span{color:rgba(255,255,255,.9)}
+.days{gap:10px}
+.day{border-radius:16px;padding:12px;gap:14px;align-items:stretch}
+.day .d{width:auto;min-width:118px;display:flex;align-items:center;gap:10px;background:#F4F7FC;border-radius:12px;padding:8px 12px 8px 8px}
+.day .d-n{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:#fff;font-family:var(--f-titre);font-size:18px;font-weight:700;color:var(--ink);box-shadow:0 1px 3px rgba(6,27,66,.08);flex:none}
+.day .d-t{display:flex;flex-direction:column;line-height:1.25}
+.day .d-t b{font-size:14px}
+.day .d-t small{font-size:12px}
+.day.td{border-color:#9DBBF6;box-shadow:0 0 0 3px rgba(18,91,255,.12),var(--sh)}
+.day.td .d{background:var(--btn-grad);color:#fff}
+.day.td .d small{color:rgba(255,255,255,.85)}
+.day.td .d-n{color:var(--acc)}
+.day .c{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.day .mi{border:0;padding:8px 10px;background:#F8FAFE;border:1px solid #EBF0F8;border-radius:12px;align-items:center}
+.day .mi-h{color:var(--acc);font-weight:700}
+.day .c > .meta{color:#8A99B2}
+/* « Horaires » */
+.grid{border-radius:18px;overflow:auto;box-shadow:0 1px 2px rgba(6,27,66,.04),0 8px 24px rgba(6,27,66,.06)}
+table.pl{border-collapse:separate;border-spacing:0}
+.pl th{position:sticky;top:0;z-index:2;background:#F6F8FD;font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:#5A6B8C;padding:12px 10px}
+.pl th.td{color:#fff;background:var(--btn-grad)}
+.pl td.nm,.pl th:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 var(--line)}
+.pl th:first-child{z-index:3;background:#F6F8FD}
+.pl td.nm{font-weight:700;color:var(--ink);padding:12px}
+.pl td{vertical-align:middle}
+.pl tr.me td.nm{color:var(--acc)}
+.pl tbody tr:hover td{background:#FAFCFF}
+.pl tbody tr:hover td.nm{background:#F6F9FF}
+.cell{padding:8px;min-height:62px}
+.cell .h{display:inline-block;background:#EAF1FF;color:var(--acc);border-radius:9px;padding:4px 9px;font-weight:700;font-size:13px;white-space:nowrap}
+.cell .a{margin-top:5px}
+.cell .s{display:inline-block;margin-top:5px;background:#FFF3E3;color:#B35C00;border-radius:999px;padding:1px 8px;font-weight:600}
+.cell.rep{background:none;color:#8A99B2;font-weight:600}
+.cell.rep::first-line{color:#8A99B2}
+.cell.cg{background:#FFF7EC;color:#B35C00;font-weight:700}
+.ed .cell:hover{background:#F2F6FF}
+.cell .plus{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;border:1.5px dashed #CAD5E8;color:#9FB0CC;font-size:18px;line-height:1}
+.ed .cell:hover .plus{border-color:var(--acc);color:var(--acc)}
+@media (max-width:760px){
+  #plSeg{display:flex;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  #plSeg::-webkit-scrollbar{display:none}
+  #plSeg button{flex:1 1 auto;padding:9px 6px;font-size:13px}
+  .wk{border-radius:14px}
+  .wk .nm{flex:1 1 calc(100% - 96px);order:0;text-align:center;font-size:15px;padding:0 4px}
+  .wk .sp{display:none}
+  .wk > .btn:not(#wPrev):not(#wNext):not(#dPrev):not(#dNext):not(#mPrev):not(#mNext),.wk > input{order:1}
+  .salle{border-radius:16px}
+  .day{flex-direction:row;align-items:center;gap:12px;padding:10px}
+  .day .d{flex-direction:column;justify-content:center;width:68px;min-width:68px;padding:7px 4px;gap:4px;align-self:stretch}
+  .day .d-n{width:36px;height:36px;font-size:16px}
+  .day .d-t{align-items:center}
+  .day .d-t b{font-size:12px}
+  .day .d-t small{display:none}
+  .day .mi{flex-direction:row;gap:10px;align-items:flex-start}
+  .day .mi-h{width:auto;white-space:nowrap}
+  table.pl{min-width:620px}
+  .pl td.nm{width:auto;min-width:88px;padding:10px}
+  .pl th{padding:10px 8px;font-size:11px}
+  .cell .h{font-size:12px;padding:3px 7px}
+}
 </style>
 </head>
 <body>
@@ -2467,13 +2585,28 @@ function rendreJour() {
     e.salles.push({ s: s, a: a });
   });
   var sansSalle = r.affectations.filter(function (x) { return !x.salle || !r.salles.some(function (s) { return s.id === x.salle; }); });
+  // frise de la journée : occupation de chaque salle (purement visuelle)
+  var mnT = function (t) { var m = String(t || '').match(/(\d{1,2})\D?(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+  var jr = (S.cfg.creneaux && S.cfg.creneaux.journee) || ['09:00', '19:00'];
+  var t0 = mnT(jr[0]) || 540, t1 = mnT(jr[1]) || 1140;
+  r.affectations.forEach(function (a) { var d = mnT(a.debut), f = mnT(a.fin); if (d !== null && d < t0) t0 = d; if (f !== null && f > t1) t1 = f; });
+  var frise = function (liste) {
+    return '<div class="sl-tl" aria-hidden="true"><div class="sl-tr">' + liste.map(function (a) {
+      var d = mnT(a.debut), f = mnT(a.fin); if (d === null || f === null || f <= d) return '';
+      return '<i class="' + (a.conflits.length ? 'c' : '') + '" style="left:' + ((d - t0) / (t1 - t0) * 100).toFixed(2) + '%;width:' + ((f - d) / (t1 - t0) * 100).toFixed(2) + '%"></i>';
+    }).join('') + '</div><div class="sl-hs"><span>' + Math.floor(t0 / 60) + 'h</span><span>' + Math.floor((t0 + t1) / 120) + 'h</span><span>' + Math.ceil(t1 / 60) + 'h</span></div></div>';
+  };
+  var initDr = function (n) { return String(n || '').replace(/^Dr\.?\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (x) { return x.charAt(0).toUpperCase(); }).join(''); };
   var carteSalle = function (titre, liste, id, inactive) {
-    return '<section class="salle"><div class="sh"><b>' + esc(titre) + '</b>' + (inactive ? ' <span class="tag">désactivée</span>' : '') +
+    return '<section class="salle' + (liste.length ? ' occ' : '') + '"><div class="sh"><i class="sl-dot" aria-hidden="true"></i><b>' + esc(titre) + '</b>' + (inactive ? ' <span class="tag">désactivée</span>' : '') +
+      '<span class="sl-n">' + (liste.length ? liste.length + ' créneau' + (liste.length > 1 ? 'x' : '') : 'Libre') + '</span>' +
       (ed && id !== null ? '<button class="lk" data-add="' + esc(id) + '" aria-label="Ajouter une affectation dans ' + esc(titre) + '">+ Ajouter</button>' : '') + '</div>' +
+      (liste.length ? frise(liste) : '') +
       (liste.length ? liste.map(function (a) {
         return '<div class="af' + (a.conflits.length ? ' af-c' : '') + (ed ? ' ed' : '') + '" data-id="' + esc(a.id) + '"' + (ed ? ' role="button" tabindex="0"' : '') + '>' +
+          '<span class="af-av" aria-hidden="true">' + esc(initDr(a.dentisteNom)) + '</span><div class="af-b">' +
           '<div class="af-h">' + hm(a.debut) + ' – ' + hm(a.fin) + '</div><div class="af-d">' + esc(a.dentisteNom) + '</div>' +
-          '<div class="af-a">' + htmlAssistantes(a) + '</div>' + (a.note ? '<div class="af-n">' + esc(a.note) + '</div>' : '') + htmlProblemes(a) + '</div>';
+          '<div class="af-a">' + htmlAssistantes(a) + '</div>' + (a.note ? '<div class="af-n">' + esc(a.note) + '</div>' : '') + htmlProblemes(a) + '</div></div>';
       }).join('') : '<div class="libre">Libre</div>') + '</section>';
   };
   etages.forEach(function (e) {
@@ -2554,7 +2687,7 @@ function rendreMoi() {
       hor = cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
         '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
     }
-    h += '<div class="day' + (j === S.today ? ' td' : '') + '"><div class="d"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></div><div class="c">' + hor +
+    h += '<div class="day' + (j === S.today ? ' td' : '') + (lst.length ? ' occ' : '') + '"><div class="d"><span class="d-n" aria-hidden="true">' + Number(j.slice(8, 10)) + '</span><span class="d-t"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></span></div><div class="c">' + hor +
       (lst.length ? lst.map(ligne).join('') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
   });
   h += '</div>';
@@ -3895,35 +4028,52 @@ var ANIM = (function () {
   };
 
   // ── 11 · réorganisation des listes (filtres, tris) : les éléments gardés glissent, les autres s'effacent ou apparaissent ──
+  var mqTact = window.matchMedia ? window.matchMedia('(hover: none), (pointer: coarse)') : null;
+  A.tactile = function () { return !!(mqTact && mqTact.matches); };
   A.photo = function (sel, cle) {
     if (!actif()) return null;
     var els = $$(sel).filter(function (e) { return !e.classList.contains('a-fantome'); }); if (!els.length || els.length > 60) return null;
-    var m = {}; els.forEach(function (e) { var k = cle(e); if (k) m[k] = { r: e.getBoundingClientRect(), el: e }; });
-    return { vue: S.vue, m: m };
+    var parent = els[0].parentNode, pr = parent.getBoundingClientRect(), m = {}, ordre = [];
+    els.forEach(function (e) { var k = cle(e); if (!k || m[k]) return; var r = e.getBoundingClientRect(); m[k] = { x: r.left - pr.left, y: r.top - pr.top, h: r.height, el: e }; ordre.push(k); });
+    return { vue: S.vue, m: m, ordre: ordre, parent: parent };
   };
+  /** Fantôme dans le flux (copie inerte, sans identifiants) qui se replie à l'ancienne place d'un élément retiré : rien n'est positionné « en fixe », donc rien ne se décale sur iPhone. */
+  function fantome(a, parent, avant) {
+    var g = a.el.cloneNode(true);
+    [g].concat($$('*', g)).forEach(function (x) { x.removeAttribute('id'); [].slice.call(x.attributes).forEach(function (at) { if (/^data-/.test(at.name)) x.removeAttribute(at.name); }); });
+    g.classList.add('a-fantome'); g.setAttribute('aria-hidden', 'true'); g.inert = true;
+    g.style.pointerEvents = 'none'; g.style.overflow = 'hidden'; g.style.boxSizing = 'border-box';
+    if (avant) parent.insertBefore(g, avant); else parent.appendChild(g);
+    var cs = getComputedStyle(parent), gap = parseFloat(cs.rowGap) || 0;
+    if (!g.animate) { g.remove(); return; }
+    var an = g.animate([{ height: a.h + 'px', opacity: 1 }, { height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px', marginTop: '0px', marginBottom: (-gap) + 'px', borderTopWidth: '0px', borderBottomWidth: '0px' }],
+      { duration: 240, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' });
+    var fin = function () { if (g.parentNode) g.remove(); };
+    an.onfinish = fin; setTimeout(fin, 400);
+  }
   A.glisser = function (photo, sel, cle) {
     if (!photo || photo.vue !== S.vue || !actif()) return;
     var els = $$(sel).filter(function (e) { return !e.classList.contains('a-fantome'); }); if (els.length > 60) return;
-    var gardes = {};
+    var parent = els[0] ? els[0].parentNode : photo.parent; if (!parent || !parent.isConnected) return;
+    var nv = {}; els.forEach(function (e) { nv[cle(e)] = e; });
+    // 1) éléments retirés : repli en douceur à leur ancienne place
+    photo.ordre.forEach(function (k, i) {
+      if (nv[k]) return;
+      var ref = null, j;
+      for (j = i + 1; j < photo.ordre.length && !ref; j++) if (nv[photo.ordre[j]]) ref = nv[photo.ordre[j]];
+      if (!ref) { var prec = null; for (j = i - 1; j >= 0 && !prec; j--) if (nv[photo.ordre[j]]) prec = nv[photo.ordre[j]]; ref = prec ? prec.nextSibling : (els[0] || null); }
+      if (ref && ref.parentNode !== parent) ref = null;
+      fantome(photo.m[k], parent, ref);
+    });
+    // 2) éléments gardés : glissement vers leur nouvelle place (ordinateur) ; 3) nouveaux : apparition
+    var tact = A.tactile(), pr = parent.getBoundingClientRect();
     els.forEach(function (e) {
       var k = cle(e), a = photo.m[k]; if (!e.animate) return;
       if (a) {
-        gardes[k] = 1;
-        var r = e.getBoundingClientRect(), dx = a.r.left - r.left, dy = a.r.top - r.top;
+        if (tact) return;
+        var r = e.getBoundingClientRect(), dx = a.x - (r.left - pr.left), dy = a.y - (r.top - pr.top);
         if (Math.abs(dx) > 1 || Math.abs(dy) > 1) e.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 230, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      } else e.animate([{ opacity: 0, transform: 'scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
-    });
-    // éléments retirés : un fantôme (copie inerte, sans identifiants) s'efface à leur ancienne place
-    Object.keys(photo.m).forEach(function (k) {
-      if (gardes[k]) return;
-      var a = photo.m[k], parent = els[0] ? els[0].parentNode : null; if (!parent || !a.el.cloneNode) return;
-      var g = a.el.cloneNode(true); g.removeAttribute('id'); [].slice.call(g.attributes).forEach(function (at) { if (/^data-/.test(at.name)) g.removeAttribute(at.name); }); g.classList.add('a-fantome'); $$('[id]', g).forEach(function (x) { x.removeAttribute('id'); });
-      g.setAttribute('aria-hidden', 'true'); g.inert = true;
-      g.style.cssText += ';position:fixed;margin:0;left:' + a.r.left + 'px;top:' + a.r.top + 'px;width:' + a.r.width + 'px;height:' + a.r.height + 'px;pointer-events:none;z-index:5';
-      parent.appendChild(g);
-      var an = g.animate ? g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.97)' }], { duration: 180, easing: 'ease-out', fill: 'forwards' }) : null;
-      setTimeout(function () { g.remove(); }, 200);
-      if (!an) g.remove();
+      } else e.animate(tact ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
     });
   };
   A.envelopper = function (nom, sel, cle) {
@@ -4019,7 +4169,7 @@ var ANIM = (function () {
   A.entree = function () {
     var d = $('#drawer'); if (!actif()) return;
     d.classList.remove('entre'); void d.offsetWidth; d.classList.add('entre');
-    clearTimeout(A.tDr); A.tDr = setTimeout(function () { d.classList.remove('entre'); }, 260);
+    clearTimeout(A.tDr); A.tDr = setTimeout(function () { d.classList.remove('entre'); }, 360);
   };
   A.sortie = function () {
     var d = $('#drawer'); if (!actif() || !d || !d.innerHTML) return;
@@ -4028,7 +4178,7 @@ var ANIM = (function () {
     $$('[id]', g).forEach(function (x) { x.removeAttribute('id'); });
     document.body.appendChild(g);
     requestAnimationFrame(function () { g.classList.add('fin'); });
-    setTimeout(function () { g.remove(); }, 190);
+    setTimeout(function () { g.remove(); }, window.innerWidth <= 760 ? 270 : 190);
   };
 
   // ── branchements (après la définition de toutes les fonctions de l'application) ──
