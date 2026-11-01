@@ -1753,6 +1753,10 @@ table.pl.ht{width:100%;table-layout:auto}
 /* élément ouvert depuis une notification : brièvement mis en évidence */
 .cg-c.cible{box-shadow:0 0 0 2px var(--acc),var(--sh);transition:box-shadow .3s ease}
 @media (prefers-reduced-motion:reduce){.ncl{transition:none}}
+/* iPhone / iPad (iOS 26) : la page elle-même ne défile plus, seul le contenu défile.
+   Sinon iOS fait remonter la barre du bas (élément fixe) au milieu de l'écran pendant le défilement. */
+html.ios-defil{height:100%;overflow:hidden}
+html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;scroll-padding-top:20px}
 </style>
 </head>
 <body>
@@ -1798,6 +1802,9 @@ table.pl.ht{width:100%;table-layout:auto}
 <script>window.API_URL = "https://script.google.com/macros/s/AKfycbzbVH_ipWjDwJzQ2q7SCj0VqC5K9pI_4tovfU-ywQ0ez8i24ElDaF0t-nVsg6avISw/exec";</script>
 <script>
 var AUTONOME = !!window.API_URL; // page publiée sur sa propre adresse (et non dans Google Apps Script)
+(function () { var ua = navigator.userAgent || ''; if (/iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) document.documentElement.classList.add('ios-defil'); })();
+/** Zone qui défile : le corps de la page sur iPhone/iPad, la fenêtre ailleurs. */
+function zoneDefil() { return document.documentElement.classList.contains('ios-defil') ? document.body : (document.scrollingElement || document.documentElement); }
 var PARAMS = AUTONOME ? (function () {
   var q = new URLSearchParams(location.search), net = function (v, n) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, n); };
   var p = { t: net(q.get('t'), 20), v: net(q.get('v'), 20), c: net(q.get('c'), 30), s: net(q.get('s'), 10), k: net(q.get('k'), 64) };
@@ -2205,7 +2212,7 @@ document.addEventListener('pointerdown', function (e) {
 }, true);
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menuNotifsOuvert()) { e.stopPropagation(); fermerMenuNotifs(); if ($('#bell')) $('#bell').focus(); } }, true);
 window.addEventListener('resize', function () { if (menuNotifsOuvert()) placerMenuNotifs(); });
-window.addEventListener('scroll', function () { if (menuNotifsOuvert()) placerMenuNotifs(); }, { passive: true });
+document.addEventListener('scroll', function () { if (menuNotifsOuvert()) placerMenuNotifs(); }, { passive: true, capture: true });
 /** Clic sur une notification du téléphone pendant que l'application était en veille : la cible est reprise au retour. */
 function reprendreCibleNotif() {
   if (!S.me || !window.caches) return;
@@ -2575,7 +2582,7 @@ function aller(v) {
   if (S.vue === 'compta' && v !== 'compta') verrouillerCompta(); // on quitte la comptabilité : elle se referme
   S.vue = v;
   $$('[data-v]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
-  window.scrollTo(0, 0);
+  zoneDefil().scrollTop = 0;
   if (v === 'taches') { rendreTaches(); if (!S.charge) recharger(true); else if (Date.now() - (S.dernVerif || 0) > 15000) verifierNotifs(); }
   if (v === 'planning') ouvrirPlanning();
   if (v === 'conges') { rendreConges(); rafraichirConges(); }
@@ -4427,7 +4434,7 @@ function rangeeArticle(a, chemin) {
 }
 
 function rendreMateriel(garder) {
-  var y = garder ? window.scrollY : 0;
+  var y = garder ? zoneDefil().scrollTop : 0;
   var h = '<div class="ph"><div class="ph-t"><h1>Matériel</h1><p class="ph-g">Cochez les produits dont vous avez besoin, puis validez en bas de l’écran. Ce que d’autres ont déjà demandé est signalé en orange.</p></div>' +
     (S.mat && S.mat.gestion ? '<div class="ph-a"><button class="btn" id="mGer">Gérer le catalogue</button></div>' : '') + '</div>';
   if (!S.mat) { $('#main').innerHTML = h + sq('liste'); return; }
@@ -4481,7 +4488,7 @@ function rendreMateriel(garder) {
   var focus = document.activeElement && document.activeElement.id === 'mQ', pos = focus ? $('#mQ').selectionStart : 0;
   $('#main').innerHTML = h;
   if (focus) { $('#mQ').focus(); try { $('#mQ').setSelectionRange(pos, pos); } catch (e) { } }
-  if (garder) window.scrollTo(0, y);
+  if (garder) zoneDefil().scrollTop = y;
   brancherMateriel();
 }
 
