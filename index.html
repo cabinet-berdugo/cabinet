@@ -1757,6 +1757,16 @@ table.pl.ht{width:100%;table-layout:auto}
    Sinon iOS fait remonter la barre du bas (élément fixe) au milieu de l'écran pendant le défilement. */
 html.ios-defil{height:100%;overflow:hidden}
 html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;scroll-padding-top:20px}
+/* Barre du bas sur téléphone : plus fine, collée au bord de l'écran.
+   --ecart-bas : correction d'iOS 26, qui laisse un vide sous les éléments fixes dans l'application installée. */
+@media (max-width:760px){
+  :root{--nav:54px}
+  .bnav{bottom:calc(-1 * var(--ecart-bas, 0px));padding:4px 6px max(6px, calc(env(safe-area-inset-bottom) - 16px));box-shadow:0 -4px 14px rgba(11,23,54,.05)}
+  .bnav button{padding:5px 0 4px;margin:0 3px;font-size:10.5px;border-radius:12px;line-height:1.25}
+  .bnav button svg{width:22px;height:22px;margin-bottom:1px}
+  .bnav button.on{box-shadow:0 3px 10px rgba(0,71,217,.28)}
+  .bnav .cnt{top:2px}
+}
 </style>
 </head>
 <body>
@@ -1804,6 +1814,26 @@ html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;o
 var AUTONOME = !!window.API_URL; // page publiée sur sa propre adresse (et non dans Google Apps Script)
 (function () { var ua = navigator.userAgent || ''; if (/iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) document.documentElement.classList.add('ios-defil'); })();
 /** Zone qui défile : le corps de la page sur iPhone/iPad, la fenêtre ailleurs. */
+/** iOS 26, application installée : écart entre le bas réel de l'écran et le bas utilisé pour les éléments fixes. */
+function ecartBas() {
+  var g = 0;
+  try {
+    var appli = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    if (appli && document.documentElement.classList.contains('ios-defil') && document.body) {
+      var p = document.createElement('div');
+      p.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:100lvh;visibility:hidden;pointer-events:none';
+      document.body.appendChild(p); var lvh = p.getBoundingClientRect().height; p.remove();
+      var portrait = innerHeight > innerWidth, sh = portrait ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width);
+      g = Math.max(lvh - innerHeight, sh - innerHeight, 0);
+      if (g > 120) g = 0; // clavier ouvert ou mesure incohérente : aucune correction
+    }
+  } catch (e) { g = 0; }
+  document.documentElement.style.setProperty('--ecart-bas', Math.round(g) + 'px');
+}
+ecartBas();
+window.addEventListener('resize', ecartBas);
+window.addEventListener('orientationchange', function () { setTimeout(ecartBas, 300); });
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') setTimeout(ecartBas, 100); });
 function zoneDefil() { return document.documentElement.classList.contains('ios-defil') ? document.body : (document.scrollingElement || document.documentElement); }
 var PARAMS = AUTONOME ? (function () {
   var q = new URLSearchParams(location.search), net = function (v, n) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, n); };
