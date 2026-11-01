@@ -1461,6 +1461,57 @@ table.pl{border-collapse:separate;border-spacing:0}
   .pro-r .pro-d{grid-area:d}.pro-r>span:nth-child(4){grid-area:s;justify-self:end}.pro-r .pro-w{grid-area:w}.pro-r .pro-p{grid-area:p;color:var(--ink2);font-size:13px}.pro-r .pro-l{grid-area:l;justify-self:end;font-size:13px}.pro-r .pro-a{grid-area:a}
   .pro-r .pro-a .btn{width:100%;justify-content:center}
 }
+.pin .pin-d{display:flex;justify-content:center;gap:16px;margin:6px 0 4px}
+.pin .pin-d i{width:14px;height:14px;border-radius:50%;border:2px solid #B8C6E3;transition:background .15s,border-color .15s,transform .15s}
+.pin .pin-d i.on{background:var(--acc);border-color:var(--acc);transform:scale(1.08)}
+.pin .pin-d.ko{animation:pinko .38s ease}
+@keyframes pinko{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pin .pin-e{text-align:center;min-height:20px;margin:6px 0 8px}
+.pin-k{display:grid;grid-template-columns:repeat(3,72px);gap:14px 22px;justify-content:center;margin:4px auto 10px}
+.pin-k button{width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:#F5F8FE;color:var(--ink);font:600 26px/1 var(--f-titre);cursor:pointer;display:grid;place-items:center;transition:background .12s,transform .08s,border-color .12s;-webkit-tap-highlight-color:transparent}
+.pin-k button:hover{background:#EAF1FF;border-color:#C9D8F6}
+.pin-k button:active,.pin-k button.ap{background:var(--acc);color:#fff;border-color:var(--acc);transform:scale(.96)}
+.pin-k button:focus-visible{outline:0;box-shadow:var(--focus)}
+.pin-k button[data-k=del]{background:transparent;border-color:transparent;color:var(--ink2)}
+.pin-k button[data-k=del] svg{width:26px;height:26px}
+.pin.att .pin-k{opacity:.5;pointer-events:none}
+.lien.pin-o{background:none;border:0;color:var(--acc);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;padding:6px;margin-top:2px}
+.pin-in{letter-spacing:.5em;text-align:center;font-size:18px}
+.vr-t{padding:0}.vr-t .vr-c{box-shadow:none;border:0;padding:6px 0 0}
+@media (prefers-reduced-motion:reduce){.pin .pin-d.ko{animation:none}.pin .pin-d i{transition:none}}
+@media (max-width:420px){.pin-k{grid-template-columns:repeat(3,68px);gap:12px 18px}.pin-k button{width:68px;height:68px}}
+.pt-k{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pt-k>div{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--sh)}
+.pt-sync{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);margin:-4px 0 14px}
+.pt-sync b{color:var(--ink)}
+.pt-ok,.pt-ko{width:8px;height:8px;border-radius:50%;background:var(--acc);flex:none}.pt-ko{background:#B8C6E3}
+.pt-seg{margin-bottom:12px;max-width:100%;overflow-x:auto}
+.pt-seg .cnt{display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:10px;background:#EAF1FF;color:var(--acc);font-size:12px;line-height:18px}
+.pt-seg button.on .cnt{background:var(--acc);color:#fff}
+.pro-h.pt-h5,.pro-r.pt-h5{grid-template-columns:1fr 1.3fr 1fr 1.3fr 1fr}
+.pro-h.pt-h4,.pro-r.pt-h4{grid-template-columns:1fr 1.4fr 1.2fr 1.3fr}
+.pro-r.pt-c{cursor:default}
+.pro-l small{color:var(--ink3);font-size:12px;margin-left:4px;display:inline}.pro-l small.ret{color:var(--red);font-weight:600}
+.pt-dk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:6px}
+.pt-dk>div{background:#F5F8FE;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.pt-dk small{color:var(--ink2);font-size:12px;font-weight:600}
+.pt-dl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pt-dr{display:grid;grid-template-columns:90px auto 1fr;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.pt-dr:first-child{border-top:0}.pt-dr .meta{text-align:right}
+.pt-et{margin:0 0 14px;padding-left:20px;font-size:14px;color:var(--ink2);line-height:1.5}.pt-et li{margin-bottom:6px}
+.pt-et kbd{font:600 12px var(--f-texte,inherit);background:#F1F4FA;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+#ptT{width:100%;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+.pt-ap{background:#F5F8FE;border-radius:10px;padding:10px 12px;font-size:14px;margin:4px 0 4px}
+@media (max-width:1100px){.pt-k{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .pro-r.pt-h5,.pro-r.pt-h4{grid-template-columns:1fr auto}
+  .pt-seg{display:flex;flex-wrap:nowrap}.pt-seg button{white-space:nowrap;flex:none}
+  .pt-sync{display:block;line-height:1.5}.pt-sync .pt-ok,.pt-sync .pt-ko{display:inline-block;margin-right:6px;vertical-align:1px}
+  .pro-r.pt-h5{grid-template-areas:'d s' 'e n' 'p p'}.pro-r.pt-h5 .pro-d{grid-area:d}.pro-r.pt-h5 .pt-s{grid-area:s;justify-self:end}.pro-r.pt-h5 .pt-e{grid-area:e;justify-self:start;font-size:13px}.pro-r.pt-h5 .pt-n{grid-area:n;justify-self:end;font-size:13px;color:var(--ink2)}.pro-r.pt-h5 .pt-p{grid-area:p;justify-self:start}
+  .pro-r.pt-h4{grid-template-areas:'d s' 'p l'}.pro-r.pt-h4>span:nth-child(3){grid-area:s;justify-self:end}.pro-r.pt-h4 .pro-l{grid-area:l}
+  .pro-f input{grid-column:1/-1}
+  .pt-dr{grid-template-columns:80px 1fr}.pt-dr .meta{grid-column:1/-1;text-align:left}
+}
 </style>
 </head>
 <body>
@@ -1555,7 +1606,7 @@ function $$(s, r) { return Array.prototype.slice.call((r || document).querySelec
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 var nbAppels = 0;
 function appel(fn, args) {
-  var fond = fn === 'getNouveautes';
+  var fond = fn === 'getNouveautes' || fn === 'prolongerCompta';
   if (!fond) { nbAppels++; $('#busy').classList.remove('hidden'); }
   return new Promise(function (ok, ko) {
     var fin = function () { if (fond) return; if (--nbAppels <= 0) { nbAppels = 0; $('#busy').classList.add('hidden'); } };
@@ -1786,9 +1837,11 @@ function ouvrirNotifications() {
 function monCompte() {
   tiroir('Mon compte', '<p style="margin-top:0"><b>' + esc(S.me.nom) + '</b><br><span class="meta">' + esc(S.me.fonction) + ' · ' + esc(S.me.role) + '</span></p>' +
     '<div class="sec" style="margin-top:14px">Notifications sur mon téléphone</div><div id="regN">' + sq('mini') + '</div>' +
+    (S.cfg.compta ? '<div class="sec">Code de la comptabilité</div><p class="hint" style="margin-top:0">' + ((S.cfg.pinCompta || {}).defini ? 'Votre code personnel à 4 chiffres est actif' + (S.cfg.pinCompta.modifieLe ? ' (modifié le ' + esc(dLong(S.cfg.pinCompta.modifieLe)) + ')' : '') + '.' : 'Aucun code pour l’instant : il vous sera demandé de le créer à la première ouverture de la comptabilité.') + '</p><button class="btn" id="pinM">' + ((S.cfg.pinCompta || {}).defini ? 'Changer mon code' : 'Créer mon code') + '</button>' : '') +
     '<div class="sec">Connexion</div><p class="hint" style="margin-top:0">Vous restez connecté 90 jours sur cet appareil, prolongés automatiquement à chaque utilisation. Pour changer de mot de passe : déconnectez-vous, puis « Mot de passe oublié ».</p>',
     '<button class="btn ko" id="out2">Se déconnecter</button>');
   $('#out2').onclick = seDeconnecter;
+  if ($('#pinM')) $('#pinM').onclick = function () { formulairePin((S.cfg.pinCompta || {}).defini ? 'changer' : 'creer', '', true); };
   var afficher = function (r) {
     var z = $('#regN'); if (!z) return;
     if (AUTONOME) { afficherNatif(r, afficher); return; }
@@ -3892,47 +3945,123 @@ function verrouillerCompta() {
   var etait = S.cptOuvert; S.cptOuvert = false; oublierCompta(); clearTimeout(S.tCpt);
   if (etait) api('verrouillerCompta').catch(function () { });
 }
-function verrouCompta(e) { // le serveur a refermé l'accès (délai dépassé) : on redemande le mot de passe
+function verrouCompta(e) { // le serveur a refermé l'accès (délai dépassé) : on redemande le code
   if (msgErr(e).indexOf('COMPTA_VERROU') < 0) return false;
   S.cptOuvert = false; oublierCompta();
-  if (S.vue === 'compta') afficherVerrouCompta('Par sécurité, la comptabilité s’est refermée. Saisissez à nouveau votre mot de passe.');
+  if (S.vue === 'compta') afficherVerrouCompta('Par sécurité, la comptabilité s’est refermée. Saisissez à nouveau votre code.');
   return true;
 }
+function enteteCompta() { return '<div class="ph"><div class="ph-t"><h1>Comptabilité</h1><p class="ph-g">Protégée par votre code personnel, redemandé à chaque ouverture.</p></div></div>'; }
+/** Pavé numérique : 4 points, validation automatique au 4e chiffre, vérification par le serveur. */
 function afficherVerrouCompta(msg) {
   oublierCompta(); fermer();
-  $('#main').innerHTML = '<div class="ph"><div class="ph-t"><h1>Comptabilité</h1><p class="ph-g">Protégée par votre mot de passe, redemandé à chaque ouverture.</p></div></div>' +
-    '<div class="vr"><form class="vr-c" id="vrF" autocomplete="on"><span class="vr-i">' + CADENAS + '</span><h2>Comptabilité protégée</h2>' +
-    '<p>Pour afficher les chiffres, confirmez qu’il s’agit bien de vous : saisissez le mot de passe de votre compte, ' + esc(S.me.nom) + '.</p>' +
-    '<input type="email" name="username" autocomplete="username" value="' + esc(S.me.mail || '') + '" class="vh" tabindex="-1" aria-hidden="true">' +
-    '<div class="fld"><label for="vrP">Mot de passe</label><input type="password" id="vrP" name="password" autocomplete="current-password" required></div>' +
-    '<div class="err" id="vrE">' + esc(msg || '') + '</div><button class="btn pri" id="vrO" type="submit">Déverrouiller</button>' +
-    '<p class="hint">La comptabilité se referme quand vous quittez l’onglet, quand l’application passe en arrière-plan ou après 3 minutes sans activité.</p></form></div>';
-  setTimeout(function () { if ($('#vrP')) $('#vrP').focus(); }, 60);
-  $('#vrF').onsubmit = function (ev) {
-    ev.preventDefault();
-    var mdp = $('#vrP').value; if (!mdp) return;
-    var b = $('#vrO'); b.disabled = true; b.textContent = 'Vérification…'; $('#vrE').textContent = '';
-    api('deverrouillerCompta', mdp).then(function () {
-      if ($('#vrP')) $('#vrP').value = '';
-      S.cptOuvert = true;
+  var et = S.cfg.pinCompta || {};
+  if (!et.defini) { formulairePin(et.desactive ? 'reinit' : 'creer', msg); return; }
+  var touches = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
+  $('#main').innerHTML = enteteCompta() +
+    '<div class="vr"><div class="vr-c pin" id="pinC"><span class="vr-i">' + CADENAS + '</span><h2>Code de la comptabilité</h2>' +
+    '<p>Saisissez votre code personnel à 4 chiffres.</p>' +
+    '<div class="pin-d" id="pinD" aria-live="polite" aria-label="0 chiffre saisi sur 4"><i></i><i></i><i></i><i></i></div>' +
+    '<div class="err pin-e" id="vrE" role="alert">' + esc(msg || '') + '</div>' +
+    '<div class="pin-k" id="pinK">' + touches.map(function (t) {
+      if (!t) return '<span></span>';
+      if (t === 'del') return '<button type="button" data-k="del" aria-label="Effacer le dernier chiffre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17.5 9.5l-5 5M12.5 9.5l5 5"/></svg></button>';
+      return '<button type="button" data-k="' + t + '">' + t + '</button>';
+    }).join('') + '</div>' +
+    '<button class="lien pin-o" id="pinO" type="button">Code oublié ? Réinitialiser avec mon mot de passe</button>' +
+    '<p class="hint">La comptabilité se referme quand vous quittez l’onglet, quand l’application passe en arrière-plan ou après 2 minutes sans activité.</p></div></div>';
+  var code = '', occupe = false;
+  var points = function () {
+    $$('#pinD i').forEach(function (x, i) { x.classList.toggle('on', i < code.length); });
+    $('#pinD').setAttribute('aria-label', code.length + ' chiffre' + (code.length > 1 ? 's' : '') + ' saisi' + (code.length > 1 ? 's' : '') + ' sur 4');
+  };
+  var envoyer = function () {
+    occupe = true; $('#pinC').classList.add('att');
+    api('deverrouillerCompta', code).then(function () {
+      code = ''; S.cptOuvert = true; S.cptPing = Date.now();
       if (S.vue === 'compta') { ouvrirCompta(); armerInactiviteCompta(); }
     }).catch(function (e) {
-      if (!$('#vrO')) return;
-      b.disabled = false; b.textContent = 'Déverrouiller'; $('#vrE').textContent = msgErr(e); $('#vrP').value = ''; $('#vrP').focus();
+      occupe = false; code = '';
+      if (!$('#pinC')) return;
+      $('#pinC').classList.remove('att');
+      var m = msgErr(e);
+      if (m.indexOf('PIN_ABSENT') >= 0) { S.cfg.pinCompta = { defini: false }; formulairePin('creer'); return; }
+      if (m.indexOf('désactivé') >= 0) { S.cfg.pinCompta = { defini: false, desactive: true }; formulairePin('reinit', m); return; }
+      points(); $('#vrE').textContent = m;
+      var c = $('#pinD'); c.classList.remove('ko'); void c.offsetWidth; c.classList.add('ko');
+      if (navigator.vibrate) try { navigator.vibrate(120); } catch (x) { }
+    });
+  };
+  var touche = function (k) {
+    if (occupe) return;
+    if (k === 'del') code = code.slice(0, -1);
+    else if (/^\d$/.test(k) && code.length < 4) code += k;
+    if (code.length && $('#vrE').textContent) $('#vrE').textContent = '';
+    points();
+    if (code.length === 4) setTimeout(envoyer, 90);
+  };
+  $$('#pinK [data-k]').forEach(function (b) { b.onclick = function () { touche(b.getAttribute('data-k')); }; });
+  $('#pinO').onclick = function () { formulairePin('reinit'); };
+  S.pinClavier = function (ev) {
+    if (!$('#pinK') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    if (/^\d$/.test(ev.key)) { ev.preventDefault(); touche(ev.key); var b = $('#pinK [data-k="' + ev.key + '"]'); if (b) { b.classList.add('ap'); setTimeout(function () { b.classList.remove('ap'); }, 120); } }
+    else if (ev.key === 'Backspace') { ev.preventDefault(); touche('del'); }
+  };
+}
+document.addEventListener('keydown', function (ev) { if (S.pinClavier && $('#pinK')) S.pinClavier(ev); });
+/** Créer, changer ou réinitialiser son code : toujours avec le mot de passe du compte (une assistante sur une session laissée ouverte ne peut pas le faire). */
+function formulairePin(mode, msg, depuisCompte) {
+  var titre = mode === 'creer' ? 'Créez votre code de comptabilité' : mode === 'changer' ? 'Changer mon code de comptabilité' : 'Réinitialiser mon code';
+  var intro = mode === 'creer' ? 'Ce code à 4 chiffres vous sera demandé à chaque ouverture de la comptabilité. Il est personnel : chaque praticien a le sien.'
+    : 'Pour des raisons de sécurité, confirmez avec le mot de passe de votre compte, puis choisissez un nouveau code.';
+  var corps = '<form class="vr-c" id="pfF" autocomplete="on"><span class="vr-i">' + CADENAS + '</span><h2>' + titre + '</h2><p>' + intro + '</p>' +
+    '<input type="email" name="username" autocomplete="username" value="' + esc(S.me.mail || '') + '" class="vh" tabindex="-1" aria-hidden="true">' +
+    '<div class="fld"><label for="pfM">Mot de passe du compte</label><input type="password" id="pfM" name="password" autocomplete="current-password" required></div>' +
+    '<div class="two"><div class="fld"><label for="pfN">Nouveau code</label><input type="password" id="pfN" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" class="pin-in" required></div>' +
+    '<div class="fld"><label for="pfC">Confirmer le code</label><input type="password" id="pfC" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" class="pin-in" required></div></div>' +
+    '<div class="err" id="pfE" role="alert">' + esc(msg || '') + '</div><button class="btn pri" id="pfO" type="submit">' + (mode === 'creer' ? 'Créer mon code' : 'Enregistrer le nouveau code') + '</button>' +
+    (mode === 'reinit' && (S.cfg.pinCompta || {}).defini && !depuisCompte ? '<button class="lien pin-o" id="pfR" type="button">Revenir au pavé numérique</button>' : '') +
+    '<p class="hint">Évitez les codes trop simples (1111, 1234…). Le code n’est jamais enregistré en clair.</p></form>';
+  if (depuisCompte) tiroir(titre, '<div class="vr vr-t">' + corps + '</div>', '');
+  else $('#main').innerHTML = enteteCompta() + '<div class="vr">' + corps + '</div>';
+  $$('#pfN, #pfC').forEach(function (x) { x.oninput = function () { x.value = x.value.replace(/\D/g, '').slice(0, 4); }; });
+  if ($('#pfR')) $('#pfR').onclick = function () { afficherVerrouCompta(); };
+  setTimeout(function () { if ($('#pfM')) $('#pfM').focus(); }, 60);
+  $('#pfF').onsubmit = function (ev) {
+    ev.preventDefault();
+    var n = $('#pfN').value, c = $('#pfC').value;
+    if (!/^\d{4}$/.test(n)) { $('#pfE').textContent = 'Le code doit comporter exactement 4 chiffres.'; return; }
+    if (n !== c) { $('#pfE').textContent = 'Les deux codes ne sont pas identiques.'; $('#pfC').value = ''; $('#pfC').focus(); return; }
+    var b = $('#pfO'); b.disabled = true; b.textContent = 'Enregistrement…'; $('#pfE').textContent = '';
+    api('definirPinCompta', $('#pfM').value, n).then(function (et) {
+      S.cfg.pinCompta = et;
+      if (depuisCompte || S.vue !== 'compta') { api('verrouillerCompta').catch(function () { }); fermer(); toast('Code de la comptabilité enregistré'); return; }
+      toast('Code enregistré'); S.cptOuvert = true; S.cptPing = Date.now(); ouvrirCompta(); armerInactiviteCompta();
+    }).catch(function (e) {
+      if (!$('#pfO')) return;
+      b.disabled = false; b.textContent = mode === 'creer' ? 'Créer mon code' : 'Enregistrer le nouveau code';
+      $('#pfE').textContent = msgErr(e); $('#pfM').value = ''; $('#pfM').focus();
     });
   };
 }
-var INACTIVITE_COMPTA = 3 * 60 * 1000;
+var INACTIVITE_COMPTA = 2 * 60 * 1000;
 function armerInactiviteCompta() {
   clearTimeout(S.tCpt);
   if (!S.cptOuvert) return;
   S.tCpt = setTimeout(function () {
     if (!S.cptOuvert) return;
     verrouillerCompta();
-    if (S.vue === 'compta') afficherVerrouCompta('Refermée après 3 minutes sans activité.');
+    if (S.vue === 'compta') afficherVerrouCompta('Refermée après 2 minutes sans activité.');
   }, INACTIVITE_COMPTA);
 }
-['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { if (S.cptOuvert && S.vue === 'compta') armerInactiviteCompta(); }, { passive: true, capture: true }); });
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+  document.addEventListener(ev, function () {
+    if (!S.cptOuvert || S.vue !== 'compta') return;
+    armerInactiviteCompta();
+    // le serveur referme aussi après 2 min sans appel : tant que la personne est active, on prolonge discrètement
+    if (Date.now() - (S.cptPing || 0) > 60000) { S.cptPing = Date.now(); api('prolongerCompta').catch(function (e) { verrouCompta(e); }); }
+  }, { passive: true, capture: true });
+});
 document.addEventListener('visibilitychange', function () {
   if (document.hidden && S.cptOuvert) { verrouillerCompta(); if (S.vue === 'compta') afficherVerrouCompta('Refermée pendant que l’application était en arrière-plan.'); }
 });
@@ -3999,6 +4128,9 @@ function comptaRegles(d, c) {
   if (d.droits.e) tuiles.push('<div' + (d.droits.f ? '' : ' class="ca"') + '><small>Encaissé · ' + esc(d.libelle) + '</small><b>' + eurT(d.totalEncaisse === undefined ? null : d.totalEncaisse) + '</b></div>');
   if (d.cumul && d.cumul.f !== undefined) tuiles.push('<div><small>Cumul facturé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.f) + '</b></div>');
   if (d.cumul && d.cumul.e !== undefined) tuiles.push('<div><small>Cumul encaissé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.e) + '</b></div>');
+  // les deux montants ouverts : l'écart (facturé − encaissé) s'affiche aussi
+  if (d.droits.f && d.droits.e && d.total && d.totalEncaisse !== undefined && d.totalEncaisse !== null && d.trouve) tuiles.push('<div><small>Écart (facturé − encaissé) · ' + esc(d.libelle) + '</small><b>' + eurT(euros(d.total.total) - d.totalEncaisse) + '</b></div>');
+  if (d.cumul && d.cumul.f !== undefined && d.cumul.e !== undefined && d.cumul.f !== null && d.cumul.e !== null) tuiles.push('<div><small>Écart cumulé ' + d.cumul.annee + '</small><b>' + eurT(d.cumul.f - d.cumul.e) + '</b></div>');
   if (tuiles.length) h += '<div class="cp-k cp-k' + Math.min(tuiles.length, 3) + '">' + tuiles.join('') + '</div>';
   if ((d.droits.f || d.droits.e) && !d.trouve) h += '<div class="empty">Aucune donnée disponible pour ' + esc(d.libelle) + '.</div>';
   if (d.droits.f && d.trouve && d.total && d.total.modes && d.total.modes.length) h += '<h2>Facturé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th>' + (d.droits.e && d.encaisse && d.encaisse.length ? '<th>Encaissé</th>' : '') + '</tr></thead><tbody>' +
@@ -4155,117 +4287,173 @@ function sourceAnnuel(an) {
     (an.source === 'classeurs' ? '<p class="hint">Pas de synthèse pour ' + an.annee + ' : facturé lu dans les classeurs du mois ; encaissé non disponible.</p>' : '');
 }
 function euros(t) { var n = parseFloat(String(t || '').replace(/[^\d,.-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
-// ───────── Prothèses : suivi des travaux de laboratoire (référence de dossier, jamais de nom de patient) ─────────
-S.pro = { data: null, f: { prat: '', statut: 'actifs', liv: '' } };
+// ───────── Prothèses : suivi des livraisons Protheasy (numéros, dates, statuts ; jamais de nom de patient ni de montant) ─────────
+S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } };
 function ouvrirProtheses() { rendreProtheses(); chargerProtheses(); }
 function chargerProtheses(force) {
-  if (force && $('#proR')) { $('#proR').disabled = true; $('#proR').textContent = 'Actualisation…'; }
-  return api('getProtheses').then(function (r) { S.pro.data = r; if (S.vue === 'protheses') rendreProtheses(); if (force) toast('Suivi des prothèses à jour'); })
-    .catch(function (e) { if (S.vue === 'protheses' && $('#proR')) { $('#proR').disabled = false; $('#proR').textContent = '↻ Actualiser'; } echec(e); });
+  if (force && $('#ptR')) { $('#ptR').disabled = true; $('#ptR').textContent = 'Actualisation…'; }
+  return api('getProtheasy').then(function (r) { S.pro.data = r; if (S.vue === 'protheses') rendreProtheses(); if (force) toast('Livraisons à jour'); })
+    .catch(function (e) { if (S.vue === 'protheses' && $('#ptR')) { $('#ptR').disabled = false; $('#ptR').textContent = '↻ Actualiser les livraisons'; } echec(e); });
 }
-var PRO_SUIVANT = { 'Commandée': 'En fabrication', 'En fabrication': 'Expédiée', 'Expédiée': 'Reçue' };
-function proActif(x) { return x.statut !== 'Reçue' && x.statut !== 'Annulée'; }
-function proRetard(x, auj) { return proActif(x) && x.livraisonPrevue && x.livraisonPrevue < auj; }
-function proSemaine(x, auj) { var l = lundi(auj); return x.livraisonPrevue >= l && x.livraisonPrevue <= ajout(l, 6); }
-function clsPro(st) { return { 'Commandée': 'st-todo', 'En fabrication': 'st-cours', 'Expédiée': 'pro-exp', 'Reçue': 'st-fin', 'Annulée': 'pro-ann' }[st] || ''; }
+function ptzExpediee(l, d) { return l.statut === 'Expédiée' || (l.statut === 'En cours' && l.commandes.some(function (c) { return d.expedie.indexOf(c.statut) >= 0; })); }
+function ptzCategorie(l, d) { return l.statut === 'Livrée' ? 'livrees' : ptzExpediee(l, d) ? 'expediees' : l.statut === 'Annulée' ? 'autres' : 'encours'; }
+function ptzPill(st) {
+  var c = { 'Livrée': 'st-fin', 'Livré': 'st-fin', 'En cours': 'st-cours', 'Expédiée': 'pro-exp', 'Vers le cabinet': 'pro-exp', 'Au hub': 'pro-exp', 'Prêt à expédier': 'pro-exp', 'En production': 'st-todo', 'Rejeté': 'pro-ann', 'Empreinte inexploitable': 'pro-ann', 'Annulée': 'pro-ann' }[st] || 'st-todo';
+  return st ? '<span class="pill ' + c + '">' + esc(st) + '</span>' : '<span class="meta">—</span>';
+}
+function ptzJ(prevue, auj) {
+  if (!prevue) return '—';
+  var n = Math.round((dj(prevue) - dj(auj)) / 864e5);
+  return esc(dCourt(prevue)) + ' <small class="' + (n < 0 ? 'ret' : '') + '">' + (n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : n > 0 ? 'J-' + n : 'il y a ' + (-n) + ' j') + '</small>';
+}
+function dateHeurePtz(v) { if (!v) return '—'; var h = String(v).slice(11, 16); return esc(dCourt(v.slice(0, 10))) + (h ? ' à ' + h.replace(':', 'h') : ''); }
 function rendreProtheses() {
   var d = S.pro.data, f = S.pro.f;
-  var h = '<div class="ph"><div class="ph-t"><h1>Prothèses</h1><p class="ph-g">Les travaux commandés au laboratoire, leur statut et leurs livraisons. Une référence de dossier suffit : jamais de nom de patient.</p></div>' +
-    '<div class="ph-a"><button class="btn pri" id="proNv">+ Nouveau travail</button></div></div>';
-  if (!d) { $('#main').innerHTML = h + sq('stats', 'Lecture du suivi…'); $('#proNv').onclick = function () { fichePro(null); }; return; }
-  var auj = d.aujourdhui, l = d.liste;
-  var nb = function (fn) { return l.filter(fn).length; };
-  var cartes = [
-    ['actifs', 'En cours', nb(function (x) { return x.statut === 'Commandée' || x.statut === 'En fabrication'; })],
-    ['Expédiée', 'Expédiés', nb(function (x) { return x.statut === 'Expédiée'; })],
-    ['auj', 'Livraison aujourd’hui', nb(function (x) { return proActif(x) && x.livraisonPrevue === auj; })],
-    ['semaine', 'Cette semaine', nb(function (x) { return proActif(x) && proSemaine(x, auj); })],
-    ['retard', 'En retard', nb(function (x) { return proRetard(x, auj); })],
-    ['Reçue', 'Reçus', nb(function (x) { return x.statut === 'Reçue'; })]
-  ];
-  h += '<div class="pro-k">' + cartes.map(function (c) {
-    var on = (c[0] === 'auj' || c[0] === 'semaine' || c[0] === 'retard') ? f.liv === c[0] : f.statut === c[0] && !f.liv;
-    return '<button class="' + (on ? 'on' : '') + (c[0] === 'retard' && c[2] ? ' r' : '') + '" data-pk="' + c[0] + '"><small>' + c[1] + '</small><b>' + c[2] + '</b></button>';
-  }).join('') + '</div>';
-  h += '<div class="filters pro-f"><select id="proP" aria-label="Praticien"><option value="">Tous les praticiens</option>' + d.praticiens.map(function (p) { return '<option value="' + esc(p.id) + '"' + (f.prat === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select>' +
-    '<select id="proS" aria-label="Statut"><option value="actifs"' + (f.statut === 'actifs' ? ' selected' : '') + '>Non reçus</option><option value="tous"' + (f.statut === 'tous' ? ' selected' : '') + '>Tous les statuts</option>' + d.statuts.map(function (x) { return '<option' + (f.statut === x ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select>' +
-    '<select id="proL" aria-label="Livraison"><option value="">Toutes les livraisons</option><option value="auj"' + (f.liv === 'auj' ? ' selected' : '') + '>Aujourd’hui</option><option value="semaine"' + (f.liv === 'semaine' ? ' selected' : '') + '>Cette semaine</option><option value="retard"' + (f.liv === 'retard' ? ' selected' : '') + '>En retard</option></select>' +
-    '<button class="btn" id="proR">↻ Actualiser</button>' + (d.lien ? '<a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir le service du prothésiste</a>' : '') +
-    (d.peutLien ? '<button class="btn" id="proLien">' + (d.lien ? 'Modifier le lien' : 'Lien vers le service') + '</button>' : '') + '</div>';
-  var v = l.filter(function (x) {
-    if (f.prat && x.praticien !== f.prat) return false;
-    if (f.statut === 'actifs' && !proActif(x)) return false;
-    if (f.statut !== 'actifs' && f.statut !== 'tous' && x.statut !== f.statut) return false;
-    if (f.liv === 'auj' && !(proActif(x) && x.livraisonPrevue === auj)) return false;
-    if (f.liv === 'semaine' && !(proActif(x) && proSemaine(x, auj))) return false;
-    if (f.liv === 'retard' && !proRetard(x, auj)) return false;
-    return true;
-  }).sort(function (a, b) { return (a.livraisonPrevue || '9999') < (b.livraisonPrevue || '9999') ? -1 : (a.livraisonPrevue || '9999') > (b.livraisonPrevue || '9999') ? 1 : 0; });
-  if (!l.length) h += '<div class="empty">Aucun travail suivi pour l’instant. Ajoutez le premier avec « Nouveau travail ».<div class="hint" style="margin-top:6px">Le service du prothésiste n’est pas relié automatiquement : les travaux se saisissent ici, avec une référence de dossier.</div></div>';
-  else if (!v.length) h += '<div class="empty">Aucun travail ne correspond à ces filtres.</div>';
-  else h += '<div class="pro-t"><div class="pro-h"><span>Dossier</span><span>Praticien</span><span>Travail</span><span>Statut</span><span>Livraison prévue</span><span></span></div>' + v.map(function (x) {
-    var ret = proRetard(x, auj), suiv = PRO_SUIVANT[x.statut];
-    return '<div class="pro-r' + (ret ? ' ret' : '') + '" data-pr="' + esc(x.id) + '" role="button" tabindex="0"><span class="pro-d"><b>' + esc(x.dossier) + '</b><small>' + esc(x.laboratoire || '') + '</small></span>' +
-      '<span class="pro-p">' + esc(x.praticienNom) + '</span><span class="pro-w">' + esc(x.travail) + (x.note ? '<small>' + esc(x.note) + '</small>' : '') + '</span>' +
-      '<span><span class="pill ' + clsPro(x.statut) + '">' + esc(x.statut) + '</span></span>' +
-      '<span class="pro-l">' + (x.statut === 'Reçue' ? 'Reçu le ' + esc(joursFr(x.recueLe) || '—') : x.livraisonPrevue ? esc(joursFr(x.livraisonPrevue)) + (x.livraisonPrevue === auj ? ' · aujourd’hui' : '') + (ret ? ' · en retard' : '') : '—') + '</span>' +
-      '<span class="pro-a">' + (suiv ? '<button class="btn sm" data-av="' + esc(x.id) + '">→ ' + esc(suiv) + '</button>' : '') + '</span></div>';
-  }).join('') + '</div>';
-  h += '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '. Le service du prothésiste n’est pas relié automatiquement (aucune intégration officielle connue à ce jour).</p>';
+  var h = '<div class="ph"><div class="ph-t"><h1>Prothèses</h1><p class="ph-g">Les livraisons du laboratoire, d’après Protheasy : numéros, dates et statuts. Jamais de nom de patient ni de montant.</p></div>' +
+    '<div class="ph-a"><button class="btn pri" id="ptI">Importer depuis Protheasy</button></div></div>';
+  if (!d) { $('#main').innerHTML = h + sq('stats', 'Lecture des livraisons…'); $('#ptI').onclick = importPtz; return; }
+  var auj = d.aujourdhui, lun = lundi(auj), dim = ajout(lun, 6);
+  var attendues = d.aVenir.concat([].concat.apply([], d.livraisons.filter(function (l) { return l.statut !== 'Livrée'; }).map(function (l) { return l.commandes; })));
+  var nbAuj = attendues.filter(function (c) { return c.prevue === auj; }).length, nbSem = attendues.filter(function (c) { return c.prevue >= lun && c.prevue <= dim; }).length;
+  var cat = {}; d.livraisons.forEach(function (l) { var k = ptzCategorie(l, d); cat[k] = (cat[k] || 0) + 1; });
+  var vues = [['avenir', 'À venir', d.aVenir.length], ['encours', 'En cours', cat.encours || 0], ['expediees', 'Expédiées', cat.expediees || 0], ['livrees', 'Livrées', cat.livrees || 0], ['toutes', 'Toutes', d.livraisons.length]];
+  h += '<div class="pro-k pt-k"><div><small>Attendues aujourd’hui</small><b>' + nbAuj + '</b></div><div><small>Attendues cette semaine</small><b>' + nbSem + '</b></div>' +
+    '<div><small>Livraisons en cours</small><b>' + ((cat.encours || 0) + (cat.expediees || 0)) + '</b></div><div><small>Commandes à venir</small><b>' + d.aVenir.length + '</b></div></div>';
+  h += '<div class="pt-sync">' + (d.sync ? '<span class="pt-ok"></span>Dernière synchronisation réussie : <b>' + esc(dHeure(d.sync.le)) + '</b>' + (d.sync.parNom ? ' par ' + esc(d.sync.parNom) : '') : '<span class="pt-ko"></span>Aucune synchronisation pour l’instant : importez la page « Livraisons » de Protheasy.') + '</div>';
+  h += '<div class="seg pt-seg" id="ptV">' + vues.map(function (v) { return '<button data-pv="' + v[0] + '"' + (f.vue === v[0] ? ' class="on"' : '') + '>' + v[1] + ' <span class="cnt">' + v[2] + '</span></button>'; }).join('') + '</div>';
+  h += '<div class="filters pro-f"><input type="search" id="ptQ" placeholder="Rechercher un n° de livraison ou de commande" value="' + esc(f.q) + '" inputmode="numeric" aria-label="Rechercher par numéro">' +
+    (f.vue === 'avenir' ? '<select id="ptP" aria-label="Praticien"><option value="">Tous les praticiens</option>' + d.praticiens.map(function (p) { return '<option value="' + esc(p.id) + '"' + (f.prat === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select>' : '') +
+    '<button class="btn" id="ptR">↻ Actualiser les livraisons</button><a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir Protheasy ↗</a></div>';
+  var q = f.q.replace(/[#\s]/g, '');
+  h += '<div id="ptL">';
+  if (f.vue === 'avenir') {
+    var v = d.aVenir.filter(function (c) { return (!q || c.numero.indexOf(q) >= 0) && (!f.prat || c.praticien === f.prat); });
+    if (!d.aVenir.length) h += '<div class="empty">Aucune commande à venir connue.<div class="hint" style="margin-top:6px">Importez la page « Commandes » de Protheasy pour voir les dates de livraison prévues et les statuts de fabrication.</div></div>';
+    else if (!v.length) h += '<div class="empty">Aucune commande ne correspond.</div>';
+    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h4"><span>Commande</span><span>Praticien</span><span>Statut</span><span>Livraison prévue</span></div>' + v.map(function (c) {
+      return '<div class="pro-r pt-h4 pt-c"><span class="pro-d"><b>#' + esc(c.numero) + '</b></span><span class="pro-p">' + esc(c.praticienNom || '—') + '</span><span>' + ptzPill(c.statut) + '</span><span class="pro-l">' + ptzJ(c.prevue, auj) + '</span></div>';
+    }).join('') + '</div>';
+  } else {
+    var w = d.livraisons.filter(function (l) {
+      if (f.vue !== 'toutes' && ptzCategorie(l, d) !== f.vue) return false;
+      return !q || l.numero.indexOf(q) >= 0 || l.commandes.some(function (c) { return c.numero.indexOf(q) >= 0; });
+    });
+    if (!d.livraisons.length) h += '<div class="empty">Aucune livraison importée pour l’instant.<div class="hint" style="margin-top:6px">Cliquez sur « Importer depuis Protheasy » : quelques secondes suffisent.</div></div>';
+    else if (!w.length) h += '<div class="empty">Aucune livraison ne correspond.</div>';
+    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h5"><span>Livraison</span><span>Expédiée le</span><span>Commandes</span><span>Livraison prévue</span><span>Statut</span></div>' + w.map(function (l) {
+      return '<div class="pro-r pt-h5" data-pl="' + esc(l.numero) + '" role="button" tabindex="0"><span class="pro-d"><b>#' + esc(l.numero) + '</b></span><span class="pro-l pt-e">' + dateHeurePtz(l.expedieLe) + '</span>' +
+        '<span class="pt-n">' + l.nbCommandes + ' commande' + (l.nbCommandes > 1 ? 's' : '') + '</span><span class="pro-l pt-p">' + (l.statut === 'Livrée' ? '<span class="meta">—</span>' : ptzJ(l.prevue, auj)) + '</span><span class="pt-s">' + ptzPill(l.statut) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  h += '</div><p class="hint">Protheasy ne propose ni API ni export : la mise à jour se fait en collant une copie de sa page (bouton « Importer »). Les montants et les noms de patients ne sont jamais repris.' + (d.peutLien ? '' : '') + '</p>';
   $('#main').innerHTML = h;
-  $('#proNv').onclick = function () { fichePro(null); };
-  $('#proR').onclick = function () { chargerProtheses(true); };
-  $('#proP').onchange = function () { f.prat = this.value; rendreProtheses(); };
-  $('#proS').onchange = function () { f.statut = this.value; rendreProtheses(); };
-  $('#proL').onchange = function () { f.liv = this.value; rendreProtheses(); };
-  $$('[data-pk]').forEach(function (b) { b.onclick = function () { var k = b.getAttribute('data-pk'); if (k === 'auj' || k === 'semaine' || k === 'retard') { f.liv = f.liv === k ? '' : k; f.statut = 'actifs'; } else { f.statut = k; f.liv = ''; } rendreProtheses(); }; });
-  if ($('#proLien')) $('#proLien').onclick = lienPro;
-  $$('[data-pr]').forEach(function (r) {
-    var ouvrir = function (ev) { if (ev && ev.target.closest('[data-av]')) return; fichePro(d.liste.filter(function (x) { return x.id === r.getAttribute('data-pr'); })[0]); };
-    r.onclick = ouvrir; r.onkeydown = function (e) { if (e.key === 'Enter') ouvrir(); };
-  });
-  $$('[data-av]').forEach(function (b) {
-    b.onclick = function (ev) {
-      ev.stopPropagation();
-      var x = d.liste.filter(function (y) { return y.id === b.getAttribute('data-av'); })[0]; if (!x) return;
-      b.disabled = true;
-      api('enregistrerProthese', Object.assign({}, x, { statut: PRO_SUIVANT[x.statut] })).then(function (r) { S.pro.data = r; rendreProtheses(); toast(x.dossier + ' : ' + PRO_SUIVANT[x.statut]); }).catch(function (e) { b.disabled = false; echec(e); });
-    };
+  $('#ptI').onclick = importPtz;
+  $('#ptR').onclick = function () { chargerProtheses(true); };
+  $$('#ptV button').forEach(function (b) { b.onclick = function () { f.vue = b.getAttribute('data-pv'); rendreProtheses(); }; });
+  $('#ptQ').oninput = function () { f.q = this.value; var pos = this.selectionStart; rendreProtheses(); var x = $('#ptQ'); x.focus(); try { x.setSelectionRange(pos, pos); } catch (e) { } };
+  if ($('#ptP')) $('#ptP').onchange = function () { f.prat = this.value; rendreProtheses(); };
+  $$('[data-pl]').forEach(function (r) {
+    var o = function () { detailPtz(r.getAttribute('data-pl')); };
+    r.onclick = o; r.onkeydown = function (e) { if (e.key === 'Enter') o(); };
   });
 }
-function fichePro(x) {
-  var d = S.pro.data, nv = !x;
-  x = x || { praticien: S.cfg.estDentiste ? S.me.id : '', statut: 'Commandée', commandeLe: S.today };
-  var labos = {}; (d ? d.liste : []).forEach(function (y) { if (y.laboratoire) labos[y.laboratoire] = 1; });
-  var corps = '<div class="fld"><label for="pfP">Praticien</label><select id="pfP"><option value="">Choisir…</option>' + (d ? d.praticiens : []).map(function (p) { return '<option value="' + esc(p.id) + '"' + (x.praticien === p.id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; }).join('') + '</select></div>' +
-    '<div class="fld"><label for="pfD">Référence du dossier</label><input type="text" id="pfD" maxlength="40" placeholder="D-2026-118" value="' + esc(x.dossier || '') + '"><div class="hint">Numéro de dossier ou de bon : jamais de nom de patient.</div></div>' +
-    '<div class="fld"><label for="pfW">Travail</label><input type="text" id="pfW" maxlength="120" placeholder="Couronne zircone 26" value="' + esc(x.travail || '') + '"></div>' +
-    '<div class="fld"><label for="pfL">Laboratoire</label><input type="text" id="pfL" maxlength="80" list="pfLl" value="' + esc(x.laboratoire || '') + '"><datalist id="pfLl">' + Object.keys(labos).map(function (k) { return '<option value="' + esc(k) + '">'; }).join('') + '</datalist></div>' +
-    '<div class="fld"><label for="pfS">Statut</label><select id="pfS">' + (d ? d.statuts : []).map(function (s0) { return '<option' + (x.statut === s0 ? ' selected' : '') + '>' + esc(s0) + '</option>'; }).join('') + '</select></div>' +
-    '<div class="two"><div class="fld"><label for="pfC">Commandé le</label><input type="date" id="pfC" value="' + esc(x.commandeLe || '') + '"></div><div class="fld"><label for="pfV">Livraison prévue</label><input type="date" id="pfV" value="' + esc(x.livraisonPrevue || '') + '"></div></div>' +
-    '<div class="fld" id="pfRw"><label for="pfR">Reçu le</label><input type="date" id="pfR" value="' + esc(x.recueLe || '') + '"></div>' +
-    '<div class="fld"><label for="pfN">Note</label><input type="text" id="pfN" maxlength="300" placeholder="Teinte A2, essayage prévu…" value="' + esc(x.note || '') + '"></div>' +
-    (x.majLe ? '<p class="hint">Modifié le ' + esc(dHeure(x.majLe)) + (x.majParNom ? ' par ' + esc(x.majParNom) : '') + '.</p>' : '') + '<div class="err" id="pfE"></div>';
-  tiroir(nv ? 'Nouveau travail' : 'Travail ' + esc(x.dossier), corps, '<button class="btn" id="pfA">Annuler</button><span class="sp"></span><button class="btn pri" id="pfO">Enregistrer</button>');
-  var maj = function () { $('#pfRw').classList.toggle('hidden', $('#pfS').value !== 'Reçue'); };
-  $('#pfS').onchange = maj; maj();
-  $('#pfA').onclick = fermer;
-  $('#pfO').onclick = function () {
-    var b = this; b.disabled = true; $('#pfE').textContent = '';
-    var o = { id: x.id || '', praticien: $('#pfP').value, dossier: $('#pfD').value, travail: $('#pfW').value, laboratoire: $('#pfL').value, statut: $('#pfS').value, commandeLe: $('#pfC').value, livraisonPrevue: $('#pfV').value, recueLe: $('#pfR').value, note: $('#pfN').value };
-    api('enregistrerProthese', o).then(function (r) { S.pro.data = r; fermer(); if (S.vue === 'protheses') rendreProtheses(); toast(nv ? 'Travail ajouté' : 'Travail enregistré'); })
-      .catch(function (e) { b.disabled = false; $('#pfE').textContent = msgErr(e); });
-  };
+function detailPtz(num) {
+  var d = S.pro.data, l = d.livraisons.filter(function (x) { return x.numero === num; })[0]; if (!l) return;
+  var auj = d.aujourdhui;
+  var corps = '<div class="pt-dk"><div><small>Statut</small>' + ptzPill(l.statut) + '</div><div><small>Expédiée le</small><b>' + dateHeurePtz(l.expedieLe) + '</b></div><div><small>Commandes</small><b>' + l.nbCommandes + '</b></div>' +
+    (l.prevue && l.statut !== 'Livrée' ? '<div><small>Livraison prévue</small><b>' + ptzJ(l.prevue, auj) + '</b></div>' : '') + '</div>' +
+    '<div class="sec">Commandes de cette livraison</div>' +
+    (l.commandes.length ? '<div class="pt-dl">' + l.commandes.map(function (c) {
+      return '<div class="pt-dr"><b>#' + esc(c.numero) + '</b><span>' + ptzPill(c.statut) + '</span><span class="meta">' + (c.prevue ? 'Prévue ' + ptzJ(c.prevue, auj) : 'Date prévue inconnue') + '</span></div>';
+    }).join('') + '</div>' + (l.commandes.length < l.nbCommandes ? '<p class="hint">' + (l.nbCommandes - l.commandes.length) + ' commande(s) pas encore connue(s) : dans Protheasy, dépliez la livraison avant de copier la page.</p>' : '')
+      : '<p class="hint">Numéros de commande pas encore connus : dans Protheasy, dépliez la livraison (flèche à gauche du numéro) avant de copier la page.</p>') +
+    '<p class="hint">Mis à jour le ' + esc(dHeure(l.majLe)) + '. Pour le détail des articles, ouvrez Protheasy.</p>';
+  tiroir('Livraison #' + esc(l.numero), corps, '<a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir Protheasy ↗</a><span class="sp"></span><button class="btn pri" id="ptF">Fermer</button>');
+  $('#ptF').onclick = fermer;
 }
-function lienPro() {
+/** Lecture d'une copie de la page Protheasy, sur l'appareil : seuls numéros, dates, statuts et praticiens reconnus sont gardés. */
+var PTZ_MOIS = { janv: 1, janvier: 1, fevr: 2, fevrier: 2, fev: 2, mars: 3, avr: 4, avril: 4, mai: 5, juin: 6, juil: 7, juillet: 7, aout: 8, sept: 9, septembre: 9, oct: 10, octobre: 10, nov: 11, novembre: 11, dec: 12, decembre: 12 };
+function sansAccent(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function datesPtz(cell) {
+  var out = [], re = /(\d{1,2})\s+([a-zA-Zéèêûôâîçàù]+)\.?\s+(\d{4})(?:\s*,?\s*(?:à\s*)?(\d{1,2})[:h](\d{2}))?/g, m;
+  while ((m = re.exec(cell))) {
+    var mo = PTZ_MOIS[sansAccent(m[2])]; if (!mo) continue;
+    var j = m[3] + '-' + ('0' + mo).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    out.push({ j: j, h: m[4] ? ('0' + m[4]).slice(-2) + ':' + m[5] : '' });
+  }
+  return out;
+}
+function lireCopiePtz(txt, d) {
+  var lignes = String(txt || '').replace(/\r/g, '').split('\n'), livs = [], cmds = [], cur = null, detail = false;
+  var stC = d.statutsCommande.map(function (x) { return [sansAccent(x), x]; }), stL = d.statutsLivraison.map(function (x) { return [sansAccent(x), x]; });
+  var prat = d.praticiens.map(function (p) { return [sansAccent(p.nom.replace(/^dr\.?\s+/i, '')).replace(/\s+/g, ' ').trim(), p.id]; });
+  var trouve = function (t, liste) { t = sansAccent(t).replace(/\s+/g, ' ').trim(); for (var i = 0; i < liste.length; i++) if (liste[i][0] === t) return liste[i][1]; return ''; };
+  for (var i = 0; i < lignes.length; i++) {
+    var L = lignes[i];
+    if (/commande/i.test(L) && /patient/i.test(L) && !/#\d/.test(L)) { if (cur) detail = true; continue; }
+    var m = L.match(/^\s*#(\d{1,9})\b(.*)$/); if (!m) continue;
+    var cells = m[2].split('\t').map(function (x) { return x.trim(); }).filter(Boolean);
+    if (!cells.length) {
+      var j = i + 1; while (j < lignes.length && !lignes[j].trim()) j++;
+      if (j < lignes.length && !/^\s*#\d/.test(lignes[j])) { cells = lignes[j].split('\t').map(function (x) { return x.trim(); }).filter(Boolean); i = j; }
+    }
+    // ligne suivante éventuelle : badge de statut seul (ex. « direct », « hub ») — ignorée
+    var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [];
+    cells.forEach(function (c) {
+      var k = c.match(/^(\d{1,4})\s+commandes?$/i); if (k) nb = Number(k[1]);
+      var sl = trouve(c, stL); if (sl) stLiv = sl;
+      var sc = trouve(c.replace(/\s+(direct|hub)$/i, ''), stC); if (sc) stCmd = sc;
+      var pr = trouve(c, prat); if (pr) praticien = pr;
+      dates = dates.concat(datesPtz(c));
+    });
+    if (nb !== null) {
+      var e = dates.filter(function (x) { return x.h; })[0] || dates[0];
+      cur = { numero: m[1], statut: stLiv, expedieLe: e ? e.j + (e.h ? ' ' + e.h : '') : '', nbCommandes: nb, commandes: [] };
+      livs.push(cur); detail = false;
+    } else if (stCmd) {
+      var cree = dates.filter(function (x) { return x.h; })[0], prev = dates.filter(function (x) { return !x.h; })[0];
+      cmds.push({ numero: m[1], statut: stCmd, prevue: prev ? prev.j : '', praticien: praticien, creeLe: cree ? cree.j : '' });
+      cur = null; detail = false;
+    } else if (cur && detail) {
+      cur.commandes.push({ numero: m[1], creeLe: dates[0] ? dates[0].j : '' });
+    }
+  }
+  return { livraisons: livs, commandes: cmds };
+}
+function importPtz() {
   var d = S.pro.data;
-  tiroir('Lien vers le service du prothésiste', '<p class="hint" style="margin-top:0">Adresse du site du prothésiste (elle s’ouvrira dans un nouvel onglet ; chacun s’y connecte avec son propre compte). Aucune donnée n’est récupérée automatiquement.</p>' +
-    '<div class="fld"><label for="plU">Adresse</label><input type="url" id="plU" placeholder="https://…" value="' + esc(d.lien || '') + '"></div><div class="err" id="plE"></div>',
-    '<button class="btn" id="plA">Annuler</button><span class="sp"></span><button class="btn pri" id="plO">Enregistrer</button>');
-  $('#plA').onclick = fermer;
-  $('#plO').onclick = function () {
-    api('enregistrerLienProtheses', $('#plU').value).then(function (r) { S.pro.data = r; fermer(); rendreProtheses(); toast('Lien enregistré'); }).catch(function (e) { $('#plE').textContent = msgErr(e); });
+  if (!d) return;
+  tiroir('Importer depuis Protheasy',
+    '<ol class="pt-et"><li><a href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrez Protheasy ↗</a>, rubrique <b>Livraisons</b> (ou <b>Commandes</b> pour les dates prévues et les statuts de fabrication).</li>' +
+    '<li>Pour avoir les numéros de commande d’une livraison, dépliez-la (flèche à gauche du numéro). Affichez autant de lignes par page que nécessaire.</li>' +
+    '<li>Sélectionnez toute la page (<kbd>⌘ A</kbd> ou <kbd>Ctrl A</kbd>), copiez (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>), puis collez ci-dessous.</li></ol>' +
+    '<div class="fld"><label for="ptT">Copie de la page Protheasy</label><textarea id="ptT" rows="7" placeholder="Collez ici…" autocomplete="off" spellcheck="false"></textarea></div>' +
+    '<div class="pt-ap" id="ptA" aria-live="polite"><span class="meta">Rien de collé pour l’instant.</span></div>' +
+    '<p class="hint">La copie est lue sur votre appareil : seuls les numéros, dates, statuts et praticiens sont envoyés. Les noms de patients, les articles et les montants sont ignorés et la copie est effacée après l’import.</p><div class="err" id="ptE"></div>',
+    '<button class="btn" id="ptX">Annuler</button><span class="sp"></span><button class="btn pri" id="ptO" disabled>Enregistrer</button>');
+  var lu = null;
+  var effacer = function () { if ($('#ptT')) $('#ptT').value = ''; lu = null; };
+  $('#ptX').onclick = function () { effacer(); fermer(); };
+  $('#ptT').oninput = function () {
+    lu = lireCopiePtz(this.value, d);
+    var nl = lu.livraisons.length, nc = lu.commandes.length, nd = lu.livraisons.reduce(function (a, l) { return a + l.commandes.length; }, 0);
+    $('#ptA').innerHTML = nl || nc ? '<b>' + nl + '</b> livraison' + (nl > 1 ? 's' : '') + (nd ? ' (dont ' + nd + ' numéro' + (nd > 1 ? 's' : '') + ' de commande)' : '') + ' et <b>' + nc + '</b> commande' + (nc > 1 ? 's' : '') + ' reconnue' + (nl + nc > 1 ? 's' : '') + '.'
+      : this.value.trim() ? '<span class="err">Aucune livraison ni commande reconnue. Copiez toute la page « Livraisons » ou « Commandes » de Protheasy.</span>' : '<span class="meta">Rien de collé pour l’instant.</span>';
+    $('#ptO').disabled = !(nl || nc);
   };
+  $('#ptO').onclick = function () {
+    if (!lu) return;
+    var b = this; b.disabled = true; b.textContent = 'Enregistrement…'; $('#ptE').textContent = '';
+    var envoi = lu; effacer();
+    api('importerProtheasy', envoi).then(function (r) {
+      S.pro.data = r; fermer();
+      if (!envoi.livraisons.length && envoi.commandes.length) S.pro.f.vue = 'avenir';
+      else if (S.pro.f.vue === 'avenir' && envoi.livraisons.length) S.pro.f.vue = 'toutes';
+      if (S.vue === 'protheses') rendreProtheses();
+      toast(r.importe.livraisons + ' livraison(s) et ' + r.importe.commandes + ' commande(s) synchronisées');
+    }).catch(function (e) { b.textContent = 'Enregistrer'; $('#ptE').textContent = msgErr(e) + ' Collez à nouveau la page.'; });
+  };
+  setTimeout(function () { if ($('#ptT')) $('#ptT').focus(); }, 60);
 }
 
 // ───────── Impayés et relances de devis (modifiables depuis l'application) ─────────
