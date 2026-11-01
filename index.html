@@ -1519,6 +1519,22 @@ table.pl{border-collapse:separate;border-spacing:0}
   .pro-r.pt-h6{grid-template-columns:1fr auto;grid-template-areas:'d s' 'a a' 'p l'}.pro-r.pt-h6 .pro-d{grid-area:d}.pro-r.pt-h6 .pt-s{grid-area:s;justify-self:end}.pro-r.pt-h6 .pt-pa{grid-area:a}.pro-r.pt-h6 .pro-p{grid-area:p}.pro-r.pt-h6 .pro-l{grid-area:l;justify-self:end}.pro-r.pt-h6 .pt-cr{display:none}
   .pt-dr{grid-template-columns:70px 1fr auto}.pt-dr .meta{grid-column:1/-1;text-align:left}
 }
+.pro-h.pt-h5,.pro-r.pt-h5{grid-template-columns:1fr 1.3fr 1fr 1fr 1.1fr 1fr}
+.pt-chev b::before{content:'›';display:inline-block;color:var(--ink3);margin-right:8px;font-weight:600}
+.pt-tr,.pt-sv{color:var(--ink2);font-size:13.5px}
+#drawer .dr.dr-large{width:min(880px,100vw);max-width:100vw}
+.pt-dt{border:1px solid var(--line);border-radius:12px;overflow:auto}
+.pt-dt table{width:100%;border-collapse:collapse;font-size:14px}
+.pt-dt th{background:#F3F6FC;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:#5A6B8C;font-weight:600;padding:9px 12px;white-space:nowrap}
+.pt-dt td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.pt-dt .pt-num{font-weight:700;white-space:nowrap}.pt-dt .pt-ar{color:var(--ink2)}.pt-dt .pt-cd{white-space:nowrap;color:var(--ink2)}
+.pt-pv{display:block;margin-top:4px;color:var(--ink3);font-size:12px}
+@media (max-width:760px){
+  .pro-r.pt-h5{grid-template-areas:'d s' 'e n' 'tr sv'}.pro-r.pt-h5 .pt-tr{grid-area:tr;font-size:13px}.pro-r.pt-h5 .pt-sv{grid-area:sv;justify-self:end;font-size:13px}
+  .pt-dt table,.pt-dt tbody,.pt-dt tr,.pt-dt td{display:block}.pt-dt thead{display:none}
+  .pt-dt tr{border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}.pt-dt tr:first-child{border-top:0}
+  .pt-dt td{border:0;padding:0}.pt-dt .pt-num{grid-row:span 2}.pt-dt td:nth-child(4),.pt-dt td:nth-child(5),.pt-dt td:nth-child(3){grid-column:2}
+}
 </style>
 </head>
 <body>
@@ -4348,12 +4364,12 @@ function rendreProtheses() {
     });
     if (!d.livraisons.length) h += '<div class="empty">Aucune livraison importée pour l’instant.<div class="hint" style="margin-top:6px">Cliquez sur « Importer depuis Protheasy » : quelques secondes suffisent.</div></div>';
     else if (!w.length) h += '<div class="empty">Aucune livraison ne correspond.</div>';
-    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h5"><span>Livraison</span><span>Expédiée le</span><span>Commandes</span><span>Livraison prévue</span><span>Statut</span></div>' + w.map(function (l) {
-      return '<div class="pro-r pt-h5" data-pl="' + esc(l.numero) + '" role="button" tabindex="0"><span class="pro-d"><b>#' + esc(l.numero) + '</b></span><span class="pro-l pt-e">' + dateHeurePtz(l.expedieLe) + '</span>' +
-        '<span class="pt-n">' + l.nbCommandes + ' commande' + (l.nbCommandes > 1 ? 's' : '') + '</span><span class="pro-l pt-p">' + (l.statut === 'Livrée' ? '<span class="meta">—</span>' : ptzJ(l.prevue, auj)) + '</span><span class="pt-s">' + ptzPill(l.statut) + '</span></div>';
+    else h += '<div class="pro-t pt-t"><div class="pro-h pt-h5"><span>Livraison</span><span>Expédiée le</span><span>Commandes</span><span>Transporteur</span><span>N° de suivi</span><span>Statut</span></div>' + w.map(function (l) {
+      return '<div class="pro-r pt-h5" data-pl="' + esc(l.numero) + '" role="button" tabindex="0"><span class="pro-d pt-chev"><b>#' + esc(l.numero) + '</b></span><span class="pro-l pt-e">' + dateHeurePtz(l.expedieLe) + '</span>' +
+        '<span class="pt-n">' + l.nbCommandes + ' commande' + (l.nbCommandes > 1 ? 's' : '') + '</span><span class="pt-tr">' + esc(l.transporteur || '—') + '</span><span class="pt-sv">' + esc(l.suivi || '—') + '</span><span class="pt-s">' + ptzPill(l.statut) + '</span></div>';
     }).join('') + '</div>';
   }
-  h += '</div><p class="hint">Relevé automatiquement sur Protheasy à 7h35, 11h35 et 16h35 (du lundi au samedi), quand l’ordinateur du cabinet est allumé. « Importer depuis Protheasy » permet aussi de mettre à jour à la main. Les montants ne sont jamais repris.</p>';
+  h += '</div><p class="hint">Relevé automatiquement sur Protheasy à 7h35, 11h35 et 16h35 (du lundi au samedi), quand l’ordinateur du cabinet est allumé. « Importer depuis Protheasy » permet aussi de mettre à jour à la main. Les prix ne sont jamais repris.</p>';
   $('#main').innerHTML = h;
   $('#ptI').onclick = importPtz;
   $('#ptR').onclick = function () { chargerProtheses(true); };
@@ -4368,15 +4384,16 @@ function rendreProtheses() {
 function detailPtz(num) {
   var d = S.pro.data, l = d.livraisons.filter(function (x) { return x.numero === num; })[0]; if (!l) return;
   var auj = d.aujourdhui;
-  var corps = '<div class="pt-dk"><div><small>Statut</small>' + ptzPill(l.statut) + '</div><div><small>Expédiée le</small><b>' + dateHeurePtz(l.expedieLe) + '</b></div><div><small>Commandes</small><b>' + l.nbCommandes + '</b></div>' +
-    (l.prevue && l.statut !== 'Livrée' ? '<div><small>Livraison prévue</small><b>' + ptzJ(l.prevue, auj) + '</b></div>' : '') + '</div>' +
-    '<div class="sec">Commandes de cette livraison</div>' +
-    (l.commandes.length ? '<div class="pt-dl">' + l.commandes.map(function (c) {
-      return '<div class="pt-dr"><b>#' + esc(c.numero) + '</b><span class="pt-pa">' + esc(c.patient || '—') + (c.praticienNom ? '<small>' + esc(c.praticienNom) + '</small>' : '') + '</span><span>' + ptzPill(c.statut) + '</span><span class="meta">' + (c.prevue ? 'Prévue ' + ptzJ(c.prevue, auj) : '') + '</span></div>';
-    }).join('') + '</div>' + (l.commandes.length < l.nbCommandes ? '<p class="hint">' + (l.nbCommandes - l.commandes.length) + ' commande(s) pas encore connue(s) : dans Protheasy, dépliez la livraison avant de copier la page.</p>' : '')
-      : '<p class="hint">Numéros de commande pas encore connus : dans Protheasy, dépliez la livraison (flèche à gauche du numéro) avant de copier la page.</p>') +
-    '<p class="hint">Mis à jour le ' + esc(dHeure(l.majLe)) + '. Pour le détail des articles, ouvrez Protheasy.</p>';
+  var corps = '<div class="pt-dk"><div><small>Statut</small>' + ptzPill(l.statut) + '</div><div><small>Expédiée le</small><b>' + dateHeurePtz(l.expedieLe) + '</b></div>' +
+    '<div><small>Transporteur</small><b>' + esc(l.transporteur || '—') + '</b></div><div><small>N° de suivi</small><b>' + esc(l.suivi || '—') + '</b></div></div>' +
+    '<div class="sec">' + l.nbCommandes + ' commande' + (l.nbCommandes > 1 ? 's' : '') + ' dans cette livraison</div>' +
+    (l.commandes.length ? '<div class="pt-dt"><table><thead><tr><th>Commande</th><th>Patient</th><th>Articles</th><th>Créée le</th><th>Statut</th></tr></thead><tbody>' + l.commandes.map(function (c) {
+      return '<tr><td class="pt-num">#' + esc(c.numero) + '</td><td class="pt-pa">' + esc(c.patient || '—') + (c.praticienNom ? '<small>' + esc(c.praticienNom) + '</small>' : '') + '</td><td class="pt-ar">' + esc(c.articles || '—') + '</td><td class="pt-cd">' + (c.creeLe ? esc(dLong(c.creeLe)) : '—') + '</td><td>' + ptzPill(c.statut) + (c.prevue && c.statut !== 'Livré' ? '<small class="pt-pv">Prévue ' + ptzJ(c.prevue, auj) + '</small>' : '') + '</td></tr>';
+    }).join('') + '</tbody></table></div>' + (l.commandes.length < l.nbCommandes ? '<p class="hint">' + (l.nbCommandes - l.commandes.length) + ' commande(s) pas encore relevée(s) : elles apparaîtront au prochain relevé.</p>' : '')
+      : '<p class="hint">Le détail de cette livraison n’a pas encore été relevé : il apparaîtra au prochain relevé automatique.</p>') +
+    '<p class="hint">Relevé le ' + esc(dHeure(l.majLe)) + '. Les prix ne sont pas repris.</p>';
   tiroir('Livraison #' + esc(l.numero), corps, '<a class="btn" href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrir Protheasy ↗</a><span class="sp"></span><button class="btn pri" id="ptF">Fermer</button>');
+  var dr = $('#drawer .dr'); if (dr) dr.classList.add('dr-large');
   $('#ptF').onclick = fermer;
 }
 /** Lecture d'une copie de la page Protheasy, sur l'appareil : seuls numéros, dates, statuts et praticiens reconnus sont gardés. */
@@ -4406,8 +4423,9 @@ function lireCopiePtz(txt, d) {
       if (j < lignes.length && !/^\s*#\d/.test(lignes[j])) { cells = lignes[j].split('\t').map(function (x) { return x.trim(); }).filter(Boolean); i = j; }
     }
     // ligne suivante éventuelle : badge de statut seul (ex. « direct », « hub ») — ignorée
-    var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [], patient = '';
+    var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [], patient = '', libres = [];
     cells.forEach(function (c) {
+      if (!/€|\d+[.,]\d{2}\b|^J[-+]?\d+$/.test(c) && !datesPtz(c).length && !trouve(c, stL) && !trouve(c, stC) && !trouve(c.replace(/\s+(direct|hub)$/i, ''), stC) && !trouve(c, prat) && !/^\d+\s+commandes?$/i.test(c)) libres.push(c);
       if (!patient && !/€|\d{3,}|^J[-+]?\d+$|^—$/.test(c) && !datesPtz(c).length && !trouve(c, stL) && !trouve(c, stC) && !trouve(c.replace(/\s+(direct|hub)$/i, ''), stC) && !trouve(c, prat) && !/^\d+\s+commandes?$/i.test(c)) patient = c.slice(0, 80);
       var k = c.match(/^(\d{1,4})\s+commandes?$/i); if (k) nb = Number(k[1]);
       var sl = trouve(c, stL); if (sl) stLiv = sl;
@@ -4417,14 +4435,17 @@ function lireCopiePtz(txt, d) {
     });
     if (nb !== null) {
       var e = dates.filter(function (x) { return x.h; })[0] || dates[0];
-      cur = { numero: m[1], statut: stLiv, expedieLe: e ? e.j + (e.h ? ' ' + e.h : '') : '', nbCommandes: nb, commandes: [] };
+      // après « N commandes » : transporteur puis n° de suivi (« — » s'il n'y en a pas), avant les montants
+      var iN = cells.findIndex(function (c) { return /^\d+\s+commandes?$/i.test(c); });
+      var tr = cells[iN + 1] || '', sv = cells[iN + 2] || '';
+      cur = { numero: m[1], statut: stLiv, expedieLe: e ? e.j + (e.h ? ' ' + e.h : '') : '', nbCommandes: nb, transporteur: /€|\d+[.,]\d{2}\b/.test(tr) || trouve(tr, stL) ? '' : tr, suivi: /€|\d+[.,]\d{2}\b|^—$/.test(sv) || trouve(sv, stL) ? '' : sv, commandes: [] };
       livs.push(cur); detail = false;
     } else if (stCmd) {
       var cree = dates.filter(function (x) { return x.h; })[0], prev = dates.filter(function (x) { return !x.h; })[0];
       cmds.push({ numero: m[1], patient: patient, statut: stCmd, prevue: prev ? prev.j : '', praticien: praticien, creeLe: cree ? cree.j : '' });
       cur = null; detail = false;
     } else if (cur && detail) {
-      cur.commandes.push({ numero: m[1], patient: patient, creeLe: dates[0] ? dates[0].j : '' });
+      cur.commandes.push({ numero: m[1], patient: libres[0] || '', articles: libres.slice(1).join(' · '), creeLe: dates[0] ? dates[0].j : '' });
     }
   }
   return { livraisons: livs, commandes: cmds };
@@ -4434,11 +4455,11 @@ function importPtz() {
   if (!d) return;
   tiroir('Importer depuis Protheasy',
     '<ol class="pt-et"><li><a href="' + esc(d.lien) + '" target="_blank" rel="noopener">Ouvrez Protheasy ↗</a>, rubrique <b>Livraisons</b> (ou <b>Commandes</b> pour les dates prévues et les statuts de fabrication).</li>' +
-    '<li>Pour avoir les numéros de commande d’une livraison, dépliez-la (flèche à gauche du numéro). Affichez autant de lignes par page que nécessaire.</li>' +
+    '<li>Pour avoir le détail des livraisons (commandes, patients), dépliez-les (flèche à gauche du numéro) avant de copier. Affichez autant de lignes par page que nécessaire.</li>' +
     '<li>Sélectionnez toute la page (<kbd>⌘ A</kbd> ou <kbd>Ctrl A</kbd>), copiez (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>), puis collez ci-dessous.</li></ol>' +
     '<div class="fld"><label for="ptT">Copie de la page Protheasy</label><textarea id="ptT" rows="7" placeholder="Collez ici…" autocomplete="off" spellcheck="false"></textarea></div>' +
     '<div class="pt-ap" id="ptA" aria-live="polite"><span class="meta">Rien de collé pour l’instant.</span></div>' +
-    '<p class="hint">La copie est lue sur votre appareil : seuls les numéros, patients, dentistes, dates et statuts sont envoyés. Les articles et les montants sont ignorés et la copie est effacée après l’import.</p><div class="err" id="ptE"></div>',
+    '<p class="hint">La copie est lue sur votre appareil : numéros, patients, articles, dentistes, dates, statuts et transporteur sont repris ; les montants sont toujours ignorés. La copie est effacée après l’import.</p><div class="err" id="ptE"></div>',
     '<button class="btn" id="ptX">Annuler</button><span class="sp"></span><button class="btn pri" id="ptO" disabled>Enregistrer</button>');
   var lu = null;
   var effacer = function () { if ($('#ptT')) $('#ptT').value = ''; lu = null; };
