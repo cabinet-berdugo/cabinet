@@ -1614,6 +1614,7 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .hz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--soft,#F8FAFD)}
 .hz-n{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .hz-n b{font-size:14.5px}
+.hz.mod{border-color:var(--acc);background:#F2F6FF}.hz.mod .hz-n b::after{content:' · modifié';font-weight:500;color:var(--acc);font-size:12.5px}
 .hz-t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .hz-t label{display:flex;flex-direction:column;font-size:11.5px;color:var(--ink2);gap:3px;font-weight:600}
 .hz-t input{width:100%;min-width:0}
@@ -1794,7 +1795,7 @@ function sauverCache() {
       var d = c.d;
       d.taches = S.taches; d.vTaches = S.vT; d.conges = S.conges; d.notifs = S.notifs || d.notifs; d.auj = S.auj;
       d.x = { mat: S.mat || null, pro: S.pro && S.pro.data || null, det: avecDetails ? S.det : null, vers: S.vers || null,
-        sem: S.semaine && S.semCache[S.semaine] ? { s: S.semaine, v: S.semCache[S.semaine] } : null };
+        sem: S.semaine && S.semCache[S.semaine] ? { s: S.semaine, v: S.semCache[S.semaine] } : null, ver: 59 };
       localStorage.setItem(CLE_CACHE, JSON.stringify(c));
     };
     try { ecrire(true); } catch (e) { try { ecrire(false); } catch (e2) { } } // mémoire pleine : sans le détail des tâches
@@ -1805,7 +1806,7 @@ function restaurerExtras(x) {
   if (x.mat && !S.mat) S.mat = x.mat;
   if (x.pro && S.pro && !S.pro.data) S.pro.data = x.pro;
   if (x.det && (!S.det || !Object.keys(S.det).length)) S.det = x.det;
-  if (x.sem && x.sem.s && !S.semCache[x.sem.s]) S.semCache[x.sem.s] = x.sem.v;
+  if (x.sem && x.sem.s && x.ver === 59 && !S.semCache[x.sem.s]) S.semCache[x.sem.s] = x.sem.v; // planning gardé par une version précédente : relu
   if (x.vers && !S.vers) S.vers = x.vers;
 }
 /** Juste après l'ouverture : matériel, prothèses et planning de la semaine, en un seul appel discret. */
@@ -3039,7 +3040,7 @@ function rendreJour() {
       if (!confirm('Recopier toute la semaine du ' + dCourt(ajout(lun, -7)) + ' sur la semaine du ' + dCourt(lun) + ' (affectations et horaires des assistantes) ? Ce qui est déjà saisi cette semaine n’est pas modifié.')) return;
       api('copierSemaineAffectations', lun, date).then(function (x) {
         S.aff = x; oublierSemaine(date); rendreJour();
-        toast(x.copies || x.horairesCopies ? x.copies + ' affectation(s) et ' + (x.horairesCopies || 0) + ' journée(s) d’horaires recopiées' : 'Rien à recopier (semaine déjà remplie ou semaine précédente vide)');
+        toast(x.copies || x.horairesCopies ? x.copies + ' affectation(s) recopiée(s), horaires des assistantes mis à jour' : 'Rien à recopier (semaine déjà remplie ou semaine précédente vide)');
       }).catch(echec);
     };
     $('#dCopy').onclick = function () {
@@ -3164,7 +3165,7 @@ function formAffectation(a, salleInit) {
     '<div class="indep"><input type="text" id="eI" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante"><button type="button" class="btn sm" id="eIAdd">+ Assistante indépendante</button></div></div>' +
     '<div class="fld hidden" id="eB2"><label id="eAL2">Assistantes de l’après-midi</label><div id="eA2"></div><div class="chips" id="eX2" style="margin-top:8px"></div>' +
     '<div class="indep"><input type="text" id="eI2" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante de l’après-midi"><button type="button" class="btn sm" id="eIAdd2">+ Assistante indépendante</button></div></div>' +
-    (r.peutHoraires ? '<div class="fld hidden" id="eHz"><label>Horaires des assistantes</label><div id="eHzL"></div><div class="hint">Remplis d’après le créneau, modifiables. Ils s’enregistrent aussi dans l’onglet Horaires : rien à ressaisir.</div></div>' : '') +
+    (r.peutHoraires ? '<div class="fld hidden" id="eHz"><label>Horaires des assistantes</label><div id="eHzL"></div><div class="hint">Le tableau Horaires se remplit tout seul d’après les salles. Ne changez une heure ici que si elle arrive plus tôt ou part plus tard.</div></div>' : '') +
     '<div class="fld"><label>Recopier sur d’autres jours de la semaine</label><div class="af-j" id="eJ"></div><div class="hint" id="eJH"></div></div>' +
     '<div class="fld"><label for="eN">Note</label><input type="text" id="eN" maxlength="200" placeholder="Chirurgie implantaire" value="' + esc(a.note || '') + '"></div>' +
     (ed && a.majParNom ? '<div class="hint">Modifié par ' + esc(a.majParNom) + (a.majLe ? ' le ' + esc(dHeure(a.majLe)) : '') + '</div>' : '') +
@@ -3226,15 +3227,18 @@ function formAffectation(a, salleInit) {
 
   // ── horaires de chaque assistante choisie : proposés d'après le créneau (et ses horaires déjà saisis ce jour-là) ──
   var split = function () { return $('#eSplit') && $('#eSplit').checked; };
+  // ce que le serveur calculera : de sa première arrivée à son dernier départ dans les salles du jour (cette fiche comprise)
   var defaut = function (id) {
-    var h1 = $('#eH1').value, h2 = $('#eH2').value, deb = null, fin = null;
+    var h1 = $('#eH1').value, h2 = $('#eH2').value, deb = null, fin = null, date = $('#eD').value;
     var mat = choisisIds.indexOf(id) >= 0, apm = split() && choisis2.indexOf(id) >= 0;
     if (mat) { deb = h1; fin = split() ? C.matin[1] : h2; }
     if (apm) { deb = deb && deb < C.apresMidi[0] ? deb : C.apresMidi[0]; fin = h2; }
-    var d = dispoDe(id);
-    if (d && d.statut === 'Travail' && d.debut && d.fin) { if (d.debut < deb) deb = d.debut; if (d.fin > fin) fin = d.fin; }
-    var pd = d && d.statut === 'Travail' && d.pauseDebut ? d.pauseDebut : '', pf = pd ? d.pauseFin : '';
-    if (!pd && deb && fin && deb <= '13:00' && fin >= '14:00') { pd = '13:00'; pf = '14:00'; }
+    if (r.debut === date) r.affectations.forEach(function (x) {
+      if (x.id === a.id || x.date !== date || !x.assistantes.some(function (y) { return y.cle === id; })) return;
+      if (!deb || x.debut < deb) deb = x.debut; if (!fin || x.fin > fin) fin = x.fin;
+    });
+    var pd = '', pf = '';
+    if (deb && fin && deb <= '13:00' && fin >= '14:00') { pd = '13:00'; pf = '14:00'; }
     return { debut: deb || '', fin: fin || '', pauseDebut: pd, pauseFin: pf };
   };
   var ordre = function () { var v = choisisIds.slice(); if (split()) choisis2.forEach(function (x) { if (v.indexOf(x) < 0) v.push(x); }); return v; };
@@ -3251,7 +3255,8 @@ function formAffectation(a, salleInit) {
     }).join('');
     $$('#eHzL .hz').forEach(function (z) {
       var id = z.getAttribute('data-hz');
-      $$('input', z).forEach(function (x) { x.oninput = function () { var v = hz[id] || defaut(id); v[x.getAttribute('data-k')] = x.value; hz[id] = v; }; });
+      $$('input', z).forEach(function (x) { x.oninput = function () { var v = hz[id] || defaut(id); v[x.getAttribute('data-k')] = x.value; hz[id] = v; z.classList.add('mod'); }; });
+      if (hz[id]) z.classList.add('mod');
     });
   };
   var rendreChips = bloc('', choisisIds, externes);
@@ -3314,7 +3319,8 @@ function formAffectation(a, salleInit) {
       var o = {}, pb = '';
       ids.forEach(function (id) {
         var dd = dispoDe(id); if (dd && dd.statut === 'Congé') return; // en congé : ses horaires ne sont pas touchés
-        var v = hz[id] || defaut(id), u = r.assistantes.filter(function (x) { return x.id === id; })[0], nm = u ? (u.prenom || u.nom) : id;
+        if (!hz[id]) return; // non modifiés : calculés par le serveur d'après les salles
+        var v = hz[id], u = r.assistantes.filter(function (x) { return x.id === id; })[0], nm = u ? (u.prenom || u.nom) : id;
         if (!v.debut || !v.fin || v.fin <= v.debut) pb = pb || 'Horaires de ' + nm + ' : l’heure de fin doit être après l’heure de début.';
         else if (!!v.pauseDebut !== !!v.pauseFin) pb = pb || 'Horaires de ' + nm + ' : indiquez le début et la fin de la pause, ou laissez les deux vides.';
         else if (v.pauseDebut && (v.pauseFin <= v.pauseDebut || v.pauseDebut < v.debut || v.pauseFin > v.fin)) pb = pb || 'Horaires de ' + nm + ' : la pause doit être comprise dans la journée.';
@@ -3574,7 +3580,7 @@ function editerCase(email, i) {
   };
   if ($('#cDel')) $('#cDel').onclick = function () { envoyer({ effacer: true }); };
   $('#cOk').onclick = function () {
-    var d = { statut: statut, debut: $('#cD').value, fin: $('#cF').value, avec: c.avec || '', heuresSup: $('#cH').value.trim(), note: $('#cN').value.trim(), pauseDebut: $('#cPD').value, pauseFin: $('#cPF').value };
+    var d = { statut: statut, debut: $('#cD').value, fin: $('#cF').value, heuresSup: $('#cH').value.trim(), note: $('#cN').value.trim(), pauseDebut: $('#cPD').value, pauseFin: $('#cPF').value };
     if (statut === 'Travail' && (!d.debut || !d.fin)) { $('#cErr').textContent = 'Indiquez l’heure de début et de fin.'; return; }
     if (statut === 'Travail' && d.fin <= d.debut) { $('#cErr').textContent = 'L’heure de fin doit être après l’heure de début.'; return; }
     if (statut === 'Travail' && (!!d.pauseDebut !== !!d.pauseFin)) { $('#cErr').textContent = 'Indiquez le début et la fin de la pause, ou laissez les deux vides.'; return; }
