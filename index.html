@@ -4408,10 +4408,10 @@ function lireCopiePtz(txt, d) {
     // ligne suivante éventuelle : badge de statut seul (ex. « direct », « hub ») — ignorée
     var nb = null, stLiv = '', stCmd = '', praticien = '', dates = [], patient = '';
     cells.forEach(function (c) {
-      if (!patient && !/€|\d{3,}|^J[-+]?\d+$|^—$/.test(c) && !datesPtz(c).length && !trouve(c, stL) && !trouve(c.replace(/\s+(direct|hub)$/i, ''), stC) && !trouve(c, prat) && !/^\d+\s+commandes?$/i.test(c)) patient = c.slice(0, 80);
+      if (!patient && !/€|\d{3,}|^J[-+]?\d+$|^—$/.test(c) && !datesPtz(c).length && !trouve(c, stL) && !trouve(c, stC) && !trouve(c.replace(/\s+(direct|hub)$/i, ''), stC) && !trouve(c, prat) && !/^\d+\s+commandes?$/i.test(c)) patient = c.slice(0, 80);
       var k = c.match(/^(\d{1,4})\s+commandes?$/i); if (k) nb = Number(k[1]);
       var sl = trouve(c, stL); if (sl) stLiv = sl;
-      var sc = trouve(c.replace(/\s+(direct|hub)$/i, ''), stC); if (sc) stCmd = sc;
+      var sc = trouve(c, stC) || trouve(c.replace(/\s+(direct|hub)$/i, ''), stC); if (sc) stCmd = sc;
       var pr = trouve(c, prat); if (pr) praticien = pr;
       dates = dates.concat(datesPtz(c));
     });
