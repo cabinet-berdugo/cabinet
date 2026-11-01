@@ -1133,6 +1133,9 @@ html.mode-auth body{padding-left:0}
 html.mode-auth header{display:none}
 .auth .brand i{color:var(--deep)}
 .auth .btn.pri{background:var(--btn-grad)}
+/* Maxime et Hervé : Tâches, Planning, Matériel, Comptabilité, Impayés, Relances, Congés, Personnel */
+html.ordre-admin .tab[data-v=taches]{order:1}html.ordre-admin .tab[data-v=planning]{order:2}html.ordre-admin .tab[data-v=materiel]{order:3}html.ordre-admin .tab[data-v=compta]{order:4}
+html.ordre-admin .tab[data-v=impayes]{order:5}html.ordre-admin .tab[data-v=relances]{order:6}html.ordre-admin .tab[data-v=conges]{order:7}html.ordre-admin .tab[data-v=personnel]{order:8}
 /* ───── Chiffre d'affaires annuel ───── */
 .cp-ann{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin:0 0 18px;padding:16px 18px;border:0;border-radius:var(--r);cursor:pointer;color:#fff;font:inherit;
   background:linear-gradient(105deg,#0047D9 0%,#125BFF 60%,#3B7BFF 100%);box-shadow:0 8px 22px rgba(0,71,217,.30);transition:transform .18s,box-shadow .18s}
@@ -1365,7 +1368,9 @@ function appliquerDemarrage(d) {
     majCloche();
     $$('[data-v]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-v')); }; });
     ['#tabPers', '#bnPers'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.gererPersonnel); });
-    ['#tabCpt', '#bnCpt', '#tabImp', '#tabRel', '#bnImp', '#bnRel'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
+    ['#tabCpt', '#bnCpt'].forEach(function (x) { $(x).classList.toggle('hidden', !S.cfg.compta); });
+    ['#tabImp', '#tabRel', '#bnImp', '#bnRel'].forEach(function (x) { $(x).classList.toggle('hidden', !ongletOuvert('impayes')); });
+    document.documentElement.classList.toggle('ordre-admin', S.me.role === 'Administrateur');
     ['taches', 'planning', 'conges', 'materiel'].forEach(function (o) { $$('#tabs [data-v="' + o + '"], #bnav [data-v="' + o + '"]').forEach(function (b) { b.classList.toggle('hidden', !ongletOuvert(o)); }); });
     $('#bnPlus').onclick = menuPlus;
     majBnav();
@@ -1768,10 +1773,13 @@ function ecranNouveauMdp(message) {
 
 /** Téléphone : 5 boutons au plus en bas ; au-delà, les 4 premiers et « Plus » (les autres rubriques). */
 var BNAV_ORDRE = ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'relances', 'personnel'];
+var BNAV_ORDRE_ADMIN = ['taches', 'planning', 'materiel', 'compta', 'impayes', 'relances', 'conges', 'personnel']; // Maxime et Hervé
 function majBnav() {
   if (!$('#bnPlus') || !S.cfg) return;
-  var ouverts = BNAV_ORDRE.filter(ongletOuvert), plus = ouverts.length > 5, visibles = plus ? ouverts.slice(0, 4) : ouverts;
-  BNAV_ORDRE.forEach(function (v) { var b = $('#bnav [data-v="' + v + '"]'); if (b) b.classList.toggle('hidden', visibles.indexOf(v) < 0); });
+  var ordre = S.me && S.me.role === 'Administrateur' ? BNAV_ORDRE_ADMIN : BNAV_ORDRE;
+  var ouverts = ordre.filter(ongletOuvert), plus = ouverts.length > 5, visibles = plus ? ouverts.slice(0, 4) : ouverts;
+  BNAV_ORDRE.forEach(function (v) { var b = $('#bnav [data-v="' + v + '"]'); if (b) { b.classList.toggle('hidden', visibles.indexOf(v) < 0); b.style.order = ordre.indexOf(v); } });
+  $('#bnPlus').style.order = 99;
   $('#bnPlus').classList.toggle('hidden', !plus);
   var caches = plus ? ouverts.slice(4) : [];
   $('#bnPlus').classList.toggle('on', caches.indexOf(S.vue) >= 0);
@@ -1791,10 +1799,11 @@ function menuPlus() {
 function ongletOuvert(v) {
   var o = (S.cfg && S.cfg.onglets) || { taches: true, planning: true, conges: true, materiel: true };
   if (v === 'personnel') return !!(S.cfg && S.cfg.gererPersonnel);
-  if (/^(compta|impayes|relances)$/.test(v)) return !!(S.cfg && S.cfg.compta);
+  if (v === 'compta') return !!(S.cfg && S.cfg.compta);
+  if (v === 'impayes' || v === 'relances') return !!(S.cfg && (S.cfg.suivi || (S.cfg.suivi === undefined && S.cfg.compta)));
   return o[v] !== false;
 }
-function premierOnglet() { return ['taches', 'planning', 'conges', 'materiel', 'compta', 'personnel'].filter(ongletOuvert)[0] || 'taches'; }
+function premierOnglet() { return ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'personnel'].filter(ongletOuvert)[0] || 'taches'; }
 function aller(v) {
   if (!ongletOuvert(v)) v = premierOnglet();
   S.vue = v;
@@ -2832,6 +2841,9 @@ function fichePersonne(p) {
   var perms = {};
   P.permissions.forEach(function (x) { perms[x.cle] = !!p.permissions[x.cle]; });
   var defauts = function (role) { var d = {}; (P.permissionsRole[role] || []).forEach(function (k) { d[k] = true; }); return d; };
+  // impayés et relances d'autres praticiens confiés à cette personne (Maxime seulement)
+  var avecDel = !nouveau && P.peutAcces && P.praticiens && p.role !== 'Administrateur';
+  var delAvant = ((P.delegations || {})[p.id] || []).slice(), del = delAvant.slice();
   var opt = function (liste, v) { return '<option value="">Choisir…</option>' + liste.map(function (x) { return '<option' + (x === v ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); };
   var corps =
     (nouveau ? '' : '<p class="meta" style="margin-top:0">Identifiant ' + esc(p.id.toUpperCase()) + ' · ' + esc(p.compte) + (p.connexion ? ' · dernière connexion le ' + esc(dHeure(p.connexion)) : '') + '</p>') +
@@ -2843,6 +2855,7 @@ function fichePersonne(p) {
     '<div class="hint">Nécessaire pour se connecter et recevoir les notifications. Modifier l’adresse ferme l’accès lié à l’ancienne.</div></div>' +
     '<label class="chk2" style="margin:4px 0 14px"><input type="checkbox" id="pAc"' + (p.actif ? ' checked' : '') + (p.archive ? ' disabled' : '') + '> Compte actif</label>' +
     '<div class="sec" style="margin-top:6px">Autorisations</div><div id="pPerms"></div>' +
+    (avecDel ? '<div id="pDel"></div>' : '') +
     '<div class="hint">' + (P.peutAcces ? 'Cochées par défaut selon le rôle ; vous pouvez les ajuster pour cette personne.' : 'Seul Dr Maxime Berdugo peut modifier le rôle et les autorisations. Un nouveau membre reçoit le rôle de sa fonction.') + '</div>' +
     '<div class="err" id="pErr"></div>' +
     (nouveau ? '' : '<div class="sec">Historique</div><div id="pHist"><div class="load" style="padding:16px"><div class="spin"></div></div></div>');
@@ -2862,6 +2875,12 @@ function fichePersonne(p) {
     $$('#pPerms input').forEach(function (c) { c.onchange = function () { perms[c.getAttribute('data-k')] = c.checked; dessinerPerms(); }; });
   };
   dessinerPerms();
+  if (avecDel) {
+    $('#pDel').innerHTML = blocPerm('compta', 'Impayés et relances confiés', P.praticiens.filter(function (x) { return x.id !== p.id; }).map(function (x) {
+      return '<label class="perm"><input type="checkbox" data-dl="' + esc(x.id) + '"' + (del.indexOf(x.id) >= 0 ? ' checked' : '') + '><span><span class="pt">' + esc(x.nom) + '<small>Voir et modifier ses impayés et relances. Jamais son chiffre d’affaires.</small></span></span></label>';
+    }).join(''));
+    $$('#pDel input').forEach(function (c) { c.onchange = function () { var id = c.getAttribute('data-dl'); del = del.filter(function (v) { return v !== id; }); if (c.checked) del.push(id); }; });
+  }
   $('#pRo').onchange = function () { var d = defauts(this.value); P.permissions.forEach(function (x) { perms[x.cle] = !!d[x.cle]; }); dessinerPerms(); };
   $('#pFo').onchange = function () { if ((!$('#pRo').value || !P.peutAcces) && P.roles.indexOf(this.value) >= 0 && (nouveau || P.peutAcces)) { $('#pRo').value = this.value; $('#pRo').onchange(); } };
   $('#pAnn').onclick = fermer;
@@ -2873,7 +2892,11 @@ function fichePersonne(p) {
     if (!d.role) return err('Choisissez le rôle.');
     if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return err('Cette adresse e-mail n’est pas valide.');
     apiSensible('enregistrerPersonne', d).then(function (r) {
-      S.pers = r; fermer(); rendrePersonnel(); rafraichirUsers(); toast(nouveau ? 'Membre ajouté' : 'Fiche enregistrée');
+      S.pers = r;
+      var change = avecDel && (del.slice().sort().join(',') !== delAvant.slice().sort().join(','));
+      return change ? apiSensible('enregistrerDelegation', p.id, del).then(function (r2) { S.pers = r2; }) : null;
+    }).then(function () {
+      fermer(); rendrePersonnel(); rafraichirUsers(); toast(nouveau ? 'Membre ajouté' : 'Fiche enregistrée');
     }).catch(function (e) {
       var m = msgErr(e);
       if (m.indexOf('DOUBLON:') === 0) {
@@ -3539,9 +3562,14 @@ function segCompta(v) {
     return '<button data-cv="' + x[0] + '"' + (x[0] === v ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div>';
 }
 function brancherSegCompta() { $$('#cpSeg [data-cv]').forEach(function (b) { b.onclick = function () { aller(b.getAttribute('data-cv')); }; }); }
+/** Praticiens dont la personne voit les impayés et relances (les siens, tous, ou ceux qui lui sont confiés). */
+function listeSuivi() {
+  if (S.cfg.suivi) return S.cfg.suivi.praticiens;
+  return (S.cfg.compta && S.cfg.compta.tous) || (S.cfg.compta ? [{ id: S.me.id, nom: S.me.nom, prenom: S.me.prenom }] : []);
+}
 function ouvrirSuivi(v) {
-  var tous = S.cfg.compta && S.cfg.compta.tous;
-  if (S.sv.pid === null) S.sv.pid = tous ? '*' : '';
+  var l = listeSuivi();
+  if (S.sv.pid === null) S.sv.pid = l.length > 1 ? '*' : (l[0] && l[0].id !== S.me.id ? l[0].id : '');
   rendreSuivi(v);
   if (!S.sv.data || S.sv.dataPid !== S.sv.pid) chargerSuivi(); else chargerSuivi(true);
 }
@@ -3557,7 +3585,7 @@ function chargerSuivi(discret) {
 function svPid(p) { return p.id === S.me.id ? '' : p.id; }
 function joursFr(iso) { return iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
 function rendreSuivi(v) {
-  var imp = v === 'impayes', tous = S.cfg.compta && S.cfg.compta.tous, d = S.sv.data;
+  var imp = v === 'impayes', tous = listeSuivi().length > 1 ? listeSuivi() : null, d = S.sv.data;
   var h = '<div class="ph"><div class="ph-t"><h1>' + (imp ? 'Impayés' : 'Relances de devis') + '</h1><p class="ph-g">' + (imp
     ? 'Les patients qui doivent encore un montant, d’après les journées remplies dans Google Sheets. Touchez un patient pour noter un règlement ou corriger le reste dû.'
     : 'Les devis à relancer. Touchez un patient pour noter la date de chaque relance, le montant du devis et vos notes.') + '</p></div>' +
@@ -3609,8 +3637,8 @@ function appliquerSuivi(r) {
 }
 /** Ajouter un patient oublié (impayé ou devis à relancer) : écrit dans la journée du classeur du mois et dans « Impayés et relances ». */
 function formAjoutSuivi(imp) {
-  var tous = S.cfg.compta && S.cfg.compta.tous, auj = S.today;
-  var choix = tous ? tous : [{ id: S.me.id, prenom: S.me.prenom || 'Moi', nom: S.me.nom }];
+  var auj = S.today, choix = listeSuivi();
+  if (!choix.length) choix = [{ id: S.me.id, prenom: S.me.prenom || 'Moi', nom: S.me.nom }];
   var def = S.sv.pid && S.sv.pid !== '*' ? S.sv.pid : (choix.some(function (p) { return p.id === S.me.id; }) ? S.me.id : choix[0].id);
   var sel = choix.length > 1 ? '<div class="fld"><label for="ajP">Praticien</label><select id="ajP">' + choix.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === def ? ' selected' : '') + '>' + esc(p.nom || p.prenom) + '</option>'; }).join('') + '</select></div>' : '';
   tiroir(imp ? 'Ajouter un impayé' : 'Ajouter une relance',
