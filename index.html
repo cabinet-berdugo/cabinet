@@ -1614,7 +1614,10 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .hz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--soft,#F8FAFD)}
 .hz-n{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .hz-n b{font-size:14.5px}
-.hz.mod{border-color:var(--acc);background:#F2F6FF}.hz.mod .hz-n b::after{content:' · modifié';font-weight:500;color:var(--acc);font-size:12.5px}
+.hz.mod{border-color:var(--acc);background:#F2F6FF}
+.hz-c{font-size:13.5px;color:var(--ink);margin:-2px 0 6px}.hz-m{font-size:13.5px;color:var(--ink2);font-variant-numeric:tabular-nums}.hz-s{font-size:13px;margin-top:8px}
+.pz-l{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:14px;color:var(--ink2)}.pz-l input[type=time]{max-width:130px}.pz-l .chk2{margin-left:4px;color:var(--ink)}
+.af-opt{display:flex;flex-direction:column;gap:6px;margin-top:10px}.af-opt .chk2{font-size:14px;color:var(--ink)}
 .hz-t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .hz-t label{display:flex;flex-direction:column;font-size:11.5px;color:var(--ink2);gap:3px;font-weight:600}
 .hz-t input{width:100%;min-width:0}
@@ -1622,6 +1625,10 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .sl-h{font-size:15px;margin:22px 0 4px}
 .slh{padding:10px 0;border-top:1px solid var(--line)}.slh b{display:block;font-size:14px;margin-bottom:6px}
 .slh .pch{min-height:36px;padding:0 12px;font-size:13.5px}
+
+.pl tr.pl-g td{background:#EEF3FB;color:var(--ink2);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;position:sticky;left:0}
+.as-h{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.af-h small{font-weight:500;color:var(--ink2)}
 </style>
 </head>
 <body>
@@ -2908,11 +2915,12 @@ function formTache(t) {
 function vuesPlanning() {
   var v = [['jour', 'Par salle']];
   v.push(['personne', 'Par personne']);
-  v.push(['horaires', 'Horaires']);
+  if (S.cfg.voitHoraires !== false) v.push(['horaires', 'Horaires']); // pas pour les praticiens (sauf direction)
   return v;
 }
 function ouvrirPlanning() {
   if (!S.plVue || S.plVue === 'moi') S.plVue = S.cfg.estDentiste || S.cfg.dansPlanning ? 'personne' : 'jour';
+  if (S.plVue === 'horaires' && S.cfg.voitHoraires === false) S.plVue = 'personne';
   if (!S.jour) S.jour = S.today;
   if (S.plVue === 'jour') chargerJour(S.jour);
   else if (S.plVue === 'personne') {
@@ -2923,7 +2931,7 @@ function ouvrirPlanning() {
       S.cibleP = moiDans ? S.me.id : (d0 ? d0.id : '');
     }
     var u0 = S.users.filter(function (u) { return u.id === S.cibleP; })[0];
-    S.cible = { id: S.cibleP, assistante: !!u0 && S.cfg.fonctionsAssistantes.indexOf(u0.fonction) >= 0 };
+    S.cible = { id: S.cibleP, assistante: !!u0 && S.cfg.fonctionsAssistantes.indexOf(u0.fonction) >= 0, secretaire: !!u0 && u0.fonction === 'Secrétaire' };
     chargerMoi(S.semaine);
   }
   else chargerPlanning(S.semaine);
@@ -2944,7 +2952,7 @@ function nomSalle(a) { return a.salleNom ? a.salleNom + (a.etage ? ' · ' + a.et
 function htmlAssistantes(a) {
   if (!a.assistantes.length) return '<span class="tag t-warn">Assistante à affecter</span>';
   return a.assistantes.map(function (y) {
-    var t = '<span class="as"><b>' + esc(y.nom) + '</b>';
+    var t = '<span class="as"><b>' + esc(y.nom) + '</b>' + (y.propre ? ' <small class="as-h">' + hm(y.debut) + '–' + hm(y.fin) + '</small>' : '');
     if (y.independante) t += ' <span class="tag">Indépendante</span>';
     if (y.partageeAvec.length) t += ' <span class="tag t-info" title="' + esc('Aussi avec ' + y.partageeAvec.map(function (p) { return p.dentisteNom + (p.salleNom ? ' (' + p.salleNom + ')' : ''); }).join(', ')) + '">Assistante partagée</span>';
     return t + '</span>';
@@ -3016,7 +3024,7 @@ function rendreJour() {
       (liste.length ? liste.map(function (a) {
         return '<div class="af' + (a.conflits.length ? ' af-c' : '') + (ed ? ' ed' : '') + '" data-id="' + esc(a.id) + '"' + (ed ? ' role="button" tabindex="0"' : '') + '>' +
           '<span class="af-av" aria-hidden="true">' + esc(initDr(a.dentisteNom)) + '</span><div class="af-b">' +
-          '<div class="af-h">' + hm(a.debut) + ' – ' + hm(a.fin) + '</div><div class="af-d">' + esc(a.dentisteNom) + '</div>' +
+          '<div class="af-h">' + hm(a.debut) + ' – ' + hm(a.fin) + (a.pause ? '<small> · pause ' + hm(a.pause.debut) + '–' + hm(a.pause.fin) + '</small>' : '') + '</div><div class="af-d">' + esc(a.dentisteNom) + '</div>' +
           '<div class="af-a">' + htmlAssistantes(a) + '</div>' + (a.note ? '<div class="af-n">' + esc(a.note) + '</div>' : '') + htmlProblemes(a) + '</div></div>';
       }).join('') : '<div class="libre">Libre</div>') + '</section>';
   };
@@ -3091,7 +3099,7 @@ function rendreMoi() {
   var auj = mes.filter(function (a) { return a.date === S.today; });
   var h = enTetePlanning();
   if (perso) {
-    var cand = S.users.filter(function (u) { return u.fonction === S.cfg.fonctionDentiste || S.cfg.fonctionsAssistantes.indexOf(u.fonction) >= 0; });
+    var cand = S.users.filter(function (u) { return u.fonction === S.cfg.fonctionDentiste || S.cfg.fonctionsAssistantes.indexOf(u.fonction) >= 0 || u.fonction === 'Secrétaire'; });
     h += '<div class="fld" style="max-width:420px"><label for="pCible">Praticien ou assistante</label><select id="pCible">' + groupesPersonnes(cand).map(function (g) {
       return '<optgroup label="' + esc(g.fonction) + '">' + g.liste.map(function (u) { return '<option value="' + esc(u.id) + '"' + (u.id === moi ? ' selected' : '') + '>' + esc(u.nom) + '</option>'; }).join('') + '</optgroup>';
     }).join('') + '</select></div>';
@@ -3109,14 +3117,14 @@ function rendreMoi() {
   jours.forEach(function (j, i) {
     var lst = mes.filter(function (a) { return a.date === j; });
     var hor = '';
-    if (assistante && p) {
+    if ((assistante || S.cible.secretaire) && p) {
       var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
       var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
       hor = cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
         '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + ' – ' + hm(c.pauseFin) : '') + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
     }
     h += '<div class="day' + (j === S.today ? ' td' : '') + (lst.length ? ' occ' : '') + '"><div class="d"><span class="d-n" aria-hidden="true">' + Number(j.slice(8, 10)) + '</span><span class="d-t"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></span></div><div class="c">' + hor +
-      (lst.length ? lst.map(ligne).join('') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
+      (lst.length ? lst.map(ligne).join('') : S.cible.secretaire ? (hor ? '' : '<div class="meta">—</div>') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
   });
   h += '</div>';
   $('#main').innerHTML = h;
@@ -3135,16 +3143,28 @@ function rendreMoi() {
 
 // ── Éditeur d'affectation ──
 /**
- * Fiche d'affectation : praticien, salle(s) (habituelles proposées d'office), créneau, assistantes avec leurs horaires,
- * et recopie sur d'autres jours de la semaine — tout en un seul enregistrement, sans repasser par l'onglet Horaires.
+ * Fiche d'affectation : praticien, salle(s) (habituelles proposées d'office), créneau et pause du praticien,
+ * cabinet différent l'après-midi, assistantes (aux mêmes horaires que le praticien ou à leurs horaires propres, pause comprise),
+ * recopie sur d'autres jours de la semaine. Le tableau Horaires se remplit tout seul d'après les salles.
  */
 function formAffectation(a, salleInit) {
   var r = S.aff, ed = !!a, C = S.cfg.creneaux, hab = r.habituelles || {};
-  a = a || { id: '', date: S.jour, dentiste: '', salle: salleInit || '', debut: C.journee[0], fin: C.journee[1], assistantes: [], note: '' };
+  a = a || { id: '', date: S.jour, dentiste: '', salle: salleInit || '', debut: C.journee[0], fin: C.journee[1], assistantes: [], note: '', pause: undefined };
   var choisisIds = a.assistantes.filter(function (y) { return !y.independante; }).map(function (y) { return y.cle; });
   var externes = a.assistantes.filter(function (y) { return y.independante; }).map(function (y) { return 'ext:' + y.nom; });
-  var salles = a.salle ? [a.salle] : [], sallesTouchees = ed || !!salleInit;
-  var jours = [], hz = {}; // jours où recopier ; horaires saisis à la main (par assistante)
+  var choisis2 = [], externes2 = [];
+  var salles = a.salle ? [a.salle] : [], salles2 = [], sallesTouchees = ed || !!salleInit;
+  var jours = [];
+  // pause du praticien : 13h–14h par défaut quand la journée la couvre
+  var couvre = function (d, f) { return d && f && d <= '13:00' && f >= '14:00'; };
+  var pz = a.pause === undefined ? { debut: '13:00', fin: '14:00', sans: !couvre(a.debut, a.fin) } : a.pause ? { debut: a.pause.debut, fin: a.pause.fin, sans: false } : { debut: '13:00', fin: '14:00', sans: true };
+  var pzTouchee = ed;
+  // horaires de chaque assistante : « mêmes horaires que le praticien » par défaut
+  var hz = {};
+  a.assistantes.forEach(function (y) {
+    var k = y.independante ? 'ext:' + y.nom : y.cle;
+    if (y.propre) hz[k] = { meme: false, debut: y.debut, fin: y.fin, pd: y.pause ? y.pause.debut : '13:00', pf: y.pause ? y.pause.fin : '14:00', sans: !y.pause };
+  });
   var etages = [];
   r.salles.filter(function (s) { return s.active || s.id === a.salle; }).forEach(function (s) {
     var e = etages.filter(function (x) { return x.nom === s.etage; })[0];
@@ -3156,16 +3176,19 @@ function formAffectation(a, salleInit) {
   var corps =
     '<div class="two"><div class="fld"><label for="eD">Date</label><input type="date" id="eD" value="' + esc(a.date) + '"></div>' +
     '<div class="fld"><label for="eP">Praticien *</label><select id="eP">' + optDent + '</select></div></div>' +
-    '<div class="fld"><label>Cabinet ou bloc <span class="meta">(un ou plusieurs)</span></label><div id="eS" class="af-sl"></div><div class="hint af-hab" id="eSH"></div></div>' +
-    '<div class="fld"><label>Créneau</label><div class="seg" id="eC">' +
-    [['journee', 'Journée'], ['matin', 'Matin'], ['apresMidi', 'Après-midi'], ['autre', 'Autre']].map(function (x) { return '<button type="button" data-c="' + x[0] + '"' + (x[0] === preset ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
-    '</div><div class="two" style="margin-top:8px"><div><input type="time" id="eH1" step="900" value="' + esc(a.debut) + '" aria-label="Début"></div><div><input type="time" id="eH2" step="900" value="' + esc(a.fin) + '" aria-label="Fin"></div></div>' +
-    '<label class="chk2" id="eSplitL" style="margin-top:10px;font-size:14px;color:var(--ink)"><input type="checkbox" id="eSplit"> Assistante différente le matin et l’après-midi</label></div>' +
+    '<div class="fld"><label id="eSL">Cabinet ou bloc <span class="meta">(un ou plusieurs)</span></label><div id="eS" class="af-sl"></div><div class="hint af-hab" id="eSH"></div></div>' +
+    '<div class="fld"><label>Présence du praticien</label><div class="seg" id="eC">' +
+    [['journee', 'Journée'], ['matin', 'Matin seulement'], ['apresMidi', 'Après-midi seulement'], ['autre', 'Autre']].map(function (x) { return '<button type="button" data-c="' + x[0] + '"' + (x[0] === preset ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
+    '</div><div class="two" style="margin-top:8px"><div><input type="time" id="eH1" step="900" value="' + esc(a.debut) + '" aria-label="Arrivée du praticien"></div><div><input type="time" id="eH2" step="900" value="' + esc(a.fin) + '" aria-label="Départ du praticien"></div></div>' +
+    '<div class="pz-l" id="ePz"><span>Pause</span><input type="time" id="ePD" step="300" aria-label="Début de pause"><span>à</span><input type="time" id="ePF" step="300" aria-label="Fin de pause"><label class="chk2"><input type="checkbox" id="ePS"> Sans pause</label></div>' +
+    '<div class="af-opt" id="eOpt"><label class="chk2"><input type="checkbox" id="eSplitS"> Change de cabinet l’après-midi</label>' +
+    '<label class="chk2"><input type="checkbox" id="eSplit"> Assistante différente l’après-midi</label></div></div>' +
+    '<div class="fld hidden" id="eS2B"><label>Cabinet ou bloc de l’après-midi (' + hm(C.apresMidi[0]) + ' – <span id="eS2F"></span>)</label><div id="eS2" class="af-sl"></div></div>' +
     '<div class="fld"><label id="eAL">Assistantes</label><div id="eA"></div><div class="chips" id="eX" style="margin-top:8px"></div>' +
     '<div class="indep"><input type="text" id="eI" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante"><button type="button" class="btn sm" id="eIAdd">+ Assistante indépendante</button></div></div>' +
     '<div class="fld hidden" id="eB2"><label id="eAL2">Assistantes de l’après-midi</label><div id="eA2"></div><div class="chips" id="eX2" style="margin-top:8px"></div>' +
     '<div class="indep"><input type="text" id="eI2" maxlength="60" placeholder="Nom de l’indépendante (facultatif)" aria-label="Nom de l’assistante indépendante de l’après-midi"><button type="button" class="btn sm" id="eIAdd2">+ Assistante indépendante</button></div></div>' +
-    (r.peutHoraires ? '<div class="fld hidden" id="eHz"><label>Horaires des assistantes</label><div id="eHzL"></div><div class="hint">Le tableau Horaires se remplit tout seul d’après les salles. Ne changez une heure ici que si elle arrive plus tôt ou part plus tard.</div></div>' : '') +
+    '<div class="fld hidden" id="eHz"><label>Horaires des assistantes</label><div id="eHzL"></div><div class="hint" id="eHzH"></div></div>' +
     '<div class="fld"><label>Recopier sur d’autres jours de la semaine</label><div class="af-j" id="eJ"></div><div class="hint" id="eJH"></div></div>' +
     '<div class="fld"><label for="eN">Note</label><input type="text" id="eN" maxlength="200" placeholder="Chirurgie implantaire" value="' + esc(a.note || '') + '"></div>' +
     (ed && a.majParNom ? '<div class="hint">Modifié par ' + esc(a.majParNom) + (a.majLe ? ' le ' + esc(dHeure(a.majLe)) : '') + '</div>' : '') +
@@ -3176,28 +3199,42 @@ function formAffectation(a, salleInit) {
   // ── salles : boutons à cocher, salles habituelles du praticien proposées d'office ──
   var memeListe = function (x, y) { return x.slice().sort().join('|') === (y || []).slice().sort().join('|'); };
   var nomSalleId = function (id) { var s = r.salles.filter(function (x) { return x.id === id; })[0]; return s ? s.nom : id; };
-  var rendreSalles = function () {
-    $('#eS').innerHTML = etages.map(function (e) {
+  var chipsSalles = function (zone, liste, apres) {
+    zone.innerHTML = etages.map(function (e) {
       return '<div class="af-et"><small>' + esc(e.nom || 'Sans étage') + '</small><div class="chips">' + e.s.map(function (s) {
-        var on = salles.indexOf(s.id) >= 0;
+        var on = liste.indexOf(s.id) >= 0;
         return '<button type="button" class="pch' + (on ? ' on' : '') + '" data-sl="' + esc(s.id) + '" aria-pressed="' + on + '">' + esc(s.nom) + '</button>';
       }).join('') + '</div></div>';
     }).join('');
-    $$('#eS [data-sl]').forEach(function (b) { b.onclick = function () { var id = b.getAttribute('data-sl'), i = salles.indexOf(id); if (i >= 0) salles.splice(i, 1); else salles.push(id); sallesTouchees = true; rendreSalles(); }; });
+    $$('[data-sl]', zone).forEach(function (b) { b.onclick = function () { var id = b.getAttribute('data-sl'), i = liste.indexOf(id); if (i >= 0) liste.splice(i, 1); else liste.push(id); apres(); }; });
+  };
+  var rendreSalles = function () {
+    chipsSalles($('#eS'), salles, function () { sallesTouchees = true; rendreSalles(); });
     var dent = $('#eP').value, h = hab[dent] || [], nomD = dent ? $('#eP').selectedOptions[0].textContent : '';
     var txt = !dent ? '' : !salles.length ? 'Aucune salle cochée : « salle à définir ».' : '';
     if (dent && salles.length && !memeListe(salles, h)) txt = '<label class="chk2"><input type="checkbox" id="eHab"> Retenir ' + esc(salles.map(nomSalleId).join(' + ')) + ' comme salle' + (salles.length > 1 ? 's' : '') + ' habituelle' + (salles.length > 1 ? 's' : '') + ' de ' + esc(nomD) + '</label>';
     else if (dent && salles.length) txt = 'Salle' + (salles.length > 1 ? 's' : '') + ' habituelle' + (salles.length > 1 ? 's' : '') + ' de ' + esc(nomD) + '. Cochez ou décochez pour changer.';
     $('#eSH').innerHTML = txt;
   };
+  var rendreSalles2 = function () { chipsSalles($('#eS2'), salles2, rendreSalles2); };
   $('#eP').onchange = function () { if (!sallesTouchees) salles = (hab[this.value] || []).slice(); rendreSalles(); };
   if (!ed && !salleInit && a.dentiste) salles = (hab[a.dentiste] || []).slice();
   rendreSalles();
 
+  // ── pause du praticien ──
+  var rendrePause = function () {
+    if (!pzTouchee) { pz.sans = !couvre($('#eH1').value, $('#eH2').value); pz.debut = '13:00'; pz.fin = '14:00'; }
+    $('#ePD').value = pz.debut; $('#ePF').value = pz.fin; $('#ePS').checked = pz.sans;
+    $('#ePD').disabled = $('#ePF').disabled = pz.sans;
+    $('#ePz').classList.toggle('hidden', split());
+  };
+  $('#ePD').oninput = function () { pz.debut = this.value; pzTouchee = true; rendreHoraires(); };
+  $('#ePF').oninput = function () { pz.fin = this.value; pzTouchee = true; rendreHoraires(); };
+  $('#ePS').onchange = function () { pz.sans = this.checked; pzTouchee = true; rendrePause(); rendreHoraires(); };
+
   // ── assistantes ──
   var dispoDe = function (id) { return r.dispo[id + '|' + $('#eD').value] || null; };
   var dispoTexte = function (id) { var d = dispoDe(id); return !d ? '' : d.statut === 'Congé' ? 'en congé' : d.statut === 'Repos' ? 'repos' : ''; };
-  var choisis2 = [], externes2 = [];
   var bloc = function (suf, ids, ext) {
     var sel = null;
     var rendre = function () {
@@ -3206,7 +3243,7 @@ function formAffectation(a, salleInit) {
       $('#eX' + suf).innerHTML = ext.map(function (k) {
         return '<span class="chip on ext">' + esc(k.slice(4)) + ' · indépendante <button type="button" class="x-ext" data-k="' + esc(k) + '" aria-label="Retirer ' + esc(k.slice(4)) + '">×</button></span>';
       }).join('');
-      $$('#eX' + suf + ' .x-ext').forEach(function (b) { b.onclick = function () { ext.splice(ext.indexOf(b.getAttribute('data-k')), 1); rendre(); }; });
+      $$('#eX' + suf + ' .x-ext').forEach(function (b) { b.onclick = function () { ext.splice(ext.indexOf(b.getAttribute('data-k')), 1); rendre(); rendreHoraires(); }; });
     };
     $('#eIAdd' + suf).onclick = function () {
       var n = $('#eI' + suf).value.trim().replace(/\|/g, ' ');
@@ -3218,54 +3255,65 @@ function formAffectation(a, salleInit) {
         n = 'Indépendante n°' + i;
       }
       if (ext.indexOf('ext:' + n) < 0) ext.push('ext:' + n);
-      $('#eI' + suf).value = ''; rendre();
+      $('#eI' + suf).value = ''; rendre(); rendreHoraires();
     };
     $('#eI' + suf).onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); $('#eIAdd' + suf).click(); } };
     rendre();
     return rendre;
   };
 
-  // ── horaires de chaque assistante choisie : proposés d'après le créneau (et ses horaires déjà saisis ce jour-là) ──
-  var split = function () { return $('#eSplit') && $('#eSplit').checked; };
-  // ce que le serveur calculera : de sa première arrivée à son dernier départ dans les salles du jour (cette fiche comprise)
-  var defaut = function (id) {
-    var h1 = $('#eH1').value, h2 = $('#eH2').value, deb = null, fin = null, date = $('#eD').value;
-    var mat = choisisIds.indexOf(id) >= 0, apm = split() && choisis2.indexOf(id) >= 0;
-    if (mat) { deb = h1; fin = split() ? C.matin[1] : h2; }
-    if (apm) { deb = deb && deb < C.apresMidi[0] ? deb : C.apresMidi[0]; fin = h2; }
-    if (r.debut === date) r.affectations.forEach(function (x) {
-      if (x.id === a.id || x.date !== date || !x.assistantes.some(function (y) { return y.cle === id; })) return;
-      if (!deb || x.debut < deb) deb = x.debut; if (!fin || x.fin > fin) fin = x.fin;
-    });
-    var pd = '', pf = '';
-    if (deb && fin && deb <= '13:00' && fin >= '14:00') { pd = '13:00'; pf = '14:00'; }
-    return { debut: deb || '', fin: fin || '', pauseDebut: pd, pauseFin: pf };
-  };
-  var ordre = function () { var v = choisisIds.slice(); if (split()) choisis2.forEach(function (x) { if (v.indexOf(x) < 0) v.push(x); }); return v; };
+  // ── horaires de chaque assistante : mêmes horaires que le praticien (par défaut) ou horaires propres ──
+  var splitS = function () { return $('#eSplitS') && $('#eSplitS').checked; };
+  var splitA = function () { return $('#eSplit') && $('#eSplit').checked; };
+  var split = function () { return splitS() || splitA(); };
+  var pauseTxt = function (sans, d, f) { return sans || !d || !f ? 'sans pause' : 'pause ' + hm(d) + '–' + hm(f); };
+  var jetonsFiche = function () { var v = choisisIds.concat(externes); if (splitA()) choisis2.concat(externes2).forEach(function (x) { if (v.indexOf(x) < 0) v.push(x); }); return v; };
+  var nomJeton = function (k) { if (k.indexOf('ext:') === 0) return k.slice(4); var u = r.assistantes.filter(function (x) { return x.id === k; })[0]; return u ? (u.prenom || u.nom) : k; };
   var rendreHoraires = function () {
-    if (!$('#eHz')) return;
-    var ids = ordre();
+    var ids = jetonsFiche(), h1 = $('#eH1').value, h2 = $('#eH2').value;
     $('#eHz').classList.toggle('hidden', !ids.length);
-    $('#eHzL').innerHTML = ids.map(function (id) {
-      var u = r.assistantes.filter(function (x) { return x.id === id; })[0] || { nom: id, prenom: id }, v = hz[id] || defaut(id), d = dispoDe(id);
-      var info = d && d.statut === 'Congé' ? '<span class="tag t-warn">en congé ce jour-là</span>' : d && d.statut === 'Repos' ? '<span class="meta">prévue en repos : passera en travail</span>' : '';
-      return '<div class="hz" data-hz="' + esc(id) + '"><div class="hz-n"><b>' + esc(u.prenom || u.nom) + '</b>' + info + '</div><div class="hz-t">' +
-        '<label>De<input type="time" step="900" data-k="debut" value="' + esc(v.debut) + '"></label><label>à<input type="time" step="900" data-k="fin" value="' + esc(v.fin) + '"></label>' +
-        '<label>Pause<input type="time" step="300" data-k="pauseDebut" value="' + esc(v.pauseDebut) + '"></label><label>à<input type="time" step="300" data-k="pauseFin" value="' + esc(v.pauseFin) + '"></label></div></div>';
+    if (split()) {
+      $('#eHzL').innerHTML = ''; $('#eHzH').textContent = 'En demi-journées, chaque assistante suit les horaires de sa demi-journée ; le temps entre les deux compte comme sa pause.';
+      return;
+    }
+    $('#eHzH').textContent = 'Le tableau Horaires se remplit tout seul d’après les salles.';
+    $('#eHzL').innerHTML = ids.map(function (k) {
+      var v = hz[k] || { meme: true }, d = k.indexOf('ext:') === 0 ? null : dispoDe(k);
+      var info = (k.indexOf('ext:') === 0 ? '<span class="tag">Indépendante</span>' : '') + (d && d.statut === 'Congé' ? '<span class="tag t-warn">en congé ce jour-là</span>' : d && d.statut === 'Repos' ? '<span class="meta">prévue en repos</span>' : '');
+      var corpsH = v.meme ? '<div class="hz-m">' + hm(h1) + ' – ' + hm(h2) + ' · ' + pauseTxt(pz.sans, pz.debut, pz.fin) + '</div>' :
+        '<div class="hz-t"><label>De<input type="time" step="900" data-k="debut" value="' + esc(v.debut) + '"></label><label>à<input type="time" step="900" data-k="fin" value="' + esc(v.fin) + '"></label>' +
+        '<label>Pause<input type="time" step="300" data-k="pd" value="' + esc(v.pd) + '"' + (v.sans ? ' disabled' : '') + '></label><label>à<input type="time" step="300" data-k="pf" value="' + esc(v.pf) + '"' + (v.sans ? ' disabled' : '') + '></label></div>' +
+        '<label class="chk2 hz-s"><input type="checkbox" data-k="sans"' + (v.sans ? ' checked' : '') + '> Sans pause</label>';
+      return '<div class="hz' + (v.meme ? '' : ' mod') + '" data-hz="' + esc(k) + '"><div class="hz-n"><b>' + esc(nomJeton(k)) + '</b>' + info + '</div>' +
+        '<label class="chk2 hz-c"><input type="checkbox" data-k="meme"' + (v.meme ? ' checked' : '') + '> Mêmes horaires que le praticien</label>' + corpsH + '</div>';
     }).join('');
     $$('#eHzL .hz').forEach(function (z) {
-      var id = z.getAttribute('data-hz');
-      $$('input', z).forEach(function (x) { x.oninput = function () { var v = hz[id] || defaut(id); v[x.getAttribute('data-k')] = x.value; hz[id] = v; z.classList.add('mod'); }; });
-      if (hz[id]) z.classList.add('mod');
+      var k = z.getAttribute('data-hz');
+      $$('input', z).forEach(function (x) {
+        x.oninput = x.onchange = function () {
+          var f = x.getAttribute('data-k'), v = hz[k] || { meme: true };
+          if (f === 'meme') {
+            v.meme = x.checked;
+            if (!v.meme && !v.debut) { v.debut = $('#eH1').value; v.fin = $('#eH2').value; v.pd = pz.debut; v.pf = pz.fin; v.sans = pz.sans; }
+            hz[k] = v; rendreHoraires(); return;
+          }
+          if (f === 'sans') { v.sans = x.checked; hz[k] = v; rendreHoraires(); return; }
+          v[f] = x.value; hz[k] = v;
+        };
+      });
     });
   };
   var rendreChips = bloc('', choisisIds, externes);
   var rendreChips2 = null;
   var majSplit = function () {
     var possible = $('#eH1').value && $('#eH2').value && $('#eH1').value < C.matin[1] && $('#eH2').value > C.apresMidi[0];
-    $('#eSplitL').classList.toggle('hidden', !possible);
-    if (!possible) $('#eSplit').checked = false;
-    var on = $('#eSplit').checked;
+    $('#eOpt').classList.toggle('hidden', !possible);
+    if (!possible) { $('#eSplit').checked = false; $('#eSplitS').checked = false; }
+    $('#eS2B').classList.toggle('hidden', !splitS());
+    $('#eS2F').textContent = hm($('#eH2').value);
+    $('#eSL').innerHTML = splitS() ? 'Cabinet ou bloc du matin (' + hm($('#eH1').value) + ' – ' + hm(C.matin[1]) + ')' : 'Cabinet ou bloc <span class="meta">(un ou plusieurs)</span>';
+    if (splitS()) rendreSalles2();
+    var on = splitA();
     $('#eB2').classList.toggle('hidden', !on);
     $('#eAL').textContent = on ? 'Assistantes du matin (' + hm($('#eH1').value) + '–' + hm(C.matin[1]) + ')' : 'Assistantes';
     $('#eAL2').textContent = 'Assistantes de l’après-midi (' + hm(C.apresMidi[0]) + '–' + hm($('#eH2').value) + ')';
@@ -3273,9 +3321,10 @@ function formAffectation(a, salleInit) {
       choisisIds.forEach(function (x) { choisis2.push(x); }); externes.forEach(function (x) { externes2.push(x); });
       rendreChips2 = bloc('2', choisis2, externes2);
     }
-    rendreHoraires();
+    rendrePause(); rendreHoraires();
   };
   $('#eSplit').onchange = majSplit;
+  $('#eSplitS').onchange = majSplit;
   majSplit();
 
   // ── recopie sur d'autres jours de la même semaine ──
@@ -3292,7 +3341,7 @@ function formAffectation(a, salleInit) {
   };
   rendreJours();
 
-  $('#eD').onchange = function () { hz = {}; rendreChips(); if (rendreChips2) rendreChips2(); rendreHoraires(); rendreJours(); };
+  $('#eD').onchange = function () { rendreChips(); if (rendreChips2) rendreChips2(); rendreHoraires(); rendreJours(); };
   $$('#eC button').forEach(function (b) {
     b.onclick = function () {
       var k = b.getAttribute('data-c');
@@ -3312,23 +3361,18 @@ function formAffectation(a, salleInit) {
     var err = function (m) { $('#eErr').textContent = m; };
     if (!d.date) return err('Indiquez la date.');
     if (!d.dentiste) return err('Choisissez le praticien.');
-    if (!d.debut || !d.fin) return err('Indiquez l’heure de début et de fin.');
-    if (d.fin <= d.debut) return err('L’heure de fin doit être après l’heure de début.');
-    var horairesDe = function (ids) {
-      if (!r.peutHoraires) return undefined;
-      var o = {}, pb = '';
-      ids.forEach(function (id) {
-        var dd = dispoDe(id); if (dd && dd.statut === 'Congé') return; // en congé : ses horaires ne sont pas touchés
-        if (!hz[id]) return; // non modifiés : calculés par le serveur d'après les salles
-        var v = hz[id], u = r.assistantes.filter(function (x) { return x.id === id; })[0], nm = u ? (u.prenom || u.nom) : id;
-        if (!v.debut || !v.fin || v.fin <= v.debut) pb = pb || 'Horaires de ' + nm + ' : l’heure de fin doit être après l’heure de début.';
-        else if (!!v.pauseDebut !== !!v.pauseFin) pb = pb || 'Horaires de ' + nm + ' : indiquez le début et la fin de la pause, ou laissez les deux vides.';
-        else if (v.pauseDebut && (v.pauseFin <= v.pauseDebut || v.pauseDebut < v.debut || v.pauseFin > v.fin)) pb = pb || 'Horaires de ' + nm + ' : la pause doit être comprise dans la journée.';
-        o[id] = { debut: v.debut, fin: v.fin, pauseDebut: v.pauseDebut, pauseFin: v.pauseFin };
-      });
-      if (pb) throw new Error(pb);
-      return o;
-    };
+    if (!d.debut || !d.fin) return err('Indiquez l’heure d’arrivée et de départ du praticien.');
+    if (d.fin <= d.debut) return err('L’heure de départ doit être après l’heure d’arrivée.');
+    // pause : jamais bloquante — incomplète ou hors de la journée, elle est simplement ignorée
+    d.pause = pz.sans || !pz.debut || !pz.fin || pz.fin <= pz.debut ? 'aucune' : pz.debut + '-' + pz.fin;
+    var ha = {}, pb = '';
+    d.assistantes.forEach(function (k) {
+      var v = hz[k]; if (!v || v.meme) return;
+      if (!v.debut || !v.fin || v.fin <= v.debut) { pb = pb || 'Horaires de ' + nomJeton(k) + ' : l’heure de fin doit être après l’heure de début.'; return; }
+      ha[k] = { debut: v.debut, fin: v.fin, pause: v.sans || !v.pd || !v.pf || v.pf <= v.pd ? 'aucune' : v.pd + '-' + v.pf };
+    });
+    if (pb && !split()) return err(pb);
+    if (!split()) d.horairesAssistantes = ha;
     var b = this, retenir = $('#eHab') && $('#eHab').checked;
     var fin = function (x) {
       S.aff = x; S.jour = d.date; oublierSemaine(d.date); fermer(); rendreJour();
@@ -3337,19 +3381,16 @@ function formAffectation(a, salleInit) {
       if (e && (e.conflits.length || e.alertes.length)) toast('Enregistré, mais à vérifier : ' + (e.conflits[0] || e.alertes[0]), true);
       else toast(n > 1 ? 'Enregistré sur ' + n + ' jours' : 'Affectation enregistrée');
     };
-    try {
-      if ($('#eSplit').checked) {
-        // deux créneaux : le matin (même fiche si elle existait) puis l'après-midi
-        var m = Object.assign({}, d, { fin: C.matin[1], horaires: horairesDe(choisisIds) });
-        var am = Object.assign({}, d, { id: '', debut: C.apresMidi[0], assistantes: choisis2.concat(externes2), horaires: horairesDe(choisis2.filter(function (x) { return choisisIds.indexOf(x) < 0; })) });
-        b.disabled = true;
-        api('enregistrerAffectation', m).then(function () { return api('enregistrerAffectation', am); })
-          .then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
-        return;
-      }
-      d.horaires = horairesDe(choisisIds);
-    } catch (x) { return err(x.message); }
     b.disabled = true;
+    if (split()) {
+      // matin puis après-midi : salle et/ou assistantes différentes ; le temps entre les deux est la pause
+      if (splitS() && !salles2.length) { b.disabled = false; return err('Cochez le cabinet ou le bloc de l’après-midi.'); }
+      var m = Object.assign({}, d, { fin: C.matin[1], pause: 'aucune' });
+      var am = Object.assign({}, d, { id: '', debut: C.apresMidi[0], pause: 'aucune', salles: splitS() ? salles2.slice() : salles.slice(), assistantes: splitA() ? choisis2.concat(externes2) : d.assistantes.slice() });
+      api('enregistrerAffectation', m).then(function () { return api('enregistrerAffectation', am); })
+        .then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
+      return;
+    }
     api('enregistrerAffectation', d).then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
   };
 }
@@ -3439,10 +3480,13 @@ function rendrePlanning() {
   if (!p.personnes.length) {
     h += '<div class="empty">Aucune assistante n’est encore enregistrée. Ajoutez-les dans l’onglet « Utilisateurs » du Google Sheet avec le rôle « Assistante ».</div>';
   } else {
+    var groupes = {}; p.personnes.forEach(function (x) { groupes[x.groupe || ''] = 1; });
+    var plusieurs = Object.keys(groupes).length > 1, gPrec = null;
+    var inter = function (pers, n) { var g = pers.groupe || ''; if (!plusieurs || g === gPrec) return ''; gPrec = g; return '<tr class="pl-g"><td colspan="' + n + '">' + esc(g) + '</td></tr>'; };
     h += '<div class="grid' + (ed ? ' ed' : '') + '"><table class="pl"><thead><tr><th></th>' +
       p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + '</tr></thead><tbody>' +
       p.personnes.map(function (pers) {
-        return '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' +
+        return inter(pers, 8) + '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' +
           p.jours.map(function (j, i) {
             var x = infoCase(p, pers.id, i), inner, cls = 'cell';
             var aff = avecQui(pers.id, j).map(function (a) { return '<div class="a">' + esc(a.dentisteNom) + (a.salleNom ? ' · ' + esc(a.salleNom) : '') + '</div>'; }).join('');
@@ -3495,6 +3539,8 @@ function hMin(n) { return Math.floor(n / 60) + 'h' + ('0' + n % 60).slice(-2); }
 /** Sous l'agenda des assistantes : heures de chaque assistante, jour par jour, total de la semaine (pauses déduites),
  *  et, pour qui gère les horaires, l'écart avec les heures prévues au contrat (heures sup ou heures en moins). */
 function tableauHeures(p, moi) {
+  var grp = {}; p.personnes.forEach(function (x) { grp[x.groupe || ''] = 1; });
+  var plusieurs = Object.keys(grp).length > 1, gPrec = null;
   var ct = p.contrats || null, totJ = p.jours.map(function () { return 0; }), totSem = 0, totSup = 0, totCt = 0, totPlus = 0, totMoins = 0, avecCt = false;
   var ecartTxt = function (n) { return n === 0 ? '<span class="ht-eg">= contrat</span>' : n > 0 ? '<span class="ht-plus">+' + hMin(n) + '</span><small class="ht-l">heures sup</small>' : '<span class="ht-moins">−' + hMin(-n) + '</span><small class="ht-l">en moins</small>'; };
   var lignes = p.personnes.map(function (pers) {
@@ -3519,13 +3565,14 @@ function tableauHeures(p, moi) {
         fin += '<td>' + hMin(cm) + '</td><td class="ht-e ht-k">' + ecartTxt(ec) + (cg ? '<small class="ht-l">dont ' + cg + ' j de congé</small>' : '') + '</td>';
       }
     }
-    return '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases + fin + '</tr>';
+    var g = pers.groupe || '', ti = plusieurs && g !== gPrec ? '<tr class="pl-g"><td colspan="' + (p.jours.length + (ct ? 4 : 2)) + '">' + esc(g) + '</td></tr>' : ''; gPrec = g;
+    return ti + '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases + fin + '</tr>';
   }).join('');
   var tete = '<th class="ht-s' + (ct ? '' : ' ht-k') + '">Semaine</th>' + (ct ? '<th>Contrat</th><th class="ht-e ht-k">Écart</th>' : '');
   var pied = '<td class="ht-s' + (ct ? '' : ' ht-k') + '">' + (totSem ? hMin(totSem) : '—') + (totSup ? '<small>+' + hMin(totSup) + ' sup</small>' : '') + '</td>' +
     (ct ? '<td>' + (avecCt ? hMin(totCt) : '—') + '</td><td class="ht-e ht-k">' + (!avecCt ? '—' : (totPlus ? '<span class="ht-plus">+' + hMin(totPlus) + '</span><small class="ht-l">heures sup</small>' : '') + (totMoins ? '<span class="ht-moins">−' + hMin(totMoins) + '</span><small class="ht-l">en moins</small>' : '') + (!totPlus && !totMoins ? '<span class="ht-eg">= contrat</span>' : '')) + '</td>' : '');
   return '<div class="ht-t"><h2 class="ht-h">Total d’heures de la semaine</h2>' + (p.peutContrats ? '<button class="btn sm" id="htC">Heures prévues au contrat</button>' : '') + '</div>' +
-    '<div class="grid"><table class="pl ht"><thead><tr><th>Assistante</th>' +
+    '<div class="grid"><table class="pl ht"><thead><tr><th>Personne</th>' +
     p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + tete + '</tr></thead><tbody>' + lignes + '</tbody>' +
     (p.personnes.length > 1 ? '<tfoot><tr><td class="nm">Total équipe</td>' + totJ.map(function (n) { return '<td>' + (n ? hMin(n) : '—') + '</td>'; }).join('') + pied + '</tr></tfoot>' : '') +
     '</table></div><div class="hint" style="margin-top:8px">Heures de présence, pauses déduites. Les heures sup saisies dans une case sont indiquées à part.' +
@@ -3534,7 +3581,7 @@ function tableauHeures(p, moi) {
 /** Direction : heures hebdomadaires prévues au contrat de chaque assistante. */
 function formContrats() {
   var p = S.planning, ct = p.contrats || {};
-  tiroir('Heures prévues au contrat', '<p class="hint" style="margin-top:0">Heures par semaine. Elles servent à calculer les heures sup ou les heures en moins sous le planning. Laissez vide si non concernée.</p>' +
+  tiroir('Heures prévues au contrat', '<p class="hint" style="margin-top:0">Heures par semaine, pour les assistantes et les secrétaires. Elles servent à calculer les heures sup ou les heures en moins sous le planning. Laissez vide si non concernée.</p>' +
     p.personnes.map(function (u) { return '<div class="fld ct-r"><label for="ct_' + esc(u.id) + '">' + esc(u.nom) + '</label><div class="ct-i"><input type="text" inputmode="decimal" id="ct_' + esc(u.id) + '" data-ct="' + esc(u.id) + '" value="' + esc(ct[u.id] === undefined ? '' : String(ct[u.id]).replace('.', ',')) + '" placeholder="—"><span>h / semaine</span></div></div>'; }).join('') +
     '<div class="err" id="ctErr"></div>', '<span class="sp"></span><button class="btn" id="ctAnn">Annuler</button><button class="btn pri" id="ctOk">Enregistrer</button>');
   $('#ctAnn').onclick = fermer;
