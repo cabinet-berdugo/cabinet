@@ -3683,10 +3683,10 @@ function ficheSuivi(imp, pid, cle) {
     (imp ? '<div><span>Reste dû</span><span style="color:var(--red)">' + esc(l.reste) + '</span></div>' : '') + (l.remarque && !imp ? '<div><span>Remarque</span><span>' + esc(l.remarque) + '</span></div>' : '') + '</div>';
   if (imp) {
     tiroir(esc(l.patient), info +
-      '<button class="btn ok sv-regle" id="svOk">✓ Le patient a réglé</button><p class="hint" style="margin:0 0 6px">' + (l.manuel ? 'Le retire de la liste des impayés ; la modification est enregistrée.' : 'Décoche « Impayé » dans la journée du ' + esc(joursFr(l.jour)) + ', met le reste dû à 0 et note la date du règlement.') + '</p>' +
+      '<button class="btn ok sv-regle" id="svOk">✓ Le patient a réglé</button><p class="hint" style="margin:0 0 6px">' + (l.manuel ? 'Le retire de la liste des impayés ; la modification est enregistrée.' : 'Met le reste dû à 0 et note la date du règlement : dans la journée' + (l.jour ? ' du ' + esc(joursFr(l.jour)) : '') + ' si l’impayé vient de la case « Impayé », sinon sur la ligne saisie dans « ' + esc(p.fichier) + ' » (gardée, jamais effacée).') + '</p>' +
       '<div class="sec">Ou corriger</div><div class="fld"><label for="svRe">Reste dû</label><input type="text" id="svRe" inputmode="decimal" value="' + esc(String(l.nReste).replace('.', ',')) + '"></div>' +
       '<div class="fld"><label for="svRm">Remarque</label><input type="text" id="svRm" value="' + esc(l.remarque) + '"></div><div class="err" id="svE"></div>' + histSuivi(l) +
-      '<p class="hint">' + (l.manuel ? 'Ligne ajoutée dans l’application : le classeur de ce mois n’a pas de colonnes « Impayé ».' : 'Modifié aussi dans le classeur du mois de ' + esc(p.prenom) + ' (onglet du ' + esc(String(Number(l.jour.slice(8, 10)))) + ').') + '</p>',
+      '<p class="hint">' + (l.manuel ? 'Ligne ajoutée dans l’application : le classeur de ce mois n’a pas de colonnes « Impayé ».' : 'Enregistré dans « ' + esc(p.fichier) + ' »' + (l.jour ? ' et, si l’impayé vient d’une journée, aussi dans le classeur du mois (onglet du ' + esc(String(Number(l.jour.slice(8, 10)))) + ')' : '') + '.') + '</p>',
       '<button class="btn" id="svA">Annuler</button><span class="sp"></span><button class="btn pri" id="svS">Enregistrer</button>');
     $('#svOk').onclick = function () {
       if (!confirm('Confirmer que ' + l.patient + ' a réglé ' + l.reste + ' ?')) return;
