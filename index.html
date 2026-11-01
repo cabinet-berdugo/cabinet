@@ -1563,11 +1563,12 @@ table.pl{border-collapse:separate;border-spacing:0}
 .ca-tip small{display:block;font-size:11.5px;color:rgba(255,255,255,.7)}.ca-tip b{font-size:14px}
 .ca-vide{padding:30px 10px;text-align:center;color:var(--ink3);font-size:14px}
 .ca-m{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line);margin-top:10px}
-.ca-mo{background:#fff;border:0;padding:11px 12px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
-.ca-mo:hover{background:#F5F8FE}
+.ca-mo{background:#fff;border:0;padding:11px 12px;text-align:left;font:inherit;display:flex;flex-direction:column;gap:3px;min-width:0}
+.ca-mo i{font-style:normal;font-size:12px;color:var(--ink2);line-height:1.3}
+.ca-mo.nf b{color:#9AA7BD;font-weight:500;font-size:13px}
 .ca-mo small{font-size:12px;color:var(--ink2);font-weight:600}
 .ca-mo b{font-size:14.5px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ca-mo.fut{cursor:default}.ca-mo.fut b,.ca-mo.fut small{color:#B3BFD3}.ca-mo.fut:hover{background:#fff}
+.ca-mo.fut b,.ca-mo.fut small{color:#B3BFD3}
 .ca-mo.cur{background:#F2F6FF}.ca-mo.cur small::after{content:' · en cours';font-weight:500;color:var(--acc)}
 .ca-mo.top b{color:#061B42}.ca-mo.top small::after{content:' · meilleur mois';font-weight:500;color:var(--acc)}
 .cp-j.fixe>button{cursor:default}
@@ -2160,7 +2161,7 @@ function sessionPerdue() {
 function seDeconnecter() {
   var j = K; K = ''; garderJeton('');
   if (push.dispo()) push.abonnement().then(function (a) { if (a) { var ep = a.endpoint; a.unsubscribe(); appel('supprimerAppareil', [j, ep]).catch(function () { }); } }).catch(function () { });
-  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.jourCache = {}; S.mat = null; S.det = {}; S.vers = null; S.autRes = null; S.cpt.caP = ''; S.sv.data = null; S.sv.parPid = {}; S.sv.pid = null; clearTimeout(tCache); S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } }; S.cptOuvert = false;
+  fermer(); $('#bell').classList.add('hidden'); S.notifs = null; S.notifVues = null; S.taches = []; S.conges = null; S.planning = null; S.charge = false; S.auj = null; S.aff = null; S.plVue = null; S.jour = null; S.pers = null; S.cibleP = null; S.semCache = {}; S.jourCache = {}; S.mat = null; S.det = {}; S.vers = null; S.autRes = null; S.cpt = { annee: 0, data: null, an: null, caP: '' }; S.sv.data = null; S.sv.parPid = {}; S.sv.pid = null; clearTimeout(tCache); S.pro = { data: null, f: { vue: 'avenir', q: '', prat: '' } }; S.cptOuvert = false;
   apiPublic('deconnexion', j).catch(function () { });
   ecranConnexion('Vous êtes déconnecté.');
 }
@@ -4102,13 +4103,12 @@ function formFournisseur(x) {
 }
 
 // ───────── Comptabilité (lecture seule, depuis les classeurs Google Sheets) ─────────
-S.cpt = { pid: '', annee: 0, mois: 0, data: null, tous: false };
+S.cpt = { annee: 0, data: null, an: null, caP: '' };
+/** Comptabilité : des totaux mensuels seulement (jamais les journées ni les modes de règlement — le serveur ne les envoie plus). */
 function ouvrirCompta() {
   var tous = S.cfg.compta && S.cfg.compta.tous;
-  if (!S.cpt.pid) S.cpt.pid = tous && !tous.some(function (p) { return p.id === S.me.id; }) ? '*' : S.me.id; // Maxime et Hervé : d'abord leur propre mois, jour par jour
-  if (!tous) S.cpt.vue = 'mois';
-  else if (!S.cpt.vue) S.cpt.vue = 'annuel'; // Maxime et Hervé : le facturé de l'année, praticien par praticien
-  if ((!tous && !S.cpt.choixP) || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : le mois en cours, sauf période choisie parmi celles autorisées
+  S.cpt.vue = tous ? 'annuel' : 'praticien'; // Maxime et Hervé : le cabinet d'abord, puis un bouton par praticien ; praticien : sa seule carte
+  if (!S.cpt.annee) S.cpt.annee = Number(S.today.slice(0, 4));
   rendreCompta(); chargerCompta();
 }
 // ───────── Comptabilité protégée : mot de passe à chaque ouverture, verrouillage automatique ─────────
@@ -4251,16 +4251,14 @@ function chargerAnnuel(annee, force) {
   }).catch(function (e) { if (verrouCompta(e)) return; if (c.chargeA === cle) { c.an = { cle: cle, erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
 }
 function chargerCompta(force) {
-  var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous, cle = c.pid + ':' + c.annee + '-' + c.mois;
-  c.charge = cle;
-  if (force) c.data = null;
-  if (tous) chargerAnnuel(c.annee, force);
+  var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous;
+  if (tous) { chargerAnnuel(c.annee, force); rendreCompta(); return; }
+  var cle = 'moi:' + (c.choixA ? c.annee : '');
+  c.charge = cle; if (force) c.data = null;
   rendreCompta();
-  if (c.vue === 'annuel' || c.pid === '*') return;
-  api('getCompta', c.pid === S.me.id ? '' : c.pid, tous || c.choixP ? c.annee : '', tous || c.choixP ? c.mois : '').then(function (r) {
-    if (c.charge !== cle) return; // l'utilisateur a changé de mois ou de praticien entre-temps
-    if (!tous && r.regles) { c.annee = r.annee; c.mois = r.mois; c.charge = c.pid + ':' + c.annee + '-' + c.mois; }
-    c.data = r; if (S.vue === 'compta') rendreCompta();
+  api('getMaCompta', c.choixA ? c.annee : '').then(function (r) {
+    if (c.charge !== cle) return; // l'utilisateur a changé d'année entre-temps
+    c.annee = r.annee; c.data = r; if (S.vue === 'compta') rendreCompta();
   }).catch(function (e) { if (verrouCompta(e)) return; if (c.charge === cle) { c.data = { erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
 }
 var MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -4271,146 +4269,45 @@ function eurT(n) { return n === null || n === undefined ? '—' : eur(n); }
 function eurC(n) { return n === null || n === undefined ? '—' : eur(n).replace(/\s€$/, '<span class="eu"> €</span>'); }
 /** Mois pas encore arrivé (heure de Paris de l'appareil, date du jour donnée par le serveur). */
 function moisFutur(annee, m) { var y = Number(S.today.slice(0, 4)), mo = Number(S.today.slice(5, 7)); return annee > y || (annee === y && m > mo); }
-/** Totaux d'une série de 12 mois : sommes des montants disponibles ; écart sur les mois où facturé et encaissé existent tous deux. */
-function totauxMois(mois) {
-  var t = { f: 0, e: 0, x: 0, nf: 0, ne: 0, nx: 0 };
-  mois.forEach(function (l) { if (l.f !== null) { t.f += l.f; t.nf++; } if (l.e !== null) { t.e += l.e; t.ne++; } if (l.f !== null && l.e !== null) { t.x += l.f - l.e; t.nx++; } });
-  return { f: t.nf ? t.f : null, e: t.ne ? t.e : null, x: t.nx ? t.x : null };
-}
-/** Détail jour par jour du facturé (repliable par jour : montants par mode). */
-function joursCompta(d, c, sansModes) {
-  var jours = d.jours || [], max = Math.max.apply(null, jours.map(function (j) { return j.n; }).concat([1]));
-  var actifs = jours.filter(function (j) { return j.n > 0; }), liste = c.tousJours ? jours : actifs;
-  var h = '<div class="cp-s"><h2>Facturé jour par jour</h2>' + (jours.length > actifs.length ? '<button class="lk" id="cpTous">' + (c.tousJours ? 'Jours travaillés seulement' : 'Afficher tous les jours') + '</button>' : '') + '</div>';
-  h += liste.length ? '<div class="cp-l">' + liste.map(function (j) {
-    var k = j.date, o = !!(c.ouverts || {})[k];
-    if (sansModes) o = false;
-    return '<div class="cp-j' + (o ? ' open' : '') + (sansModes ? ' fixe' : '') + '" data-j="' + esc(k) + '"><button' + (sansModes ? ' tabindex="-1"' : '') + '><span class="d">' + esc(j.date) + '</span><span class="t' + (j.n ? '' : ' cp-zero') + '">' + esc(j.total) + '</span>' + (sansModes ? '' : CHEV) + '</button>' +
-      (j.n ? '<div class="bar" title="' + esc(j.date + ' : ' + j.total) + '"><i style="width:' + Math.round(j.n / max * 100) + '%"></i></div>' : '') +
-      (o ? '<div class="cp-md">' + (d.modes || []).map(function (m, x) { return euros(j.modes[x]) ? '<span>' + esc(m) + ' ' + esc(j.modes[x]) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
-  }).join('') + '</div>' : '<div class="empty">Aucune journée remplie pour l’instant ce mois-ci.</div>';
-  return h;
-}
-/** Praticien : uniquement les montants que Maxime ou Hervé lui ont ouverts (le serveur n'envoie rien d'autre). */
-function comptaRegles(d, c) {
-  var lib = function (p) { return p.f && p.e ? 'facturé et encaissé' : p.f ? 'facturé' : 'encaissé'; };
-  var opts = d.periodes.map(function (p) { var v = p.annee + '-' + p.mois; return '<option value="' + v + '"' + (p.annee === d.annee && p.mois === d.mois ? ' selected' : '') + '>' + MOIS_NOMS[p.mois - 1] + ' ' + p.annee + ' · ' + lib(p) + '</option>'; });
-  d.cumuls.forEach(function (a) { if (!d.periodes.some(function (p) { return p.annee === a; })) opts.push('<option value="a' + a + '"' + (d.annee === a && !(d.droits.f || d.droits.e) ? ' selected' : '') + '>Année ' + a + ' · cumul annuel</option>'); });
-  var h = '<div class="cp-who"><b>' + esc(S.me.nom) + '</b><span>' + esc(d.libelle) + '</span><button id="cpR" class="cp-rf" aria-label="Actualiser" title="Actualiser">↻</button></div>';
-  if (opts.length > 1) h += '<div class="cp-per fld" style="max-width:420px"><label for="cpPer">Période</label><select id="cpPer">' + opts.join('') + '</select></div>';
-  if (d.refus && !d.cumul) return h + '<div class="empty">' + esc(d.refus) + '</div>';
-  var tuiles = [];
-  if (d.droits.f) tuiles.push('<div class="ca"><small>Chiffre d’affaires facturé · ' + esc(d.libelle) + '</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div>');
-  if (d.droits.e) tuiles.push('<div' + (d.droits.f ? '' : ' class="ca"') + '><small>Encaissé · ' + esc(d.libelle) + '</small><b>' + eurT(d.totalEncaisse === undefined ? null : d.totalEncaisse) + '</b></div>');
-  if (d.cumul && d.cumul.f !== undefined) tuiles.push('<div><small>Cumul facturé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.f) + '</b></div>');
-  if (d.cumul && d.cumul.e !== undefined) tuiles.push('<div><small>Cumul encaissé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.e) + '</b></div>');
-  // les deux montants ouverts : l'écart (facturé − encaissé) s'affiche aussi
-  if (d.droits.f && d.droits.e && d.total && d.totalEncaisse !== undefined && d.totalEncaisse !== null && d.trouve) tuiles.push('<div><small>Écart (facturé − encaissé) · ' + esc(d.libelle) + '</small><b>' + eurT(euros(d.total.total) - d.totalEncaisse) + '</b></div>');
-  if (d.cumul && d.cumul.f !== undefined && d.cumul.e !== undefined && d.cumul.f !== null && d.cumul.e !== null) tuiles.push('<div><small>Écart cumulé ' + d.cumul.annee + '</small><b>' + eurT(d.cumul.f - d.cumul.e) + '</b></div>');
-  if (tuiles.length) h += '<div class="cp-k cp-k' + Math.min(tuiles.length, 3) + '">' + tuiles.join('') + '</div>';
-  if ((d.droits.f || d.droits.e) && !d.trouve) h += '<div class="empty">Aucune donnée disponible pour ' + esc(d.libelle) + '.</div>';
-  if (d.droits.f && d.trouve && d.total && d.total.modes && d.total.modes.length) h += '<h2>Facturé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th>' + (d.droits.e && d.encaisse && d.encaisse.length ? '<th>Encaissé</th>' : '') + '</tr></thead><tbody>' +
-    (d.modes || []).map(function (m, x) { var en = (d.encaisse || []).filter(function (y) { return y.mode === m; })[0]; return '<tr><td>' + esc(m) + '</td><td>' + esc(d.total.modes[x] || '—') + '</td>' + (d.droits.e && d.encaisse && d.encaisse.length ? '<td>' + esc(en ? en.encaisse : '—') + '</td>' : '') + '</tr>'; }).join('') + '</tbody></table></div>';
-  else if (d.droits.e && d.encaisse && d.encaisse.length) h += '<h2>Encaissé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Encaissé</th></tr></thead><tbody>' +
-    d.encaisse.map(function (y) { return '<tr><td>' + esc(y.mode) + '</td><td>' + esc(y.encaisse || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
-  if (d.droits.f && d.trouve && d.jours) h += joursCompta(d, c);
-  if (d.url) h += '<div class="cp-o"><a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir mon classeur du mois</a></div>';
-  return h;
-}
-/** Tableau des 12 mois : Mois | Facturé | Encaissé | Écart (facturé − encaissé), avec la ligne TOTAL ANNUEL. Les mois à venir ne comptent pas comme zéro. */
-function tableAnnuelle(lignes, titre, annee) {
-  var corps = lignes.map(function (l, i) {
-    var mois = '<td><span class="m-l">' + MOIS_NOMS[i] + '</span><span class="m-c">' + MOIS_COURTS[i] + '</span></td>';
-    if (moisFutur(annee, i + 1) && l.f === null && l.e === null) return '<tr class="avenir">' + mois + '<td colspan="3">Pas encore disponible</td></tr>';
-    var x = l.f !== null && l.e !== null ? l.f - l.e : null;
-    return '<tr data-am="' + (i + 1) + '" class="clic">' + mois + '<td>' + eurC(l.f) + '</td><td>' + eurC(l.e) + '</td><td>' + eurC(x) + '</td></tr>';
-  }).join(''), t = totauxMois(lignes);
-  return (titre ? '<h2>' + titre + '</h2>' : '') + '<div class="cp-l cp-sc"><table class="cp-t cp-an"><thead><tr><th>Mois</th><th>Facturé<span class="m-c"> (€)</span></th><th>Encaissé<span class="m-c"> (€)</span></th><th>Écart<span class="m-c"> (€)</span></th></tr></thead><tbody>' + corps + '</tbody>' +
-    '<tfoot><tr><td><span class="m-l">TOTAL ANNUEL</span><span class="m-c">TOTAL</span></td><td>' + eurC(t.f) + '</td><td>' + eurC(t.e) + '</td><td>' + eurC(t.x) + '</td></tr></tfoot></table></div>';
-}
-function noteEcart() { return '<p class="hint">Du 1er janvier au dernier mois disponible. Écart = facturé − encaissé, calculé sur les mois où les deux montants sont renseignés. Un tiret : pas de donnée.</p>'; }
+/** Praticien : sa seule carte — le total de chaque mois ouvert par Maxime ou Hervé, avec la courbe. Ni journées, ni modes de règlement. */
 function rendreCompta() {
   var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous;
-  if (tous && c.vue === 'annuel') return rendreAnnuel();
-  var d = c.data && !c.data.erreur && (!tous || (c.data.annee === c.annee && c.data.mois === c.mois)) ? c.data : null;
-  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires facturé du mois, praticien par praticien et pour tout le cabinet. ' : d && d.regles ? 'Les périodes et les montants que Dr Maxime Berdugo ou Dr Hervé Berdugo vous ont ouverts. ' : 'Votre chiffre d’affaires facturé du mois en cours. ') +
-    'Les chiffres viennent des classeurs Google Sheets : on continue de les remplir là-bas.</p></div></div>';
-  if (!tous && d && d.regles) h += comptaRegles(d, c); // ── Praticien avec autorisations réglées par Maxime ou Hervé ──
-  else if (!tous) {
-    // ── Praticien : son facturé du mois en cours, rien d'autre ──
-    h += '<div class="cp-who"><b>' + esc(S.me.nom) + '</b><span>' + esc(d ? d.libelle : MOIS_NOMS[c.mois - 1] + ' ' + c.annee) + '</span><button id="cpR" class="cp-rf" aria-label="Actualiser" title="Actualiser">↻</button></div>';
-    if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
-    else if (!d) h += sq('stats', 'Lecture du classeur…');
-    else if (!d.trouve) h += '<div class="empty">Aucune donnée disponible pour le mois en cours.</div>';
-    else {
-      h += '<div class="cp-k cp-k1"><div class="ca"><small>Chiffre d’affaires facturé · ' + esc(d.libelle) + '</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div></div>';
-      if (d.total && d.total.modes && d.total.modes.length) h += '<h2>Facturé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th></tr></thead><tbody>' +
-        (d.modes || []).map(function (m, x) { return '<tr><td>' + esc(m) + '</td><td>' + esc(d.total.modes[x] || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
-      h += joursCompta(d, c);
-      if (d.url) h += '<div class="cp-o"><a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir mon classeur du mois</a></div>';
-    }
-  } else {
-    // ── Maxime et Hervé : tous les praticiens, toutes les périodes ──
-    h += '<div class="cp-pr"><button data-pp="*" class="' + (c.pid === '*' ? 'on' : '') + '">Tous les praticiens</button>' + tous.map(function (p) { return '<button data-pp="' + esc(p.id) + '" class="' + (p.id === c.pid ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
-    h += selPeriode(c, true);
-    var an = c.an && c.an.cle === '*:' + c.annee && !c.an.erreur ? c.an : null, mi = c.mois - 1;
-    h = h.replace('<div class="ph"><div class="ph-t">', '<div class="ph"><div class="ph-t"><button class="ph-ret" id="cpRet">‹ Année ' + c.annee + ' · tous les praticiens</button>');
-    var bandeau = '';
-    if (c.pid === '*') {
-      if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
-      else if (!an) h += sq('table', 'Lecture de la synthèse…');
-      else {
-        var tf = 0, te = 0, af = false, ae = false;
-        var lignes = an.praticiens.map(function (p) { var m = p.mois[mi]; if (m.f !== null) { tf += m.f; af = true; } if (m.e !== null) { te += m.e; ae = true; }
-          return '<tr class="clic" data-vp="' + esc(p.id) + '"><td><span class="m-l">' + esc(p.nom) + '</span><span class="m-c">' + esc(p.prenom) + '</span> <span class="cp-go">›</span></td><td>' + eurT(m.f) + '</td></tr>'; }).join('');
-        h += '<div class="cp-k cp-k1"><div class="ca"><small>Facturé · ' + MOIS_NOMS[mi] + ' ' + c.annee + ' · cabinet</small><b>' + (af ? eur(tf) : '—') + '</b></div></div>';
-        h += '<h2>' + MOIS_NOMS[mi] + ' ' + c.annee + ' · par praticien</h2><div class="cp-l cp-sc"><table class="cp-t cp-an"><thead><tr><th>Praticien</th><th>Facturé</th></tr></thead><tbody>' + lignes +
-          '</tbody><tfoot><tr><td>Total cabinet</td><td>' + (af ? eur(tf) : '—') + '</td></tr></tfoot></table></div><p class="hint">Touchez un praticien pour voir ses journées du mois.</p>';
-        h += sourceAnnuel(an);
-      }
-    } else {
-      if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
-      else if (!d) h += sq('stats', 'Lecture du classeur…');
-      else {
-        h += '<h2 class="cp-h">' + esc(d.praticien.nom) + ' · ' + esc(d.libelle) + '</h2>';
-        if (!d.trouve) h += '<div class="empty">Pas de classeur « ' + esc(d.fichier) + ' » dans Google Drive.</div>' + bandeau;
-        else {
-          h += '<div class="cp-k"><div class="ca"><small>Chiffre d’affaires facturé</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div>' +
-            (d.joursTravailles ? '<div><small>Jours travaillés</small><b>' + esc(d.joursTravailles) + '</b></div>' : '') +
-            (d.moyenne ? '<div><small>Moyenne / jour</small><b>' + esc(d.moyenne) + '</b></div>' : '') + '</div>';
-          h += joursCompta(d, c, true);
-        }
-        h += '<div class="cp-o">' + (d.url ? '<a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir le classeur du mois</a>' : '') + '</div>';
-      }
-    }
-  }
-  if (d || (c.an && c.an.lu)) h += '<p class="hint">Lu le ' + esc(dHeure((d && d.lu) || c.an.lu)) + '.</p>';
+  if (tous) return rendreAnnuel();
+  var d = c.data && !c.data.erreur ? c.data : null;
+  var h = '<div class="ph"><div class="ph-t"><h1>Mon chiffre d’affaires</h1><p class="ph-g">' + (d && !d.regles ? 'Votre chiffre d’affaires facturé du mois en cours.' : 'Votre chiffre d’affaires facturé, mois par mois, sur les périodes que Dr Maxime Berdugo ou Dr Hervé Berdugo vous ont ouvertes.') + '</p></div></div>';
+  var ans = d ? d.annees.slice() : [];
+  if (d && ans.indexOf(d.annee) < 0) ans.push(d.annee);
+  ans.sort(function (a, b) { return b - a; });
+  h += '<div class="cp-sel">' + (ans.length > 1 ? '<label>Année<select id="cpA">' + ans.map(function (y) { return '<option' + (y === d.annee ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select></label>' : '') +
+    '<button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
+  if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
+  else if (!d) h += sq('stats', 'Lecture de vos chiffres…');
+  else if (d.refus) h += '<div class="empty">' + esc(d.refus) + '</div>';
+  else h += carteCA({ id: S.me.id, titre: S.me.nom, annee: d.annee, seul: true, perso: true, cumul: d.cumul,
+    mois: d.mois.map(function (x) { return x.o && x.f !== undefined ? x.f : null; }), ouverts: d.mois.map(function (x) { return x.o; }),
+    enc: d.mois.map(function (x) { return x.o && x.e !== undefined ? x.e : undefined; }) });
+  if (d) h += '<p class="hint">Lu le ' + esc(dHeure(d.lu)) + '.</p>';
   $('#main').innerHTML = h;
   brancherCompta();
+  dessinerCourbesCA();
 }
-function selPeriode(c, avecMois) {
+function selAnnee(c) {
   var an0 = Number(S.today.slice(0, 4)), ans = []; for (var y = an0; y >= Math.min(an0 - 4, c.annee); y--) ans.push(y);
-  return '<div class="cp-sel">' + (avecMois ? '<label>Mois<select id="cpM">' + MOIS_NOMS.map(function (m, i) { return '<option value="' + (i + 1) + '"' + (i + 1 === c.mois ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></label>' : '') +
-    '<label>Année<select id="cpA">' + ans.map(function (y) { return '<option' + (y === c.annee ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select></label>' +
-    (avecMois ? '<button id="cpP" aria-label="Mois précédent">‹</button><button id="cpN" aria-label="Mois suivant">›</button>' : '') + '<button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
+  return '<div class="cp-sel"><label>Année<select id="cpA">' + ans.map(function (y) { return '<option' + (y === c.annee ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select></label><button id="cpR" aria-label="Actualiser" title="Actualiser">↻</button></div>';
 }
-/** Page « Chiffre d'affaires facturé » (Maxime et Hervé) : le cabinet puis chaque praticien — total de l'année, courbe et montant de chaque mois. */
+/** Page « Chiffre d'affaires facturé » (Maxime et Hervé) : d'abord tout le cabinet, seul ; un bouton par praticien affiche sa carte à lui. Montants mensuels uniquement. */
 function rendreAnnuel() {
   var c = S.cpt, an = c.an && c.an.cle === '*:' + c.annee && !c.an.erreur ? c.an : null;
-  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires facturé</h1><p class="ph-g">Le facturé de chaque praticien sur l’année, mois par mois, d’après la synthèse Google Sheets. Touchez un mois pour voir ses journées.</p></div></div>';
-  h += selPeriode(c, false);
+  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires facturé</h1><p class="ph-g">Le facturé de l’année, mois par mois, d’après la synthèse Google Sheets. Touchez un praticien pour voir son chiffre.</p></div></div>';
+  h += selAnnee(c);
   if (c.an && c.an.erreur) h += '<div class="err">' + esc(c.an.erreur) + '</div>';
   else if (!an) h += sq('table', 'Lecture de la synthèse…');
   else {
-    // un bouton par praticien : son chiffre facturé et sa courbe, seuls à l'écran
     if (c.caP && !an.praticiens.some(function (p) { return p.id === c.caP; })) c.caP = '';
-    h += '<div class="cp-pr ca-pr"><button data-cab="" class="' + (!c.caP ? 'on' : '') + '">Tous</button>' + an.praticiens.map(function (p) { return '<button data-cab="' + esc(p.id) + '" class="' + (c.caP === p.id ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
+    h += '<div class="cp-pr ca-pr" role="tablist"><button data-cab="" role="tab" aria-selected="' + !c.caP + '" class="' + (!c.caP ? 'on' : '') + '">Cabinet</button>' + an.praticiens.map(function (p) { return '<button data-cab="' + esc(p.id) + '" role="tab" aria-selected="' + (c.caP === p.id) + '" class="' + (c.caP === p.id ? 'on' : '') + '">' + esc(p.prenom) + '</button>'; }).join('') + '</div>';
     if (!S.autRes && !S.autResEnCours) { S.autResEnCours = true; apiFond('getAutorisationsCompta', '').then(function (r) { S.autRes = r.praticiens; S.autResEnCours = false; if (S.vue === 'compta' && S.cpt.vue === 'annuel') rendreAnnuel(); }).catch(function () { S.autResEnCours = false; }); }
-    if (!c.caP) {
-      var cab = an.mois.map(function (m) { return m.f; });
-      h += carteCA({ id: '*', titre: 'Tout le cabinet', sous: an.praticiens.length + ' praticiens', mois: cab, annee: c.annee, cabinet: true });
-    }
-    an.praticiens.forEach(function (p) { if (!c.caP || c.caP === p.id) h += carteCA({ id: p.id, titre: p.nom, mois: p.mois.map(function (m) { return m.f; }), annee: c.annee, seul: !!c.caP, droits: droitsAffiches(p.id) }); });
+    if (!c.caP) h += carteCA({ id: '*', titre: 'Tout le cabinet', sous: an.praticiens.length + ' praticiens', mois: an.mois.map(function (m) { return m.f; }), annee: c.annee, cabinet: true, seul: true });
+    else an.praticiens.forEach(function (p) { if (c.caP === p.id) h += carteCA({ id: p.id, titre: p.nom, mois: p.mois.map(function (m) { return m.f; }), annee: c.annee, seul: true, droits: droitsAffiches(p.id) }); });
     h += sourceAnnuel(an);
     h += '<p class="hint">Lu le ' + esc(dHeure(an.lu)) + '.</p>';
   }
@@ -4418,23 +4315,27 @@ function rendreAnnuel() {
   brancherCompta();
   dessinerCourbesCA();
 }
-/** Une carte : bandeau bleu marine (nom + total facturé de l'année), courbe d'évolution, puis le montant de chaque mois. */
+/** Une carte : bandeau bleu marine (nom + total facturé), courbe d'évolution, puis le montant de chaque mois (non cliquable : pas de détail). */
 function carteCA(o) {
   var vals = o.mois.filter(function (v) { return v !== null && v !== undefined; });
-  var total = vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) : null;
+  var total = vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) : null, libT = 'Total de l’année';
+  if (o.cumul && o.cumul.f !== undefined) { total = o.cumul.f; libT = 'Total ' + o.annee + (o.cumul.jusqua && o.annee === Number(S.today.slice(0, 4)) ? ' · à fin ' + o.cumul.jusqua.toLowerCase() : ''); }
+  else if (o.perso) libT = (o.ouverts || []).filter(Boolean).length > 1 ? 'Total des mois ouverts' : 'Total';
   var faits = o.mois.map(function (v, i) { return v !== null && v !== undefined && !moisFutur(o.annee, i + 1) ? v : null; }).filter(function (v) { return v !== null; });
-  var moy = faits.length ? faits.reduce(function (a, b) { return a + b; }, 0) / faits.length : null;
-  var max = faits.length ? Math.max.apply(null, faits) : null;
+  var moy = faits.length > 1 ? faits.reduce(function (a, b) { return a + b; }, 0) / faits.length : null;
+  var max = faits.length > 1 ? Math.max.apply(null, faits) : null;
   var auj = Number(S.today.slice(0, 4)) === o.annee ? Number(S.today.slice(5, 7)) : 0;
+  var encT = o.cumul && o.cumul.e !== undefined ? '<span>Encaissé ' + eurT(o.cumul.e) + '</span>' : '';
   var h = '<section class="ca-c' + (o.cabinet ? ' ca-cab' : '') + (o.seul ? ' ca-seul' : '') + '">' +
     '<div class="ca-b"><div class="ca-n"><b>' + esc(o.titre) + '</b><small>' + (o.sous ? esc(o.sous) + ' · ' : '') + 'facturé ' + o.annee + '</small>' +
     (o.droits ? '<button class="ca-dr" data-cadr="' + esc(o.id) + '" title="Ce que ce praticien peut voir dans sa comptabilité"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Ses droits : ' + esc(o.droits) + '</span></button>' : '') + '</div>' +
-    '<div class="ca-t"><small>Total de l’année</small><b>' + eurT(total) + '</b>' + (moy !== null ? '<span>Moyenne ' + eur(moy) + ' / mois</span>' : '') + '</div></div>' +
-    '<div class="ca-g" data-courbe="' + esc(o.id) + '" data-vals="' + esc(JSON.stringify(o.mois)) + '" data-an="' + o.annee + '" role="img" aria-label="' + esc('Évolution du facturé ' + o.annee + ' : ' + o.titre) + '"></div>' +
+    '<div class="ca-t"><small>' + esc(libT) + '</small><b>' + eurT(total) + '</b>' + (moy !== null ? '<span>Moyenne ' + eur(moy) + ' / mois</span>' : '') + encT + '</div></div>' +
+    (o.perso && faits.length < 2 && !(o.cumul && !vals.length) ? '' : '<div class="ca-g" data-courbe="' + esc(o.id) + '" data-vals="' + esc(JSON.stringify(o.mois)) + '" data-an="' + o.annee + '"' + (o.perso && !vals.length ? ' data-vide="' + esc(o.cumul ? 'Seul le total de l’année vous est communiqué.' : 'Pas encore de chiffre pour ce mois.') + '"' : '') + ' role="img" aria-label="' + esc('Évolution du facturé ' + o.annee + ' : ' + o.titre) + '"></div>') + // un seul mois : pas de courbe
     '<div class="ca-m">' + o.mois.map(function (v, i) {
-      var fut = moisFutur(o.annee, i + 1), vide = v === null || v === undefined;
-      return '<button class="ca-mo' + (fut ? ' fut' : '') + (i + 1 === auj ? ' cur' : '') + (!vide && v === max ? ' top' : '') + '" data-cam="' + (i + 1) + '" data-cap="' + esc(o.id) + '"' + (fut ? ' disabled' : '') + '>' +
-        '<small>' + MOIS_COURTS[i] + '</small><b>' + (fut ? '—' : vide ? '—' : eur(v)) + '</b></button>';
+      var fut = moisFutur(o.annee, i + 1), vide = v === null || v === undefined, ferme = o.ouverts && !o.ouverts[i] && !fut;
+      var en = o.enc && o.enc[i] !== undefined ? '<i>Encaissé ' + eurT(o.enc[i]) + '</i>' : '';
+      return '<div class="ca-mo' + (fut ? ' fut' : '') + (ferme ? ' nf' : '') + (i + 1 === auj ? ' cur' : '') + (!vide && v === max ? ' top' : '') + '">' +
+        '<small>' + MOIS_COURTS[i] + '</small><b>' + (fut || (vide && !ferme) ? '—' : ferme ? 'Non ouvert' : eur(v)) + '</b>' + en + '</div>';
     }).join('') + '</div></section>';
   return h;
 }
@@ -4448,12 +4349,13 @@ function droitsAffiches(pid) {
 }
 /** Courbes dessinées à la largeur réelle de la carte (texte net sur téléphone comme sur ordinateur), avec survol mois par mois. */
 function dessinerCourbesCA() {
+  var z0 = $('.ca-g[data-courbe]'); S.lCourbe = z0 ? z0.clientWidth : 0;
   $$('.ca-g[data-courbe]').forEach(function (z) {
     var vals = JSON.parse(z.getAttribute('data-vals')), annee = Number(z.getAttribute('data-an'));
     var cs = getComputedStyle(z), seul = !!z.closest('.ca-seul'), W = Math.max(240, z.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)), H = W < 480 ? (seul ? 200 : 150) : (seul ? 260 : 180), pl = W < 480 ? 44 : 56, pr = 14, pt = 18, pb = 26;
     var pts = vals.map(function (v, i) { return v === null || v === undefined || moisFutur(annee, i + 1) ? null : v; });
     var connus = pts.filter(function (v) { return v !== null; });
-    if (!connus.length) { z.innerHTML = '<div class="ca-vide">Pas encore de chiffre pour ' + annee + '.</div>'; return; }
+    if (!connus.length) { z.innerHTML = '<div class="ca-vide">' + esc(z.getAttribute('data-vide') || 'Pas encore de chiffre pour ' + annee + '.') + '</div>'; return; }
     var vmax = Math.max.apply(null, connus), pas = arrondiPas(vmax / 3), top = Math.max(pas * 3, pas);
     var x = function (i) { return pl + (W - pl - pr) * i / 11; }, y = function (v) { return pt + (H - pt - pb) * (1 - v / top); };
     var g = '';
@@ -4506,38 +4408,17 @@ function cheminLisse(p) {
   for (i = 0; i < n - 1; i++) d += ' C' + (p[i][0] + dx[i] / 3) + ',' + (p[i][1] + t[i] * dx[i] / 3) + ' ' + (p[i + 1][0] - dx[i] / 3) + ',' + (p[i + 1][1] - t[i + 1] * dx[i] / 3) + ' ' + p[i + 1][0] + ',' + p[i + 1][1];
   return d;
 }
-window.addEventListener('resize', function () { clearTimeout(S.tCourbe); S.tCourbe = setTimeout(function () { if (S.vue === 'compta' && $('.ca-g[data-courbe]')) dessinerCourbesCA(); }, 150); });
+window.addEventListener('resize', function () { clearTimeout(S.tCourbe); S.tCourbe = setTimeout(function () { var z = $('.ca-g[data-courbe]'); if (S.vue !== 'compta' || !z || z.clientWidth === S.lCourbe) return; dessinerCourbesCA(); }, 150); }); // téléphone : la barre d'adresse qui se replie ne redessine pas
 function brancherCompta() {
   var c = S.cpt;
-  $('#cpR').onclick = function () { chargerCompta(true); };
-  if ($('#cpRet')) $('#cpRet').onclick = function () { c.vue = 'annuel'; rendreCompta(); window.scrollTo(0, 0); };
-  if ($('#cpAnn')) $('#cpAnn').onclick = function () { c.vue = 'annuel'; c.anP = ''; rendreCompta(); window.scrollTo(0, 0); };
-  $$('[data-pp]').forEach(function (b) { b.onclick = function () { c.pid = b.getAttribute('data-pp'); c.ouverts = {}; chargerCompta(true); }; });
-  $$('[data-vp]').forEach(function (b) { b.onclick = function () { c.pid = b.getAttribute('data-vp'); c.ouverts = {}; chargerCompta(true); window.scrollTo(0, 0); }; });
-  $$('[data-ap]').forEach(function (b) { b.onclick = function () { c.anP = b.getAttribute('data-ap'); rendreCompta(); window.scrollTo(0, 0); }; });
-  $$('[data-anp]').forEach(function (b) { b.onclick = function () { c.anP = b.getAttribute('data-anp'); rendreCompta(); window.scrollTo(0, 0); }; });
+  if ($('#cpR')) $('#cpR').onclick = function () { chargerCompta(true); };
   $$('[data-cab]').forEach(function (b) { b.onclick = function () { c.caP = b.getAttribute('data-cab'); rendreAnnuel(); }; });
   $$('[data-cadr]').forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); ficheAutoCompta(b.getAttribute('data-cadr')); }; });
-  $$('[data-cam]').forEach(function (b) { b.onclick = function () { c.mois = Number(b.getAttribute('data-cam')); c.pid = b.getAttribute('data-cap'); c.vue = 'mois'; c.ouverts = {}; c.data = null; chargerCompta(); window.scrollTo(0, 0); }; });
-  $$('tr[data-am]').forEach(function (b) { b.onclick = function () { c.mois = Number(b.getAttribute('data-am')); if (c.vue === 'annuel') { c.pid = c.anP || '*'; c.vue = 'mois'; } c.ouverts = {}; c.data = null; chargerCompta(); window.scrollTo(0, 0); }; });
-  if ($('#cpA')) $('#cpA').onchange = function () { c.annee = Number(this.value); c.ouverts = {}; c.data = null; chargerCompta(); };
-  if ($('#cpM')) {
-    $('#cpM').onchange = function () { c.mois = Number(this.value); c.ouverts = {}; c.data = null; chargerCompta(); };
-    $('#cpP').onclick = function () { if (--c.mois < 1) { c.mois = 12; c.annee--; } c.ouverts = {}; c.data = null; chargerCompta(); };
-    $('#cpN').onclick = function () { if (++c.mois > 12) { c.mois = 1; c.annee++; } c.ouverts = {}; c.data = null; chargerCompta(); };
-  }
-  if ($('#cpTous')) $('#cpTous').onclick = function () { c.tousJours = !c.tousJours; rendreCompta(); };
-  if ($('#cpPer')) $('#cpPer').onchange = function () {
-    var v = this.value; c.choixP = true; c.ouverts = {}; c.data = null;
-    if (v.charAt(0) === 'a') { c.annee = Number(v.slice(1)); c.mois = c.annee < Number(S.today.slice(0, 4)) ? 12 : Number(S.today.slice(5, 7)); }
-    else { c.annee = Number(v.split('-')[0]); c.mois = Number(v.split('-')[1]); }
-    chargerCompta();
-  };
-  $$('.cp-j>button').forEach(function (b) { b.onclick = function () { var k = b.parentNode.getAttribute('data-j'); c.ouverts = c.ouverts || {}; c.ouverts[k] = !c.ouverts[k]; rendreCompta(); }; });
+  if ($('#cpA')) $('#cpA').onchange = function () { c.annee = Number(this.value); c.choixA = true; c.data = null; chargerCompta(); };
 }
 function sourceAnnuel(an) {
   return '<div class="cp-o">' + (an.url ? '<a class="btn" href="' + esc(an.url) + '" target="_blank" rel="noopener">Ouvrir la synthèse de l’année</a>' : '') + '</div>' +
-    (an.source === 'classeurs' ? '<p class="hint">Pas de synthèse pour ' + an.annee + ' : facturé lu dans les classeurs du mois ; encaissé non disponible.</p>' : '');
+    (an.source === 'classeurs' ? '<p class="hint">Pas de synthèse pour ' + an.annee + ' : facturé lu dans les classeurs du mois.</p>' : '');
 }
 function euros(t) { var n = parseFloat(String(t || '').replace(/[^\d,.-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
 // ───────── Prothèses : suivi des livraisons Protheasy (numéros, patient, dentiste, dates, statuts — comme dans Protheasy ; jamais de montant) ─────────
@@ -4948,7 +4829,7 @@ var ANIM = (function () {
     return p.avant + (neg ? '-' : '') + s[0] + (p.dec ? ',' + s[1] : '') + p.apres;
   }
   function contexte() {
-    if (S.vue === 'compta' && S.cpt) return [S.cpt.vue || '', S.cpt.pid, S.cpt.annee, S.cpt.mois].join(':');
+    if (S.vue === 'compta' && S.cpt) return [S.cpt.vue || '', S.cpt.caP || '', S.cpt.annee].join(':');
     if ((S.vue === 'impayes' || S.vue === 'relances') && S.sv) return S.sv.pid;
     return '';
   }
