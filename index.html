@@ -1615,7 +1615,7 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .hz-n{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .hz-n b{font-size:14.5px}
 .hz.mod{border-color:var(--acc);background:#F2F6FF}
-.hz-c{font-size:13.5px;color:var(--ink);margin:-2px 0 6px}.hz-m{font-size:13.5px;color:var(--ink2);font-variant-numeric:tabular-nums}.hz-s{font-size:13px;margin-top:8px}
+.hz-c{font-size:13.5px;color:var(--ink);margin:-2px 0 6px}.hz-e{margin-left:auto;font-size:12.5px;color:var(--ink3)}.hz-e .lk{font-size:12.5px}.hz-m{font-size:13.5px;color:var(--ink2);font-variant-numeric:tabular-nums}.hz-s{font-size:13px;margin-top:8px}
 .pz-l{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:14px;color:var(--ink2)}.pz-l input[type=time]{max-width:130px}.pz-l .chk2{margin-left:4px;color:var(--ink)}
 .af-opt{display:flex;flex-direction:column;gap:6px;margin-top:10px}.af-opt .chk2{font-size:14px;color:var(--ink)}
 .hz-t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -1629,6 +1629,18 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .pl tr.pl-g td{background:#EEF3FB;color:var(--ink2);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;position:sticky;left:0}
 .as-h{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .af-h small{font-weight:500;color:var(--ink2)}
+
+/* fiche d'affectation compacte : salles et prénoms plus petits, côte à côte */
+.af-sl{gap:6px}.af-et small{margin-bottom:4px}
+.af-sl .pch{min-height:34px;padding:0 12px;font-size:13.5px;border-width:1px}
+.af-sl .chips{gap:6px}
+.selp-plat{border:0;background:none;box-shadow:none;padding:0}
+.selp-plat .selp-l{padding:0;max-height:none}
+.selp-plat .selp-g{border:0;padding:0;margin:0}
+.selp-plat .selp-b{padding:0}
+.selp-plat .chips{gap:6px}
+.selp-plat .pch{min-height:36px;padding:0 13px;font-size:14px;border-width:1px}
+.selp-plat .selp-s:empty{display:none}
 </style>
 </head>
 <body>
@@ -2565,14 +2577,14 @@ function selecteurPersonnes(zone, opts) {
     return homonymes ? u.nom.replace(/^Dr\s+/, '') : p;
   };
   var dessiner = function () {
-    var gs = groupesPersonnes(opts.personnes);
+    var gs = opts.plat ? [{ cle: 'tous', fonction: '', liste: opts.personnes.slice().sort(function (x, y) { return (x.prenom || x.nom).localeCompare(y.prenom || y.nom, 'fr'); }) }] : groupesPersonnes(opts.personnes);
     var avecMoi = opts.moi && opts.personnes.some(function (u) { return u.id === S.me.id; });
-    zone.innerHTML = '<div class="selp"><div class="selp-h"><input type="search" class="selp-q" placeholder="Rechercher un prénom" aria-label="Rechercher un prénom" autocomplete="off">' +
+    zone.innerHTML = '<div class="selp' + (opts.plat ? ' selp-plat' : '') + '"><div class="selp-h"' + (opts.plat ? ' style="display:none"' : '') + '><input type="search" class="selp-q" placeholder="Rechercher un prénom" aria-label="Rechercher un prénom" autocomplete="off">' +
       '<span class="selp-n"></span></div>' +
       (avecMoi ? '<div class="selp-b" style="padding-top:10px"><button type="button" class="pch moi" data-moi="1">Moi-même</button></div>' : '') +
       '<div class="selp-l" style="max-height:none">' +
       gs.map(function (g) {
-        return '<div class="selp-g" data-grp="' + esc(g.cle) + '"><div class="selp-gt"><span>' + esc(g.fonction) + '</span><button type="button" class="lk" data-g="' + esc(g.cle) + '">Tous</button></div>' +
+        return '<div class="selp-g" data-grp="' + esc(g.cle) + '">' + (opts.plat ? '' : '<div class="selp-gt"><span>' + esc(g.fonction) + '</span><button type="button" class="lk" data-g="' + esc(g.cle) + '">Tous</button></div>') +
           '<div class="selp-b"><div class="chips">' + g.liste.map(function (u) {
             var info = opts.info ? opts.info(u.id) : '';
             return '<button type="button" class="pch" data-id="' + esc(u.id) + '" data-q="' + esc(sansAccent((u.prenom || '') + ' ' + u.nom.replace(/^Dr\s+/, ''))) + '" title="' + esc(u.nom) + '">' + esc(libelle(u)) + (info ? ' <small>' + esc(info) + '</small>' : '') + '</button>';
@@ -3163,7 +3175,7 @@ function formAffectation(a, salleInit) {
   var hz = {};
   a.assistantes.forEach(function (y) {
     var k = y.independante ? 'ext:' + y.nom : y.cle;
-    if (y.propre) hz[k] = { meme: false, debut: y.debut, fin: y.fin, pd: y.pause ? y.pause.debut : '13:00', pf: y.pause ? y.pause.fin : '14:00', sans: !y.pause };
+    if (y.propre) hz[k] = { debut: y.debut, fin: y.fin, pd: y.pause ? y.pause.debut : '13:00', pf: y.pause ? y.pause.fin : '14:00', sans: !y.pause };
   });
   var etages = [];
   r.salles.filter(function (s) { return s.active || s.id === a.salle; }).forEach(function (s) {
@@ -3238,7 +3250,7 @@ function formAffectation(a, salleInit) {
   var bloc = function (suf, ids, ext) {
     var sel = null;
     var rendre = function () {
-      if (!sel) sel = selecteurPersonnes($('#eA' + suf), { personnes: r.assistantes, choisis: ids, info: dispoTexte, onChange: rendreHoraires });
+      if (!sel) sel = selecteurPersonnes($('#eA' + suf), { personnes: r.assistantes, choisis: ids, info: dispoTexte, onChange: rendreHoraires, plat: true });
       else sel.redessiner();
       $('#eX' + suf).innerHTML = ext.map(function (k) {
         return '<span class="chip on ext">' + esc(k.slice(4)) + ' · indépendante <button type="button" class="x-ext" data-k="' + esc(k) + '" aria-label="Retirer ' + esc(k.slice(4)) + '">×</button></span>';
@@ -3269,38 +3281,39 @@ function formAffectation(a, salleInit) {
   var pauseTxt = function (sans, d, f) { return sans || !d || !f ? 'sans pause' : 'pause ' + hm(d) + '–' + hm(f); };
   var jetonsFiche = function () { var v = choisisIds.concat(externes); if (splitA()) choisis2.concat(externes2).forEach(function (x) { if (v.indexOf(x) < 0) v.push(x); }); return v; };
   var nomJeton = function (k) { if (k.indexOf('ext:') === 0) return k.slice(4); var u = r.assistantes.filter(function (x) { return x.id === k; })[0]; return u ? (u.prenom || u.nom) : k; };
+  // horaires proposés pour une assistante : ceux du praticien (en demi-journées : ceux de sa demi-journée ; le temps entre les deux est sa pause)
+  var defautH = function (k) {
+    var h1 = $('#eH1').value, h2 = $('#eH2').value;
+    if (!split()) return { debut: h1, fin: h2, pd: pz.sans ? '' : pz.debut, pf: pz.sans ? '' : pz.fin, sans: pz.sans };
+    var mat = choisisIds.concat(externes).indexOf(k) >= 0, apm = splitA() ? choisis2.concat(externes2).indexOf(k) >= 0 : mat;
+    if (mat && apm) return { debut: h1, fin: h2, pd: C.matin[1], pf: C.apresMidi[0], sans: false };
+    return mat ? { debut: h1, fin: C.matin[1], pd: '', pf: '', sans: true } : { debut: C.apresMidi[0], fin: h2, pd: '', pf: '', sans: true };
+  };
   var rendreHoraires = function () {
-    var ids = jetonsFiche(), h1 = $('#eH1').value, h2 = $('#eH2').value;
+    var ids = jetonsFiche();
     $('#eHz').classList.toggle('hidden', !ids.length);
-    if (split()) {
-      $('#eHzL').innerHTML = ''; $('#eHzH').textContent = 'En demi-journées, chaque assistante suit les horaires de sa demi-journée ; le temps entre les deux compte comme sa pause.';
-      return;
-    }
-    $('#eHzH').textContent = 'Le tableau Horaires se remplit tout seul d’après les salles.';
+    $('#eHzH').textContent = 'Remplis comme le praticien : changez une heure si l’assistante arrive plus tard ou part plus tôt. Le tableau Horaires se remplit tout seul.';
     $('#eHzL').innerHTML = ids.map(function (k) {
-      var v = hz[k] || { meme: true }, d = k.indexOf('ext:') === 0 ? null : dispoDe(k);
+      var propre = !!hz[k], v = hz[k] || defautH(k), d = k.indexOf('ext:') === 0 ? null : dispoDe(k);
       var info = (k.indexOf('ext:') === 0 ? '<span class="tag">Indépendante</span>' : '') + (d && d.statut === 'Congé' ? '<span class="tag t-warn">en congé ce jour-là</span>' : d && d.statut === 'Repos' ? '<span class="meta">prévue en repos</span>' : '');
-      var corpsH = v.meme ? '<div class="hz-m">' + hm(h1) + ' – ' + hm(h2) + ' · ' + pauseTxt(pz.sans, pz.debut, pz.fin) + '</div>' :
-        '<div class="hz-t"><label>De<input type="time" step="900" data-k="debut" value="' + esc(v.debut) + '"></label><label>à<input type="time" step="900" data-k="fin" value="' + esc(v.fin) + '"></label>' +
-        '<label>Pause<input type="time" step="300" data-k="pd" value="' + esc(v.pd) + '"' + (v.sans ? ' disabled' : '') + '></label><label>à<input type="time" step="300" data-k="pf" value="' + esc(v.pf) + '"' + (v.sans ? ' disabled' : '') + '></label></div>' +
-        '<label class="chk2 hz-s"><input type="checkbox" data-k="sans"' + (v.sans ? ' checked' : '') + '> Sans pause</label>';
-      return '<div class="hz' + (v.meme ? '' : ' mod') + '" data-hz="' + esc(k) + '"><div class="hz-n"><b>' + esc(nomJeton(k)) + '</b>' + info + '</div>' +
-        '<label class="chk2 hz-c"><input type="checkbox" data-k="meme"' + (v.meme ? ' checked' : '') + '> Mêmes horaires que le praticien</label>' + corpsH + '</div>';
+      return '<div class="hz' + (propre ? ' mod' : '') + '" data-hz="' + esc(k) + '"><div class="hz-n"><b>' + esc(nomJeton(k)) + '</b>' + info +
+        '<span class="hz-e">' + (propre ? '<button type="button" class="lk hz-r">↺ Comme le praticien</button>' : 'comme le praticien') + '</span></div>' +
+        '<div class="hz-t"><label>Arrivée<input type="time" step="900" data-k="debut" value="' + esc(v.debut) + '"></label><label>Départ<input type="time" step="900" data-k="fin" value="' + esc(v.fin) + '"></label>' +
+        '<label>Pause<input type="time" step="300" data-k="pd" value="' + esc(v.sans ? '' : v.pd) + '"' + (v.sans ? ' disabled' : '') + '></label><label>à<input type="time" step="300" data-k="pf" value="' + esc(v.sans ? '' : v.pf) + '"' + (v.sans ? ' disabled' : '') + '></label></div>' +
+        '<label class="chk2 hz-s"><input type="checkbox" data-k="sans"' + (v.sans ? ' checked' : '') + '> Sans pause</label></div>';
     }).join('');
     $$('#eHzL .hz').forEach(function (z) {
       var k = z.getAttribute('data-hz');
+      var lire = function () { var v = hz[k] || defautH(k); return { debut: v.debut, fin: v.fin, pd: v.pd || '13:00', pf: v.pf || '14:00', sans: v.sans }; };
       $$('input', z).forEach(function (x) {
         x.oninput = x.onchange = function () {
-          var f = x.getAttribute('data-k'), v = hz[k] || { meme: true };
-          if (f === 'meme') {
-            v.meme = x.checked;
-            if (!v.meme && !v.debut) { v.debut = $('#eH1').value; v.fin = $('#eH2').value; v.pd = pz.debut; v.pf = pz.fin; v.sans = pz.sans; }
-            hz[k] = v; rendreHoraires(); return;
-          }
+          var f = x.getAttribute('data-k'), v = lire();
           if (f === 'sans') { v.sans = x.checked; hz[k] = v; rendreHoraires(); return; }
-          v[f] = x.value; hz[k] = v;
+          v[f] = x.value; hz[k] = v; z.classList.add('mod');
+          var e = $('.hz-e', z); if (e && !$('.hz-r', z)) { e.innerHTML = '<button type="button" class="lk hz-r">↺ Comme le praticien</button>'; $('.hz-r', z).onclick = function () { delete hz[k]; rendreHoraires(); }; }
         };
       });
+      if ($('.hz-r', z)) $('.hz-r', z).onclick = function () { delete hz[k]; rendreHoraires(); };
     });
   };
   var rendreChips = bloc('', choisisIds, externes);
@@ -3366,13 +3379,14 @@ function formAffectation(a, salleInit) {
     // pause : jamais bloquante — incomplète ou hors de la journée, elle est simplement ignorée
     d.pause = pz.sans || !pz.debut || !pz.fin || pz.fin <= pz.debut ? 'aucune' : pz.debut + '-' + pz.fin;
     var ha = {}, pb = '';
-    d.assistantes.forEach(function (k) {
-      var v = hz[k]; if (!v || v.meme) return;
-      if (!v.debut || !v.fin || v.fin <= v.debut) { pb = pb || 'Horaires de ' + nomJeton(k) + ' : l’heure de fin doit être après l’heure de début.'; return; }
+    jetonsFiche().forEach(function (k) {
+      var v = hz[k]; if (!v) return; // inchangés : comme le praticien
+      if (!v.debut || !v.fin || v.fin <= v.debut) { pb = pb || 'Horaires de ' + nomJeton(k) + ' : l’heure de départ doit être après l’heure d’arrivée.'; return; }
       ha[k] = { debut: v.debut, fin: v.fin, pause: v.sans || !v.pd || !v.pf || v.pf <= v.pd ? 'aucune' : v.pd + '-' + v.pf };
     });
-    if (pb && !split()) return err(pb);
-    if (!split()) d.horairesAssistantes = ha;
+    if (pb) return err(pb);
+    var pour = function (liste) { var o = {}; liste.forEach(function (k) { if (ha[k]) o[k] = ha[k]; }); return o; };
+    d.horairesAssistantes = pour(d.assistantes);
     var b = this, retenir = $('#eHab') && $('#eHab').checked;
     var fin = function (x) {
       S.aff = x; S.jour = d.date; oublierSemaine(d.date); fermer(); rendreJour();
@@ -3387,6 +3401,7 @@ function formAffectation(a, salleInit) {
       if (splitS() && !salles2.length) { b.disabled = false; return err('Cochez le cabinet ou le bloc de l’après-midi.'); }
       var m = Object.assign({}, d, { fin: C.matin[1], pause: 'aucune' });
       var am = Object.assign({}, d, { id: '', debut: C.apresMidi[0], pause: 'aucune', salles: splitS() ? salles2.slice() : salles.slice(), assistantes: splitA() ? choisis2.concat(externes2) : d.assistantes.slice() });
+      am.horairesAssistantes = pour(am.assistantes); // ses horaires propres valent pour toute sa journée
       api('enregistrerAffectation', m).then(function () { return api('enregistrerAffectation', am); })
         .then(fin).catch(function (x) { b.disabled = false; err(msgErr(x)); });
       return;
