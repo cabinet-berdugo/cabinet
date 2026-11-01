@@ -1382,6 +1382,39 @@ table.pl{border-collapse:separate;border-spacing:0}
   .pl th{padding:10px 8px;font-size:11px}
   .cell .h{font-size:12px;padding:3px 7px}
 }
+/* ───── Autorisations comptables ───── */
+.ac-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.ac-c{justify-content:space-between}
+.ac-c .chev{width:18px;height:18px;color:var(--ink3);flex:none}
+.ac-p{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.ac-p span:last-child{display:flex;flex-direction:column}
+.ac-p small{color:var(--ink2);font-size:12.5px}
+.ac-av{width:44px;height:44px}
+.ac-an{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0 10px}
+.ac-an b{font-family:var(--f-titre);font-size:18px;min-width:56px;text-align:center}
+.ac-rac{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ac-rac .btn{border-radius:999px}
+.ac-t{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+.ac-t th{text-align:left;font-size:12px;color:#5A6B8C;text-transform:uppercase;letter-spacing:.03em;padding:8px 6px;border-bottom:1px solid var(--line)}
+.ac-t th+th,.ac-t td+td{text-align:center;width:84px}
+.ac-t td{padding:7px 6px;border-bottom:1px solid var(--line)}
+.ac-t tr.fut td{color:#9AA7BD}
+.ac-t tr.cour td:first-child{font-weight:700;color:var(--acc)}
+.ac-t tfoot td{font-weight:700;background:#F6F8FD;border-bottom:0}
+.ac-t tfoot td:first-child{border-radius:10px 0 0 10px}.ac-t tfoot td:last-child{border-radius:0 10px 10px 0}
+.ac-b{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 7px;background:#EAF1FF;color:var(--acc);margin-left:4px}
+.ac-b.gris{background:#F1F4F8;color:#8A99B2}
+.ac-x{display:inline-grid;place-items:center;cursor:pointer}
+.ac-x input{position:absolute;opacity:0;width:1px;height:1px}
+.ac-x i{width:24px;height:24px;border-radius:8px;border:1.5px solid #C5D0E2;background:#fff;display:grid;place-items:center;transition:background .15s,border-color .15s}
+.ac-x input:checked+i{background:var(--btn-grad);border-color:#0040C4}
+.ac-x input:checked+i::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ac-x input:focus-visible+i{outline:2px solid var(--acc);outline-offset:2px}
+.ac-x input:disabled+i{background:#F4F6FA;border-color:#E1E6EF;cursor:not-allowed}
+.ac-h{display:flex;flex-direction:column;gap:8px}
+.ac-h div{background:#F8FAFE;border:1px solid #EBF0F8;border-radius:12px;padding:9px 12px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.ac-h span{color:var(--ink2)}
+.cp-per{margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -3002,6 +3035,7 @@ function rendrePersonnel() {
   h += '<div class="filters ps-f"><span class="ps-q">' + ico('loupe') + '<input id="pQ" type="search" placeholder="Rechercher un nom, un rôle ou une adresse e-mail…" value="' + esc(S.persQ || '') + '"></span>' +
     (nbArch ? '<label class="chk2 ps-arch"><input type="checkbox" id="pArch"' + (S.persArch ? ' checked' : '') + '> Afficher les archivés (' + nbArch + ')</label>' : '') + '</div>';
   if (P.onglets && !q) h += blocRoles(P);
+  if (!q && S.cfg.compta && S.cfg.compta.tous) h += blocAutoCompta();
   var ordre = P.fonctions.concat(['']), corps = '';
   ordre.forEach(function (f) {
     var l = vis.filter(function (p) { return f ? p.fonction === f : P.fonctions.indexOf(p.fonction) < 0; });
@@ -3022,6 +3056,8 @@ function rendrePersonnel() {
   $('#main').innerHTML = h;
   $('#pAdd').onclick = function () { fichePersonne(null); };
   if (S.pers.peutAcces) $$('.rl-c').forEach(function (c) { c.onclick = function () { ficheRole(c.getAttribute('data-r')); }; });
+  $$('[data-acp]').forEach(function (c) { c.onclick = function () { ficheAutoCompta(c.getAttribute('data-acp')); }; });
+  if (S.cfg.compta && S.cfg.compta.tous && !S.autC && !S.autCEnCours) chargerAutoCompta();
   $('#pQ').oninput = function () { S.persQ = this.value; var pos = this.selectionStart; rendrePersonnel(); var n = $('#pQ'); n.focus(); n.setSelectionRange(pos, pos); };
   if ($('#pArch')) $('#pArch').onchange = function () { S.persArch = this.checked; rendrePersonnel(); };
   $$('.pc').forEach(function (c) {
@@ -3042,6 +3078,91 @@ function blocRoles(P) {
         P.onglets.filter(function (o) { return o.cle !== 'ongletCompta' || r === 'Chirurgien-dentiste' || r === 'Administrateur'; }).map(function (o) { var on = l.indexOf(o.cle) >= 0; return '<span class="' + (on ? 'on' : 'off') + '">' + (on ? '✓ ' : '') + esc(o.libelle) + '</span>'; }).join('') +
         '</span></button>';
     }).join('') + '</div></div>';
+}
+// ───────── Autorisations comptables des praticiens (Maxime et Hervé uniquement) ─────────
+function chargerAutoCompta() {
+  S.autCEnCours = true;
+  return api('getAutorisationsCompta', '').then(function (r) { S.autC = r; S.autCEnCours = false; if (S.vue === 'personnel' && !(S.persQ || '')) rendrePersonnel(); })
+    .catch(function (e) { S.autCEnCours = false; echec(e); });
+}
+function resumeAuto(x) {
+  if (!x.regle) return 'Règle d’origine : facturé du mois en cours (si le classeur est partagé)';
+  var t = [];
+  if (x.courant) t.push('mois en cours : ' + (x.courant === 'fe' ? 'facturé + encaissé' : x.courant === 'f' ? 'facturé' : 'encaissé'));
+  if (x.nbMois) t.push(x.nbMois + ' mois ouvert' + (x.nbMois > 1 ? 's' : ''));
+  if (x.cumuls) t.push(x.cumuls + ' cumul' + (x.cumuls > 1 ? 's' : '') + ' annuel' + (x.cumuls > 1 ? 's' : ''));
+  return t.length ? t.join(' · ') : 'Aucun accès';
+}
+function blocAutoCompta() {
+  var l = (S.autC && S.autC.praticiens) || S.cfg.compta.tous.map(function (p) { return { id: p.id, nom: p.nom, prenom: p.prenom, charge: true }; });
+  return '<div class="pg"><h2>Autorisations comptables</h2><p class="hint" style="margin:-4px 0 12px">Ce que chaque praticien peut consulter dans « Comptabilité » : facturé, encaissé, mois par mois et cumuls annuels. Les chiffres sont lus par l’application dans les Google Sheets, même si le praticien n’y a plus accès. Réservé à vous et à Dr Hervé Berdugo ; chaque modification est tracée.</p><div class="ac-l">' +
+    l.map(function (x) {
+      return '<button class="rl-c ac-c" data-acp="' + esc(x.id) + '"><span class="rl-t">' + ico('compta', 'rl-i') + '<span><b>' + esc(x.nom) + '</b><small>' + (x.charge ? 'Lecture…' : esc(resumeAuto(x))) + '</small></span></span>' + CHEV + '</button>';
+    }).join('') + '</div></div>';
+}
+function ficheAutoCompta(pid) {
+  tiroir('Autorisations comptables', sq('mini', 'Lecture des autorisations…'));
+  api('getAutorisationsCompta', pid).then(function (r) { S.autC = r; editeurAutoCompta(r); }).catch(function (e) { fermer(); echec(e); });
+}
+function editeurAutoCompta(r) {
+  var auj = r.aujourdhui, ac = Number(auj.slice(0, 4)), mc = Number(auj.slice(5, 7));
+  var g = r.regles ? JSON.parse(JSON.stringify(r.regles)) : { courantF: true, courantE: false, annees: {} };
+  var an = ac, p = r.praticien;
+  var A = function () { return (g.annees[an] = g.annees[an] || { m: {}, cumulF: false, cumulE: false }); };
+  var droit = function (m, k) { return (A().m[m] || '').indexOf(k) >= 0; };
+  var poser = function (m, k, v) {
+    var x = A().m[m] || '', f = k === 'f' ? v : x.indexOf('f') >= 0, e = k === 'e' ? v : x.indexOf('e') >= 0;
+    var n = (f ? 'f' : '') + (e ? 'e' : ''); if (n) A().m[m] = n; else delete A().m[m];
+  };
+  var avenir = function (m) { return an > ac || (an === ac && m > mc); };
+  var dessiner = function () {
+    var x = A();
+    var lignes = MOIS_NOMS.map(function (nm, i) {
+      var m = i + 1, fut = avenir(m), cour = an === ac && m === mc;
+      return '<tr class="' + (fut ? 'fut' : '') + (cour ? ' cour' : '') + '"><td>' + nm + (cour ? ' <span class="ac-b">en cours</span>' : '') + (fut ? ' <span class="ac-b gris">à venir</span>' : '') + '</td>' +
+        ['f', 'e'].map(function (k) { return '<td><label class="ac-x"><input type="checkbox" data-m="' + m + '" data-k="' + k + '"' + (droit(m, k) ? ' checked' : '') + (fut ? ' disabled' : '') + ' aria-label="' + (k === 'f' ? 'Facturé' : 'Encaissé') + ' ' + nm + ' ' + an + '"><i></i></label></td>'; }).join('') + '</tr>';
+    }).join('');
+    var corps = '<div class="ac-p"><span class="av-w ac-av">' + esc(initiales({ prenom: p.prenom, nom: p.nom })) + '</span><span><b>' + esc(p.nom) + '</b><small>' + (r.regles ? 'Autorisations personnalisées' : 'Pas encore réglé : règle d’origine (facturé du mois en cours, si son classeur lui est partagé)') + '</small></span></div>' +
+      '<div class="pg-c"><div class="pg-ch">' + ico('planning') + '<b>Mois en cours</b></div><p class="hint" style="margin:2px 0 6px">Toujours le mois actuel : chaque 1er du mois, l’accès passe automatiquement au nouveau mois.</p>' +
+      '<label class="perm"><span><b>Facturé du mois en cours</b></span><input type="checkbox" id="acCF"' + (g.courantF ? ' checked' : '') + '></label>' +
+      '<label class="perm"><span><b>Encaissé du mois en cours</b></span><input type="checkbox" id="acCE"' + (g.courantE ? ' checked' : '') + '></label></div>' +
+      '<div class="pg-c"><div class="pg-ch">' + ico('compta') + '<b>Mois et cumuls par année</b></div>' +
+      '<div class="ac-an"><button class="btn sm" id="acP" aria-label="Année précédente">‹</button><b>' + an + '</b><button class="btn sm" id="acN" aria-label="Année suivante"' + (an >= ac ? ' disabled' : '') + '>›</button></div>' +
+      '<div class="ac-rac"><button class="btn sm" data-rac="f">Toute l’année · facturé</button><button class="btn sm" data-rac="e">Toute l’année · encaissé</button><button class="btn sm" data-rac="3">3 derniers mois</button><button class="btn sm" data-rac="0">Vider l’année</button></div>' +
+      '<table class="ac-t"><thead><tr><th>Mois</th><th>Facturé</th><th>Encaissé</th></tr></thead><tbody>' + lignes + '</tbody>' +
+      '<tfoot><tr><td>Cumul annuel ' + an + '</td>' + ['F', 'E'].map(function (k) { return '<td><label class="ac-x"><input type="checkbox" data-cumul="' + k + '"' + (x['cumul' + k] ? ' checked' : '') + ' aria-label="Cumul annuel ' + (k === 'F' ? 'facturé' : 'encaissé') + ' ' + an + '"><i></i></label></td>'; }).join('') + '</tr></tfoot></table></div>' +
+      '<button class="btn ko" id="acRien" style="width:100%;justify-content:center">Aucun accès (tout retirer, toutes années)</button>' +
+      '<div class="sec" style="margin-top:18px">Historique des modifications</div>' +
+      ((r.historique || []).length ? '<div class="ac-h">' + r.historique.map(function (h) { return '<div><b>' + esc(dHeure(h.date)) + ' · ' + esc(h.admin) + '</b><span>' + esc(h.detail) + '</span></div>'; }).join('') + '</div>' : '<p class="hint">Aucune modification pour l’instant.</p>') +
+      '<div class="err" id="acE"></div>';
+    var y = $('#drb') ? $('#drb').scrollTop : 0;
+    tiroir('Autorisations comptables', corps, '<button class="btn" id="acA">Annuler</button><span class="sp"></span><button class="btn pri" id="acOk">Enregistrer</button>');
+    if ($('#drb')) $('#drb').scrollTop = y;
+    $('#acCF').onchange = function () { g.courantF = this.checked; };
+    $('#acCE').onchange = function () { g.courantE = this.checked; };
+    $('#acP').onclick = function () { an--; dessiner(); };
+    $('#acN').onclick = function () { if (an < ac) { an++; dessiner(); } };
+    $$('#drb [data-m]').forEach(function (c) { c.onchange = function () { poser(c.getAttribute('data-m'), c.getAttribute('data-k'), c.checked); }; });
+    $$('#drb [data-cumul]').forEach(function (c) { c.onchange = function () { A()['cumul' + c.getAttribute('data-cumul')] = c.checked; }; });
+    $$('#drb [data-rac]').forEach(function (b) {
+      b.onclick = function () {
+        var v = b.getAttribute('data-rac');
+        if (v === '0') { delete g.annees[an]; }
+        else if (v === '3') { for (var k = 1; k <= 3; k++) { var d = new Date(ac, mc - 1 - k, 1); if (d.getFullYear() === an) poser(String(d.getMonth() + 1), 'f', true); } }
+        else for (var m = 1; m <= 12; m++) if (!avenir(m)) poser(String(m), v, true);
+        dessiner();
+      };
+    });
+    $('#acRien').onclick = function () { if (!confirm('Retirer tous les accès comptables de ' + p.nom + ' ?')) return; g = { courantF: false, courantE: false, annees: {} }; dessiner(); };
+    $('#acA').onclick = fermer;
+    $('#acOk').onclick = function () {
+      var b = this; b.disabled = true;
+      apiSensible('enregistrerAutorisationsCompta', p.id, g).then(function (r2) {
+        S.autC = r2; fermer(); toast('Autorisations de ' + p.nom + ' enregistrées'); if (S.vue === 'personnel') rendrePersonnel();
+      }).catch(function (e) { b.disabled = false; $('#acE').textContent = msgErr(e); });
+    };
+  };
+  dessiner();
 }
 /** Bloc d'autorisations : un titre et une liste d'interrupteurs. */
 function blocPerm(icone, titre, lignes) { return '<div class="pg-c"><div class="pg-ch">' + ico(icone) + '<b>' + titre + '</b></div>' + lignes + '</div>'; }
@@ -3602,7 +3723,7 @@ function ouvrirCompta() {
   var tous = S.cfg.compta && S.cfg.compta.tous;
   if (!S.cpt.pid) S.cpt.pid = tous && !tous.some(function (p) { return p.id === S.me.id; }) ? '*' : S.me.id; // Maxime et Hervé : d'abord leur propre mois, jour par jour
   if (!tous) S.cpt.vue = 'mois';
-  if (!tous || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : toujours le mois en cours
+  if ((!tous && !S.cpt.choixP) || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : le mois en cours, sauf période choisie parmi celles autorisées
   rendreCompta(); chargerCompta();
 }
 /** Données annuelles (Maxime et Hervé) : tous les praticiens d'une année, depuis la Synthèse. */
@@ -3622,8 +3743,9 @@ function chargerCompta(force) {
   if (tous) chargerAnnuel(c.annee, force);
   rendreCompta();
   if (c.vue === 'annuel' || c.pid === '*') return;
-  api('getCompta', c.pid === S.me.id ? '' : c.pid, tous ? c.annee : '', tous ? c.mois : '').then(function (r) {
+  api('getCompta', c.pid === S.me.id ? '' : c.pid, tous || c.choixP ? c.annee : '', tous || c.choixP ? c.mois : '').then(function (r) {
     if (c.charge !== cle) return; // l'utilisateur a changé de mois ou de praticien entre-temps
+    if (!tous && r.regles) { c.annee = r.annee; c.mois = r.mois; c.charge = c.pid + ':' + c.annee + '-' + c.mois; }
     c.data = r; if (S.vue === 'compta') rendreCompta();
   }).catch(function (e) { if (c.charge === cle) { c.data = { erreur: msgErr(e) }; if (S.vue === 'compta') rendreCompta(); } });
 }
@@ -3654,6 +3776,29 @@ function joursCompta(d, c) {
   }).join('') + '</div>' : '<div class="empty">Aucune journée remplie pour l’instant ce mois-ci.</div>';
   return h;
 }
+/** Praticien : uniquement les montants que Maxime ou Hervé lui ont ouverts (le serveur n'envoie rien d'autre). */
+function comptaRegles(d, c) {
+  var lib = function (p) { return p.f && p.e ? 'facturé et encaissé' : p.f ? 'facturé' : 'encaissé'; };
+  var opts = d.periodes.map(function (p) { var v = p.annee + '-' + p.mois; return '<option value="' + v + '"' + (p.annee === d.annee && p.mois === d.mois ? ' selected' : '') + '>' + MOIS_NOMS[p.mois - 1] + ' ' + p.annee + ' · ' + lib(p) + '</option>'; });
+  d.cumuls.forEach(function (a) { if (!d.periodes.some(function (p) { return p.annee === a; })) opts.push('<option value="a' + a + '"' + (d.annee === a && !(d.droits.f || d.droits.e) ? ' selected' : '') + '>Année ' + a + ' · cumul annuel</option>'); });
+  var h = '<div class="cp-who"><b>' + esc(S.me.nom) + '</b><span>' + esc(d.libelle) + '</span><button id="cpR" class="cp-rf" aria-label="Actualiser" title="Actualiser">↻</button></div>';
+  if (opts.length > 1) h += '<div class="cp-per fld" style="max-width:420px"><label for="cpPer">Période</label><select id="cpPer">' + opts.join('') + '</select></div>';
+  if (d.refus && !d.cumul) return h + '<div class="empty">' + esc(d.refus) + '</div>';
+  var tuiles = [];
+  if (d.droits.f) tuiles.push('<div class="ca"><small>Chiffre d’affaires facturé · ' + esc(d.libelle) + '</small><b>' + esc(d.total ? d.total.total : '—') + '</b></div>');
+  if (d.droits.e) tuiles.push('<div' + (d.droits.f ? '' : ' class="ca"') + '><small>Encaissé · ' + esc(d.libelle) + '</small><b>' + eurT(d.totalEncaisse === undefined ? null : d.totalEncaisse) + '</b></div>');
+  if (d.cumul && d.cumul.f !== undefined) tuiles.push('<div><small>Cumul facturé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.f) + '</b></div>');
+  if (d.cumul && d.cumul.e !== undefined) tuiles.push('<div><small>Cumul encaissé ' + d.cumul.annee + ' · jusqu’à ' + esc(d.cumul.jusqua.toLowerCase()) + '</small><b>' + eurT(d.cumul.e) + '</b></div>');
+  if (tuiles.length) h += '<div class="cp-k cp-k' + Math.min(tuiles.length, 3) + '">' + tuiles.join('') + '</div>';
+  if ((d.droits.f || d.droits.e) && !d.trouve) h += '<div class="empty">Aucune donnée disponible pour ' + esc(d.libelle) + '.</div>';
+  if (d.droits.f && d.trouve && d.total && d.total.modes && d.total.modes.length) h += '<h2>Facturé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Facturé</th>' + (d.droits.e && d.encaisse && d.encaisse.length ? '<th>Encaissé</th>' : '') + '</tr></thead><tbody>' +
+    (d.modes || []).map(function (m, x) { var en = (d.encaisse || []).filter(function (y) { return y.mode === m; })[0]; return '<tr><td>' + esc(m) + '</td><td>' + esc(d.total.modes[x] || '—') + '</td>' + (d.droits.e && d.encaisse && d.encaisse.length ? '<td>' + esc(en ? en.encaisse : '—') + '</td>' : '') + '</tr>'; }).join('') + '</tbody></table></div>';
+  else if (d.droits.e && d.encaisse && d.encaisse.length) h += '<h2>Encaissé par mode de paiement</h2><div class="cp-l"><table class="cp-t"><thead><tr><th>Mode</th><th>Encaissé</th></tr></thead><tbody>' +
+    d.encaisse.map(function (y) { return '<tr><td>' + esc(y.mode) + '</td><td>' + esc(y.encaisse || '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  if (d.droits.f && d.trouve && d.jours) h += joursCompta(d, c);
+  if (d.url) h += '<div class="cp-o"><a class="btn" href="' + esc(d.url) + '" target="_blank" rel="noopener">Ouvrir mon classeur du mois</a></div>';
+  return h;
+}
 /** Tableau des 12 mois : Mois | Facturé | Encaissé | Écart (facturé − encaissé), avec la ligne TOTAL ANNUEL. Les mois à venir ne comptent pas comme zéro. */
 function tableAnnuelle(lignes, titre, annee) {
   var corps = lignes.map(function (l, i) {
@@ -3670,9 +3815,10 @@ function rendreCompta() {
   var c = S.cpt, tous = S.cfg.compta && S.cfg.compta.tous;
   if (tous && c.vue === 'annuel') return rendreAnnuel();
   var d = c.data && !c.data.erreur && (!tous || (c.data.annee === c.annee && c.data.mois === c.mois)) ? c.data : null;
-  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires facturé et encaissé de chaque praticien et du cabinet, mois par mois. ' : 'Votre chiffre d’affaires facturé du mois en cours. ') +
+  var h = '<div class="ph"><div class="ph-t"><h1>Chiffre d’affaires</h1><p class="ph-g">' + (tous ? 'Le chiffre d’affaires facturé et encaissé de chaque praticien et du cabinet, mois par mois. ' : d && d.regles ? 'Les périodes et les montants que Dr Maxime Berdugo ou Dr Hervé Berdugo vous ont ouverts. ' : 'Votre chiffre d’affaires facturé du mois en cours. ') +
     'Les chiffres viennent des classeurs Google Sheets : on continue de les remplir là-bas.</p></div></div>';
-  if (!tous) {
+  if (!tous && d && d.regles) h += comptaRegles(d, c); // ── Praticien avec autorisations réglées par Maxime ou Hervé ──
+  else if (!tous) {
     // ── Praticien : son facturé du mois en cours, rien d'autre ──
     h += '<div class="cp-who"><b>' + esc(S.me.nom) + '</b><span>' + esc(d ? d.libelle : MOIS_NOMS[c.mois - 1] + ' ' + c.annee) + '</span><button id="cpR" class="cp-rf" aria-label="Actualiser" title="Actualiser">↻</button></div>';
     if (c.data && c.data.erreur) h += '<div class="err">' + esc(c.data.erreur) + '</div>';
@@ -3786,6 +3932,12 @@ function brancherCompta() {
     $('#cpN').onclick = function () { if (++c.mois > 12) { c.mois = 1; c.annee++; } c.ouverts = {}; c.data = null; chargerCompta(); };
   }
   if ($('#cpTous')) $('#cpTous').onclick = function () { c.tousJours = !c.tousJours; rendreCompta(); };
+  if ($('#cpPer')) $('#cpPer').onchange = function () {
+    var v = this.value; c.choixP = true; c.ouverts = {}; c.data = null;
+    if (v.charAt(0) === 'a') { c.annee = Number(v.slice(1)); c.mois = c.annee < Number(S.today.slice(0, 4)) ? 12 : Number(S.today.slice(5, 7)); }
+    else { c.annee = Number(v.split('-')[0]); c.mois = Number(v.split('-')[1]); }
+    chargerCompta();
+  };
   $$('.cp-j>button').forEach(function (b) { b.onclick = function () { var k = b.parentNode.getAttribute('data-j'); c.ouverts = c.ouverts || {}; c.ouverts[k] = !c.ouverts[k]; rendreCompta(); }; });
 }
 function sourceAnnuel(an) {
