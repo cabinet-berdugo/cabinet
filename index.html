@@ -1641,6 +1641,18 @@ table.pl.ht td small.ht-l{color:var(--ink2);font-weight:500}
 .selp-plat .chips{gap:6px}
 .selp-plat .pch{min-height:36px;padding:0 13px;font-size:14px;border-width:1px}
 .selp-plat .selp-s:empty{display:none}
+
+/* tableau des totaux : compact, sans colonnes par jour */
+.ht-g{max-width:760px}
+table.pl.ht{min-width:0}
+table.pl.ht td small{display:inline}
+table.pl.ht{width:100%;table-layout:auto}
+@media (max-width:640px){
+  table.pl.ht td,table.pl.ht th{padding:10px 8px;white-space:normal}
+  table.pl.ht td.nm{min-width:0;width:auto}
+  table.pl.ht td small{display:block;font-size:11px}
+  table.pl.ht td.ht-e small.ht-l{display:block}
+}
 </style>
 </head>
 <body>
@@ -3555,43 +3567,29 @@ function hMin(n) { return Math.floor(n / 60) + 'h' + ('0' + n % 60).slice(-2); }
  *  et, pour qui gère les horaires, l'écart avec les heures prévues au contrat (heures sup ou heures en moins). */
 function tableauHeures(p, moi) {
   var grp = {}; p.personnes.forEach(function (x) { grp[x.groupe || ''] = 1; });
-  var plusieurs = Object.keys(grp).length > 1, gPrec = null;
-  var ct = p.contrats || null, totJ = p.jours.map(function () { return 0; }), totSem = 0, totSup = 0, totCt = 0, totPlus = 0, totMoins = 0, avecCt = false;
-  var ecartTxt = function (n) { return n === 0 ? '<span class="ht-eg">= contrat</span>' : n > 0 ? '<span class="ht-plus">+' + hMin(n) + '</span><small class="ht-l">heures sup</small>' : '<span class="ht-moins">−' + hMin(-n) + '</span><small class="ht-l">en moins</small>'; };
+  var plusieurs = Object.keys(grp).length > 1, gPrec = null, ct = p.contrats || null, nc = ct ? 4 : 2;
+  var ecartTxt = function (n) { return n === 0 ? '<span class="ht-eg">= contrat</span>' : n > 0 ? '<span class="ht-plus">+' + hMin(n) + '</span> <small class="ht-l">heures sup</small>' : '<span class="ht-moins">−' + hMin(-n) + '</span> <small class="ht-l">en moins</small>'; };
+  // une ligne par personne : total de la semaine (pauses déduites) et, pour qui gère les horaires, l'écart avec son contrat
   var lignes = p.personnes.map(function (pers) {
     var sem = 0, sup = 0, cg = 0;
-    var cases = p.jours.map(function (j, i) {
+    p.jours.forEach(function (j, i) {
       var x = infoCase(p, pers.id, i);
-      if (x.conge) { cg++; return '<td class="ht-x">Congé</td>'; }
-      if (x.c && x.c.statut === 'Repos') return '<td class="ht-x">Repos</td>';
-      var n = minutesJour(x.c);
-      if (n === null) return '<td class="ht-x">—</td>';
-      var s2 = minutesSup(x.c.heuresSup);
-      sem += n; sup += s2; totJ[i] += n;
-      return '<td>' + hMin(n) + (s2 ? '<small>+' + hMin(s2) + ' sup</small>' : '') + '</td>';
-    }).join('');
-    totSem += sem; totSup += sup;
-    var fin = '<td class="ht-s' + (ct ? '' : ' ht-k') + '">' + (sem ? hMin(sem) : '—') + (sup ? '<small>+' + hMin(sup) + ' sup</small>' : '') + '</td>';
+      if (x.conge) { cg++; return; }
+      var n = minutesJour(x.c); if (n === null) return;
+      sem += n; sup += minutesSup(x.c.heuresSup);
+    });
+    var l = '<td class="ht-s">' + (sem ? hMin(sem) : '—') + (sup ? ' <small>+' + hMin(sup) + ' sup notées</small>' : '') + '</td>';
     if (ct) {
       var c = ct[pers.id];
-      if (c === undefined || c === null) fin += '<td class="ht-x">—</td><td class="ht-e ht-k ht-x">—</td>';
-      else {
-        var cm = Math.round(c * 60), ec = sem - cm; avecCt = true; totCt += cm; if (ec > 0) totPlus += ec; else totMoins -= ec;
-        fin += '<td>' + hMin(cm) + '</td><td class="ht-e ht-k">' + ecartTxt(ec) + (cg ? '<small class="ht-l">dont ' + cg + ' j de congé</small>' : '') + '</td>';
-      }
+      if (c === undefined || c === null) l += '<td class="ht-x">—</td><td class="ht-x">—</td>';
+      else { var cm = Math.round(c * 60); l += '<td>' + hMin(cm) + '</td><td class="ht-e">' + ecartTxt(sem - cm) + (cg ? ' <small class="ht-l">· ' + cg + ' j de congé</small>' : '') + '</td>'; }
     }
-    var g = pers.groupe || '', ti = plusieurs && g !== gPrec ? '<tr class="pl-g"><td colspan="' + (p.jours.length + (ct ? 4 : 2)) + '">' + esc(g) + '</td></tr>' : ''; gPrec = g;
-    return ti + '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + cases + fin + '</tr>';
+    var g = pers.groupe || '', ti = plusieurs && g !== gPrec ? '<tr class="pl-g"><td colspan="' + nc + '">' + esc(g) + '</td></tr>' : ''; gPrec = g;
+    return ti + '<tr class="' + (pers.id === moi ? 'me' : '') + '"><td class="nm">' + esc(pers.nom) + '</td>' + l + '</tr>';
   }).join('');
-  var tete = '<th class="ht-s' + (ct ? '' : ' ht-k') + '">Semaine</th>' + (ct ? '<th>Contrat</th><th class="ht-e ht-k">Écart</th>' : '');
-  var pied = '<td class="ht-s' + (ct ? '' : ' ht-k') + '">' + (totSem ? hMin(totSem) : '—') + (totSup ? '<small>+' + hMin(totSup) + ' sup</small>' : '') + '</td>' +
-    (ct ? '<td>' + (avecCt ? hMin(totCt) : '—') + '</td><td class="ht-e ht-k">' + (!avecCt ? '—' : (totPlus ? '<span class="ht-plus">+' + hMin(totPlus) + '</span><small class="ht-l">heures sup</small>' : '') + (totMoins ? '<span class="ht-moins">−' + hMin(totMoins) + '</span><small class="ht-l">en moins</small>' : '') + (!totPlus && !totMoins ? '<span class="ht-eg">= contrat</span>' : '')) + '</td>' : '');
-  return '<div class="ht-t"><h2 class="ht-h">Total d’heures de la semaine</h2>' + (p.peutContrats ? '<button class="btn sm" id="htC">Heures prévues au contrat</button>' : '') + '</div>' +
-    '<div class="grid"><table class="pl ht"><thead><tr><th>Personne</th>' +
-    p.jours.map(function (j, i) { return '<th class="' + (j === S.today ? 'td' : '') + '">' + JOURS[i].slice(0, 3) + '. ' + dCourt(j) + '</th>'; }).join('') + tete + '</tr></thead><tbody>' + lignes + '</tbody>' +
-    (p.personnes.length > 1 ? '<tfoot><tr><td class="nm">Total équipe</td>' + totJ.map(function (n) { return '<td>' + (n ? hMin(n) : '—') + '</td>'; }).join('') + pied + '</tr></tfoot>' : '') +
-    '</table></div><div class="hint" style="margin-top:8px">Heures de présence, pauses déduites. Les heures sup saisies dans une case sont indiquées à part.' +
-    (ct ? ' Écart = heures de la semaine − heures prévues au contrat (les jours de congé sont signalés, pas déduits).' : '') + '</div>';
+  return '<div class="ht-t"><h2 class="ht-h">Total de la semaine</h2>' + (p.peutContrats ? '<button class="btn sm" id="htC">Heures prévues au contrat</button>' : '') + '</div>' +
+    '<div class="grid ht-g"><table class="pl ht"><thead><tr><th>Personne</th><th class="ht-s">Semaine</th>' + (ct ? '<th>Contrat</th><th class="ht-e">Écart</th>' : '') + '</tr></thead><tbody>' + lignes + '</tbody></table></div>' +
+    '<div class="hint" style="margin-top:8px">Heures de présence, pauses déduites.' + (ct ? ' Écart = heures de la semaine − heures prévues au contrat ; les jours de congé sont signalés, pas déduits.' : '') + '</div>';
 }
 /** Direction : heures hebdomadaires prévues au contrat de chaque assistante. */
 function formContrats() {
