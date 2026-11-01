@@ -3339,7 +3339,7 @@ function formFournisseur(x) {
 S.cpt = { pid: '', annee: 0, mois: 0, data: null, tous: false };
 function ouvrirCompta() {
   var tous = S.cfg.compta && S.cfg.compta.tous;
-  if (!S.cpt.pid) S.cpt.pid = tous ? '*' : S.me.id;
+  if (!S.cpt.pid) S.cpt.pid = tous && !tous.some(function (p) { return p.id === S.me.id; }) ? '*' : S.me.id; // Maxime et Hervé : d'abord leur propre mois, jour par jour
   if (!tous) S.cpt.vue = 'mois';
   if (!tous || !S.cpt.annee) { S.cpt.annee = Number(S.today.slice(0, 4)); S.cpt.mois = Number(S.today.slice(5, 7)); } // praticien : toujours le mois en cours
   rendreCompta(); chargerCompta();
