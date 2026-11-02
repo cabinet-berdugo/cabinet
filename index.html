@@ -3349,7 +3349,6 @@ function formTache(t) {
     '<div class="fld"><label>Personnes concernées</label><div id="fConc"></div>' +
     (groupesAnciens.length ? '<div class="hint">Également : groupe' + (groupesAnciens.length > 1 ? 's' : '') + ' ' + esc(groupesAnciens.map(function (g) { return g.slice(7); }).join(', ')) + ' (ancienne sélection).</div>' : '') +
     '<div class="hint">Chaque personne reçoit une notification et valide sa propre partie. Sans sélection, la tâche est pour vous seul.</div></div>' +
-    '<label class="chk2" style="margin:-4px 0 14px"><input type="checkbox" id="fConf"' + (t.confidentiel ? ' checked' : '') + '> Confidentielle : ne pas afficher le titre dans les notifications</label>' +
     (ed && t.recurrence ? '<div class="rec-info">' + ICONE_REC + '<span><b>Tâche récurrente</b><br>' + esc(t.recurrenceInfo ? t.recurrenceInfo.texte + (t.recurrenceInfo.actif ? '' : ' · arrêtée') : '') + '</span></div>' +
         (t.recurrenceInfo && t.recurrenceInfo.peutModifier ? '<label class="chk2" style="margin:0 0 10px"><input type="checkbox" id="fSuiv" checked> Appliquer aussi ces modifications aux prochaines occurrences</label>' +
           '<div class="rec-r" style="margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm" id="fRecMod">Modifier le rythme</button>' +
@@ -3379,7 +3378,7 @@ function formTache(t) {
   $('#fOk').onclick = function () {
     var d = {
       titre: $('#fT').value.trim(), categorie: $('#fC').value, priorite: priorite, description: $('#fD').value,
-      lien: $('#fL').value.trim(), concernes: groupesAnciens.concat(choisis), confidentiel: $('#fConf').checked
+      lien: $('#fL').value.trim(), concernes: groupesAnciens.concat(choisis), confidentiel: !!t.confidentiel // plus de case : une ancienne tâche confidentielle le reste
     };
     if (!d.titre) { $('#fErr').textContent = 'Indiquez un titre.'; $('#fT').focus(); return; }
     if (!d.categorie) { $('#fErr').textContent = 'Choisissez une catégorie.'; $('#fC').focus(); return; }
@@ -4605,12 +4604,14 @@ function rendreConges() {
       '<div class="m">' + nbJours(x) + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + '</div></div>';
   }).join('');
   h += '<h2>' + (dentiste ? 'Mes absences' : 'Mes demandes') + '</h2>' + (c.miens.length ? c.miens.map(function (x) {
-    var modifiable = ['En attente', 'Acceptée', 'Déclarée'].indexOf(x.statut) >= 0 && x.fin >= S.today;
+    // un congé validé (ou refusé) ne se modifie plus : seule la direction peut encore l'annuler
+    var modifiable = (x.statut === 'En attente' || x.statut === 'Déclarée') && x.fin >= S.today;
     var trait = x.traitePar && x.traiteLe && x.statut !== 'Déclarée' ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : x.statut === 'Refusée' ? 'refusée' : 'annulée') + ' par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)) : '';
     return '<div class="cg-c" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
       '<div class="m">' + nbJours(x) + ' · ' + (x.absence ? 'déclarée' : 'demandée') + ' le ' + esc(dHeure(x.demandeLe)) + (x.majLe ? ' · modifiée le ' + esc(dHeure(x.majLe)) : '') + trait + '</div>' +
       (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
       (x.reponse ? '<div class="m" style="margin-top:4px">Réponse : ' + esc(x.reponse) + '</div>' : '') +
+      (x.statut === 'Acceptée' && x.fin >= S.today ? '<div class="m" style="margin-top:4px">Congé validé : pour tout changement, adressez-vous à la direction.</div>' : '') +
       (modifiable ? '<div class="r"><button class="lk" data-mod="' + esc(x.id) + '">Modifier</button><button class="lk" data-ann="' + esc(x.id) + '" data-abs="' + (x.absence ? 1 : '') + '">' + (x.absence ? 'Annuler mon absence' : 'Annuler ma demande') + '</button></div>' : '') + '</div>';
   }).join('') : '<div class="empty">' + (dentiste ? 'Aucune absence déclarée pour l’instant.' : 'Vous n’avez pas encore fait de demande.') + '</div>');
   if (c.peutValider && c.equipe.length) {
@@ -4675,7 +4676,7 @@ function formConge(c) {
     '<div class="fld"><label for="gC">Commentaire</label><textarea id="gC" placeholder="Facultatif">' + esc(ed ? c.commentaire || '' : '') + '</textarea></div>' +
     '<div class="hint" id="gN"></div>' +
     '<div class="hint">' + (dentiste ? 'Absence enregistrée tout de suite, sans validation. Aya, Jessica, Maxime et Hervé sont prévenus.' : 'Votre demande est soumise à validation. Aya, Jessica, Maxime et Hervé sont prévenus.') +
-    (ed && c.statut === 'Acceptée' ? ' Ce congé déjà accepté devra être de nouveau validé.' : '') + '</div><div class="err" id="gErr"></div>';
+    '</div><div class="err" id="gErr"></div>';
   var titre = dentiste ? (ed ? 'Modifier mon absence' : 'Déclarer une absence') : (ed ? 'Modifier ma demande de congé' : 'Demander un congé');
   var bouton = ed ? 'Enregistrer les modifications' : dentiste ? 'Déclarer l’absence' : 'Envoyer la demande';
   tiroir(titre, corps, '<button class="btn" id="gAnn">Annuler</button><button class="btn pri" id="gOk">' + bouton + '</button>');
