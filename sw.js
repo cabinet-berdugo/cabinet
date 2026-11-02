@@ -1,5 +1,5 @@
 // Service worker du Cabinet Berdugo : ouverture rapide, et notifications même application fermée.
-const VERSION = 'v-0b4b73876e';
+const VERSION = 'v-84f967a54a';
 const API = 'https://script.google.com/macros/s/AKfycbzbVH_ipWjDwJzQ2q7SCj0VqC5K9pI_4tovfU-ywQ0ez8i24ElDaF0t-nVsg6avISw/exec';
 const FICHIERS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

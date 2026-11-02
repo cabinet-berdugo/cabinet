@@ -1773,6 +1773,35 @@ html.ios-defil body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;o
   .bnav button.on{box-shadow:0 3px 10px rgba(0,71,217,.28)}
   .bnav .cnt{top:2px}
 }
+/* ───────── Tâches récurrentes, aperçu du dernier commentaire, congés (demi-journées) ───────── */
+.p-info{background:var(--accbg);color:var(--acc)}
+.pill.p-rec{background:var(--accbg);color:var(--acc);display:inline-flex;align-items:center;gap:4px}
+.pill.p-rec svg{width:12px;height:12px}
+.tc-com{margin-top:10px;padding:8px 11px;border-radius:10px;background:var(--soft2);border:1px solid var(--line);font-size:13px;line-height:1.4;color:var(--ink2)}
+.tc-com .tc-com-h{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;color:var(--ink3);font-size:12px}
+.tc-com .tc-com-h b{color:var(--ink);font-weight:600;font-size:12.5px}
+.tc-com p{margin:3px 0 0;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:var(--ink)}
+.tc-com .tc-suite{display:inline-block;margin-top:3px;color:var(--acc);font-weight:600;font-size:12.5px}
+.rec-box{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px;background:var(--soft)}
+.rec-box .rec-r{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.rec-box label.sub{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin:10px 0 5px}
+.rec-j{display:flex;gap:6px;flex-wrap:wrap}
+.rec-j button{min-width:38px;height:34px;border-radius:9px;border:1px solid var(--line2);background:#fff;font:inherit;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.rec-j button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.rec-box input[type=time],.rec-box input[type=date],.rec-box input[type=number],.rec-box select{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;font:inherit;background:#fff}
+.rec-box input[type=number]{width:72px}
+.rec-res{margin-top:10px;font-size:13px;color:var(--acc);font-weight:600}
+.rec-info{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--accbg);color:var(--acc2);font-size:13.5px;margin:10px 0}
+.rec-info svg{width:16px;height:16px;flex:none;margin-top:2px}
+.com .com-a{display:inline-flex;gap:10px;margin-left:8px}
+.com .com-a button{border:0;background:none;color:var(--acc);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
+.com textarea{width:100%;min-height:60px;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font:inherit;margin-top:6px}
+.cg-seg{margin-bottom:12px}
+#gPl select{margin-top:6px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:7px 9px;font:inherit;background:#fff}
+.rl-c{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.rl-c .rl-t{font-weight:700;color:var(--ink)}
+.rl-c .rl-m{font-size:13px;color:var(--ink2);margin-top:3px}
+.rl-c .rl-a{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -2585,9 +2614,10 @@ function ecranNouveauMdp(message) {
 /** Téléphone : 5 boutons au plus en bas ; au-delà, les 4 premiers et « Plus » (les autres rubriques). */
 var BNAV_ORDRE = ['taches', 'planning', 'conges', 'materiel', 'compta', 'impayes', 'relances', 'protheses', 'personnel'];
 var BNAV_ORDRE_ADMIN = ['taches', 'planning', 'materiel', 'compta', 'impayes', 'relances', 'conges', 'protheses', 'personnel']; // Maxime et Hervé
+var BNAV_ORDRE_DENTISTE = ['taches', 'planning', 'materiel', 'compta', 'protheses', 'conges', 'impayes', 'relances', 'personnel']; // la comptabilité reste dans la barre, les absences dans « Plus »
 function majBnav() {
   if (!$('#bnPlus') || !S.cfg) return;
-  var ordre = S.me && S.me.role === 'Administrateur' ? BNAV_ORDRE_ADMIN : BNAV_ORDRE;
+  var ordre = S.me && S.me.role === 'Administrateur' ? BNAV_ORDRE_ADMIN : S.cfg.estDentiste ? BNAV_ORDRE_DENTISTE : BNAV_ORDRE;
   var ouverts = ordre.filter(ongletOuvert), plus = ouverts.length > 5, visibles = plus ? ouverts.slice(0, 4) : ouverts;
   BNAV_ORDRE.forEach(function (v) { var b = $('#bnav [data-v="' + v + '"]'); if (b) { b.classList.toggle('hidden', visibles.indexOf(v) < 0); b.style.order = ordre.indexOf(v); } });
   $('#bnPlus').style.order = 99;
@@ -2667,7 +2697,7 @@ function rendreTaches() {
     .map(function (o) { return '<option value="' + esc(o[0]) + '"' + (f.statut === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
   $('#main').innerHTML =
     '<div class="ph"><div class="ph-t"><h1>Tâches et demandes</h1><p class="ph-g">Touchez une tâche pour l’ouvrir. Indiquez « En cours » quand vous commencez, « Terminée » quand c’est fait.</p></div><div class="ph-a">' +
-    '<button class="btn pri" id="nv">+ Nouvelle tâche</button></div></div>' +
+    '<button class="btn" id="nvRec" title="Tâches récurrentes">↻ Récurrentes</button><button class="btn pri" id="nv">+ Nouvelle tâche</button></div></div>' +
     '<div id="ajd"></div><div class="stats st3" id="stats"></div>' +
     '<div class="filters">' +
     '<div class="seg" id="seg"><button data-p="tout">Toutes</button><button data-p="moi">Mes tâches</button><button data-p="crees">Mes demandes</button></div>' +
@@ -2676,6 +2706,7 @@ function rendreTaches() {
     '<input id="fQ" type="search" placeholder="Rechercher" value="' + esc(f.q) + '"><button type="button" class="btn" id="fTog"></button></div>' +
     '<div class="list" id="list">' + (S.charge ? '' : sq('cartes', 'Chargement des tâches…')) + '</div>';
   $('#nv').onclick = function () { formTache(); };
+  $('#nvRec').onclick = ouvrirRecurrences;
   majAujourdhui();
   $$('#seg button').forEach(function (b) { b.onclick = function () { f.portee = b.getAttribute('data-p'); rendreListe(); }; });
   $('#fSt').onchange = function () { f.statut = this.value; rendreListe(); };
@@ -2803,6 +2834,30 @@ function brancherBoutonsStatut(zone) {
     };
   });
 }
+var ICONE_REC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2.5 20.5 6 17 9.5"/><path d="M3.5 11.5V10a4 4 0 0 1 4-4h13"/><path d="M7 21.5 3.5 18 7 14.5"/><path d="M20.5 12.5V14a4 4 0 0 1-4 4h-13"/></svg>';
+/** Aperçu du dernier commentaire (auteur, date, premières lignes) ; la suite se lit en ouvrant la tâche. */
+/** Modification d'un commentaire dans le détail de la tâche (la saisie en cours est gardée dans S.comEdit). */
+function editionCom(box, t) {
+  var cle = S.comEdit.cle;
+  $('p', box).outerHTML = '<textarea aria-label="Modifier le commentaire">' + esc(S.comEdit.texte) + '</textarea><div class="row" style="margin-top:6px;gap:8px"><button class="btn sm" data-cx>Annuler</button><button class="btn sm pri" data-cv>Enregistrer</button></div>';
+  var ta = $('textarea', box);
+  ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+  ta.oninput = function () { if (S.comEdit) S.comEdit.texte = ta.value; };
+  if ($('.com-a', box)) $('.com-a', box).classList.add('hidden');
+  $('[data-cx]', box).onclick = function () { S.comEdit = null; afficherTache(t); };
+  $('[data-cv]', box).onclick = function () {
+    var v = ta.value.trim(); if (!v) return;
+    this.disabled = true;
+    api('modifierCommentaire', t.id, cle, v).then(function (r) { S.comEdit = null; garderDetail(r); afficherSiOuvert(r); toast('Commentaire modifié'); })
+      .catch(function (e) { $('[data-cv]', box).disabled = false; echec(e); });
+  };
+}
+function apercuCom(t) {
+  var c = t.dernierCommentaire;
+  if (!c) return '';
+  return '<div class="tc-com"><div class="tc-com-h"><b>' + esc(c.email === S.me.id ? 'Moi' : c.nom) + '</b><span>' + esc(dHeure(c.date)) + (c.modifie ? ' · modifié' : '') + '</span>' +
+    (t.nbCommentaires > 1 ? '<span>· ' + t.nbCommentaires + ' commentaires</span>' : '') + '</div><p>' + esc(c.texte) + (c.suite ? '…' : '') + '</p>' + (c.suite ? '<span class="tc-suite">Lire la suite</span>' : '') + '</div>';
+}
 function carte(t) {
   var nonLu = t.jeParticipe && t.monStatut !== 'Terminée' && t.creePar !== S.me.id && !t.luParMoi;
   var n = t.participations.length;
@@ -2813,13 +2868,14 @@ function carte(t) {
   var pills = '<span class="pill ' + clsStatut(t.statut) + '">' + esc(t.statut) + '</span>';
   if (t.priorite === 'Haute') pills += '<span class="pill p-haute">Priorité haute</span>';
   if (n > 1) pills += '<span class="pill" title="Participations terminées">' + t.nbTerminees + '/' + n + ' terminé' + (t.nbTerminees > 1 ? 's' : '') + '</span>';
-  if (t.nbCommentaires) pills += '<span class="pill">' + t.nbCommentaires + ' comm.</span>';
+  if (t.nbCommentaires && !t.dernierCommentaire) pills += '<span class="pill">' + t.nbCommentaires + ' comm.</span>';
   if (t.fichiers.length) pills += '<span class="pill">' + t.fichiers.length + ' pièce' + (t.fichiers.length > 1 ? 's' : '') + '</span>';
+  if (t.recurrence) pills += '<span class="pill p-rec" title="' + esc(t.recurrenceInfo ? t.recurrenceInfo.texte : 'Tâche récurrente') + '">' + ICONE_REC + 'Récurrente' + (t.occurrence ? ' · ' + esc(dCourt(t.occurrence)) : '') + '</span>';
   var urg = t.priorite === 'Haute' && t.statut !== 'Terminée';
   return '<div class="tc ' + clsCarte(t.statut) + (urg ? ' urg' : '') + '" data-id="' + esc(t.id) + '"><div class="bd">' +
     (urg ? '<div class="urg-b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.8 19.5h18.4z"/><path d="M12 10v4.2M12 17.2h0"/></svg>Urgent</div>' : '') +
     '<div class="tt">' + (nonLu ? '<i class="dot" title="Non lu"></i>' : '') + '<span>' + esc(t.titre) + '</span></div>' +
-    '<div class="meta">' + meta.join(' · ') + '</div>' + (pour ? '<div class="mine">' + pour + '</div>' : '') + '<div class="pills">' + pills + '</div></div>' +
+    '<div class="meta">' + meta.join(' · ') + '</div>' + (pour ? '<div class="mine">' + pour + '</div>' : '') + '<div class="pills">' + pills + '</div>' + apercuCom(t) + '</div>' +
     (t.jeParticipe ? boutonsStatut(t) : '') + '</div>';
 }
 
@@ -2903,7 +2959,7 @@ function tiroir(titre, corps, pied) {
   $('#ov').onclick = fermer; $('#xx').onclick = fermer;
   document.body.style.overflow = 'hidden';
 }
-function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; S.matTiroir = null; S.matListeOuverte = false; S.brSt = {}; S.brId = null; S.brBase = null; }
+function fermer() { $('#drawer').innerHTML = ''; document.body.style.overflow = ''; S.detail = null; S.comEdit = null; S.valErr = null; S.matTiroir = null; S.matListeOuverte = false; S.brSt = {}; S.brId = null; S.brBase = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#drawer').innerHTML) fermer(); });
 
 // ───────── Tâche : détail ─────────
@@ -2995,6 +3051,8 @@ function afficherTache(t) {
     (t.statut === 'Terminée' && t.termineeLe ? '<dt>Terminée le</dt><dd>' + esc(dHeure(t.termineeLe)) + '</dd>' : '') +
     (t.lien ? '<dt>Lien</dt><dd><a href="' + esc(t.lien) + '" target="_blank" rel="noopener" style="word-break:break-all">' + esc(t.lien) + '</a></dd>' : '') +
     '</dl>' +
+    (t.recurrence ? '<div class="rec-info">' + ICONE_REC + '<span><b>Tâche récurrente' + (t.occurrence ? ' · occurrence du ' + esc(dLong(t.occurrence)) : '') + '</b><br>' +
+      esc(t.recurrenceInfo ? t.recurrenceInfo.texte + (t.recurrenceInfo.actif ? '' : ' · récurrence arrêtée') : '') + '<br><small>Terminer cette tâche ne change rien aux prochaines.</small></span></div>' : '') +
     (t.description ? '<div class="desc">' + esc(t.description) + '</div>' : '') +
     '<div class="sec">Pièces jointes</div><div class="thumbs">' + fichiers + '</div>' +
     '<div style="margin-top:8px"><label class="lk" style="cursor:pointer">+ Ajouter une photo ou un fichier<input type="file" id="pj" multiple accept="image/*,application/pdf" class="hidden"></label></div>' +
@@ -3008,7 +3066,11 @@ function afficherTache(t) {
     }).join('') + '</div>' +
     (t.peutGerer && t.participations.some(function (p) { return p.id !== moi; }) ? '<div class="hint">Vous pouvez changer le statut des autres personnes ; votre intervention est enregistrée dans l’historique.</div>' : '') +
     '<div class="sec">Commentaires</div>' +
-    (enAttente ? '<div class="no-t">Chargement…</div>' : t.commentaires.length ? t.commentaires.map(function (c) { return '<div class="com"><b>' + esc(c.nom) + '</b> <small>' + esc(dHeure(c.date)) + '</small><p>' + esc(c.texte) + '</p></div>'; }).join('') : '<div class="no-t">Aucun commentaire.</div>') +
+    (enAttente ? '<div class="no-t">Chargement…</div>' : t.commentaires.length ? t.commentaires.map(function (c) {
+      return '<div class="com" data-com="' + esc(c.cle || '') + '"><b>' + esc(c.nom) + '</b> <small>' + esc(dHeure(c.date)) + (c.modifieLe ? ' · modifié' : '') + '</small>' +
+        (c.moi && c.cle ? '<span class="com-a"><button type="button" data-ca="mod">Modifier</button><button type="button" data-ca="sup">Supprimer</button></span>' : (S.cfg.gererTaches && c.cle ? '<span class="com-a"><button type="button" data-ca="sup">Supprimer</button></span>' : '')) +
+        '<p>' + esc(c.texte) + '</p></div>';
+    }).join('') : '<div class="no-t">Aucun commentaire.</div>') +
     '<div class="fld" style="margin-top:10px"><textarea id="com" placeholder="Écrire un commentaire… (enregistré avec « Valider »)" style="min-height:64px;width:100%;border:1px solid var(--line2);border-radius:8px;padding:9px 11px"></textarea></div>' +
     '<details style="margin-top:10px"><summary class="sec" style="cursor:pointer;margin:0">Historique complet</summary><div class="hist">' +
     (enAttente ? '<div>Chargement…</div>' : t.historique.map(function (h) { return '<div>' + esc(dHeure(h.date)) + ' — <b>' + esc(h.nom) + '</b> · ' + esc(h.action === 'Ouverture' ? 'a ouvert la tâche' : h.action) + (h.detail ? ' : ' + esc(h.detail) : '') + '</div>'; }).join('')) + '</div></details>' +
@@ -3020,6 +3082,7 @@ function afficherTache(t) {
   if (garde) $('#drb').scrollTop = garde;
   if (ouvertDetails && $('#drb details')) $('#drb details').open = true;
   if (brouillon && $('#com')) $('#com').value = brouillon; // un commentaire en cours de saisie n'est jamais perdu
+  if (S.valErr && S.valErr.id === t.id) { if ($('#tErr')) $('#tErr').textContent = S.valErr.msg; if ($('#com') && !$('#com').value && S.valErr.com) $('#com').value = S.valErr.com; }
   brancherBrouillon(t);
   var act = function (p) { return p.then(afficherSiOuvert).catch(echec); };
   $$('#drb [data-a]').forEach(function (b) {
@@ -3037,6 +3100,24 @@ function afficherTache(t) {
     Promise.all(fs.map(preparerFichier)).then(function (l) { return act(api('ajouterPieceJointe', t.id, l)); }).catch(echec);
   };
   if ($('#mod')) $('#mod').onclick = function () { formTache(t); };
+  // modifier / supprimer son commentaire : l'aperçu de la liste suit tout de suite
+  $$('#drb .com[data-com] [data-ca]').forEach(function (b) {
+    b.onclick = function () {
+      var box = b.closest('.com'), cle = box.getAttribute('data-com'), act = b.getAttribute('data-ca');
+      if (act === 'sup') {
+        if (!confirm('Supprimer ce commentaire ?')) return;
+        api('supprimerCommentaire', t.id, cle).then(function (r) { garderDetail(r); afficherSiOuvert(r); toast('Commentaire supprimé'); }).catch(echec);
+        return;
+      }
+      S.comEdit = { tache: t.id, cle: cle, texte: $('p', box).textContent };
+      editionCom(box, t);
+    };
+  });
+  // une mise à jour arrivée pendant la modification d'un commentaire ne fait pas perdre la saisie
+  if (S.comEdit && S.comEdit.tache === t.id) {
+    var bx = $$('#drb .com[data-com]').filter(function (x) { return x.getAttribute('data-com') === S.comEdit.cle; })[0];
+    if (bx) editionCom(bx, t); else S.comEdit = null;
+  }
   if ($('#sup')) $('#sup').onclick = function () {
     if (!confirm('Supprimer définitivement cette tâche ?')) return;
     api('supprimerTache', t.id).then(function () {
@@ -3096,7 +3177,7 @@ function validerTache(t) {
     if (com) opt.nbCommentaires = (opt.nbCommentaires || 0) + 1;
     majLocale(opt);
   }
-  S.brSt = {}; if (S.detail === id) fermer();
+  S.brSt = {}; S.valErr = null; if (S.detail === id) fermer();
   var fin = changes.filter(function (c) { return !c.pour && c.cible === 'Terminée'; }).length;
   toast(fin ? 'Tâche terminée ✓' : 'Tâche enregistrée ✓');
   changes.forEach(function (c) { if (!c.pour) ANIM.statutOk(id, c.cible); });
@@ -3106,10 +3187,12 @@ function validerTache(t) {
     if (avant) majLocale(avant);
     S.brId = id; S.brSt = brouillon.st;
     ouvrirTache(id);
+    // message gardé : une mise à jour de la tâche arrivée ensuite ne l'efface pas
+    S.valErr = { id: id, msg: 'Non enregistré : ' + msgErr(e) + ' Vos changements sont conservés : réessayez.', com: brouillon.com };
     setTimeout(function () {
       if (S.detail !== id) return;
-      if ($('#com') && brouillon.com) $('#com').value = brouillon.com;
-      if ($('#tErr')) $('#tErr').textContent = 'Non enregistré : ' + msgErr(e) + ' Vos changements sont conservés : réessayez.';
+      if ($('#com') && brouillon.com && !$('#com').value) $('#com').value = brouillon.com;
+      if ($('#tErr') && S.valErr) $('#tErr').textContent = S.valErr.msg;
       majBrouillon();
     }, 60);
     toast('Tâche non enregistrée : ' + msgErr(e), true);
@@ -3141,8 +3224,117 @@ function preparerFichier(file) {
 }
 
 // ───────── Tâche : formulaire ─────────
+// ───────── Tâches récurrentes : réglage (fréquence, jours, heure, début, fin) ─────────
+var JOURS_L = ['L', 'M', 'M', 'J', 'V', 'S', 'D'], JOURS_N = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'], JOURS_C = ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'];
+function jourSem(iso) { return dj(iso).getDay() || 7; }
+/** « Du lundi au vendredi à 08h00, sans date de fin » (même texte que le serveur). */
+function texteRecurrence(r) {
+  var u = r.frequence === 'perso' ? r.unite : r.frequence, n = r.frequence === 'perso' ? Math.max(1, Number(r.intervalle) || 1) : 1, j = (r.jours || []).slice().sort();
+  var lj = j.map(function (x) { return JOURS_C[x - 1]; }).join(', '), t;
+  if (u === 'jour') {
+    if (n === 1 && j.join() === '1,2,3,4,5') t = 'Du lundi au vendredi';
+    else if (n === 1) t = j.length && j.length < 7 ? 'Chaque ' + lj : 'Tous les jours';
+    else t = 'Tous les ' + n + ' jours' + (j.length && j.length < 7 ? ' (' + lj + ')' : '');
+  } else if (u === 'semaine') t = (n === 1 ? 'Chaque semaine' : 'Toutes les ' + n + ' semaines') + ' (' + lj + ')';
+  else t = n === 1 ? 'Le ' + r.jourMois + ' de chaque mois' : 'Le ' + r.jourMois + ', tous les ' + n + ' mois';
+  return t + ' à ' + hm(r.heure) + (r.fin ? ', jusqu’au ' + dLong(r.fin) : ', sans date de fin');
+}
+/** Réglage d'une récurrence dans une zone ; renvoie { lire, erreur }. */
+function blocRecurrence(zone, g) {
+  g = g || {};
+  var deb = g.debut || S.today;
+  var st = { frequence: g.frequence || 'jour', unite: g.unite && g.unite !== g.frequence ? g.unite : (g.frequence === 'perso' ? g.unite || 'jour' : 'jour'), intervalle: g.intervalle || 2,
+    jours: g.jours && g.jours.length ? g.jours.slice() : (g.frequence === 'semaine' ? [jourSem(deb)] : [1, 2, 3, 4, 5]),
+    jourMois: g.jourMois || Number(deb.slice(8, 10)), heure: g.heure || '08:00', debut: deb, fin: g.fin || '' };
+  if (g.frequence === 'perso' && g.intervalle) st.intervalle = g.intervalle;
+  var unite = function () { return st.frequence === 'perso' ? st.unite : st.frequence; };
+  var dessiner = function () {
+    var u = unite();
+    zone.innerHTML =
+      '<label class="sub">Fréquence</label><div class="seg" data-r="freq" style="flex-wrap:wrap">' + [['jour', 'Tous les jours'], ['semaine', 'Toutes les semaines'], ['mois', 'Tous les mois'], ['perso', 'Personnalisée']].map(function (o) {
+        return '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (st.frequence === o[0]) + '"' + (st.frequence === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div>' +
+      (st.frequence === 'perso' ? '<div class="rec-r"><span>Tous les</span><input type="number" min="1" max="365" data-r="n" aria-label="Intervalle" value="' + st.intervalle + '"><select data-r="unite" aria-label="Unité">' +
+        [['jour', 'jours'], ['semaine', 'semaines'], ['mois', 'mois']].map(function (o) { return '<option value="' + o[0] + '"' + (st.unite === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></div>' : '') +
+      (u !== 'mois' ? '<label class="sub">' + (u === 'jour' ? 'Jours concernés' : 'Jours de la semaine') + '</label><div class="rec-j">' + JOURS_L.map(function (l, i) {
+        var on = st.jours.indexOf(i + 1) >= 0; return '<button type="button" data-j="' + (i + 1) + '" title="' + JOURS_N[i] + '" aria-label="' + JOURS_N[i] + '" aria-pressed="' + on + '"' + (on ? ' class="on"' : '') + '>' + l + '</button>'; }).join('') + '</div>' +
+        (u === 'jour' ? '<div class="rec-r"><button type="button" class="lk" data-q="ouvres">Du lundi au vendredi</button><button type="button" class="lk" data-q="six">Du lundi au samedi</button><button type="button" class="lk" data-q="tous">Tous les jours</button></div>' : '')
+        : '<label class="sub">Jour du mois</label><div class="rec-r"><span>Le</span><input type="number" min="1" max="31" data-r="jm" aria-label="Jour du mois" value="' + st.jourMois + '"><span>du mois</span></div><div class="hint">Le 29, 30 ou 31 tombe le dernier jour des mois plus courts.</div>') +
+      '<div class="two" style="margin-top:2px"><div><label class="sub" for="recH">Heure d’apparition</label><input type="time" id="recH" data-r="h" value="' + esc(st.heure) + '"></div>' +
+      '<div><label class="sub" for="recD">À partir du</label><input type="date" id="recD" data-r="deb" value="' + esc(st.debut) + '"></div></div>' +
+      '<label class="sub">Fin de la récurrence</label><div class="rec-r"><label class="chk2" style="margin:0"><input type="radio" name="recFin" value=""' + (st.fin ? '' : ' checked') + '> Sans date de fin (toute l’année)</label>' +
+      '<label class="chk2" style="margin:0"><input type="radio" name="recFin" value="d"' + (st.fin ? ' checked' : '') + '> Jusqu’au</label><input type="date" data-r="fin" aria-label="Date de fin" value="' + esc(st.fin) + '"' + (st.fin ? '' : ' disabled') + '></div>' +
+      '<div class="rec-res" data-r="res" aria-live="polite"></div>';
+    var res = function () { var e = erreur(); $('[data-r=res]', zone).textContent = e ? e : '↻ ' + texteRecurrence(st); $('[data-r=res]', zone).style.color = e ? 'var(--red)' : ''; };
+    $$('[data-r=freq] button', zone).forEach(function (b) { b.onclick = function () {
+      var v = b.getAttribute('data-v');
+      if (v === 'semaine' && st.frequence !== 'semaine' && st.jours.length > 2) st.jours = [jourSem(st.debut)];
+      st.frequence = v; dessiner(); }; });
+    $$('[data-j]', zone).forEach(function (b) { b.onclick = function () {
+      var j = Number(b.getAttribute('data-j')), i = st.jours.indexOf(j);
+      if (i >= 0) st.jours.splice(i, 1); else st.jours.push(j);
+      b.classList.toggle('on', i < 0); b.setAttribute('aria-pressed', i < 0); res(); }; });
+    $$('[data-q]', zone).forEach(function (b) { b.onclick = function () { var q = b.getAttribute('data-q'); st.jours = q === 'ouvres' ? [1, 2, 3, 4, 5] : q === 'six' ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5, 6, 7]; dessiner(); }; });
+    var ch = function (sel, f) { var e = $(sel, zone); if (e) e.oninput = e.onchange = function () { f(this.value); res(); }; };
+    ch('[data-r=n]', function (v) { st.intervalle = Math.max(1, parseInt(v, 10) || 1); });
+    ch('[data-r=jm]', function (v) { st.jourMois = Math.max(1, Math.min(31, parseInt(v, 10) || 1)); });
+    ch('[data-r=h]', function (v) { st.heure = v; });
+    ch('[data-r=deb]', function (v) { st.debut = v; });
+    ch('[data-r=fin]', function (v) { st.fin = v; });
+    var u2 = $('[data-r=unite]', zone); if (u2) u2.onchange = function () { st.unite = this.value; if (st.unite === 'semaine' && st.jours.length > 2) st.jours = [jourSem(st.debut)]; dessiner(); };
+    $$('input[name=recFin]', zone).forEach(function (r) { r.onchange = function () {
+      var avec = r.value === 'd' && r.checked; $('[data-r=fin]', zone).disabled = !avec;
+      if (!avec) st.fin = ''; else { if (!$('[data-r=fin]', zone).value) $('[data-r=fin]', zone).value = ajout(st.debut || S.today, 30); st.fin = $('[data-r=fin]', zone).value; }
+      res(); }; });
+    res();
+  };
+  var erreur = function () {
+    if (!st.heure) return 'Indiquez l’heure d’apparition.';
+    if (!st.debut) return 'Indiquez la date de début.';
+    if (unite() !== 'mois' && !st.jours.length) return 'Choisissez au moins un jour.';
+    if (st.fin && st.fin < st.debut) return 'La date de fin est avant la date de début.';
+    return '';
+  };
+  dessiner();
+  return {
+    erreur: erreur,
+    lire: function () { var u = unite(); return { frequence: st.frequence, unite: u, intervalle: st.frequence === 'perso' ? st.intervalle : 1, jours: u === 'mois' ? [] : st.jours.slice().sort(), jourMois: u === 'mois' ? st.jourMois : '', heure: st.heure, debut: st.debut, fin: st.fin }; }
+  };
+}
+/** Liste des tâches récurrentes : rythme, prochaine occurrence, modifier, arrêter ou reprendre. */
+function ouvrirRecurrences() {
+  tiroir('Tâches récurrentes', sq('mini'));
+  var dessiner = function (l) {
+    if (!$('#drb')) return;
+    $('#drb').innerHTML = '<p class="hint" style="margin-top:0">Chaque occurrence est une tâche ordinaire, créée à l’heure choisie : la terminer ne change rien aux suivantes. Modifier ou arrêter une récurrence ne touche pas aux tâches déjà créées.</p>' +
+      (l.length ? l.map(function (r) {
+        return '<div class="rl-c" data-rid="' + esc(r.id) + '"><div class="rl-t">' + esc(r.titre) + (r.actif ? '' : ' <span class="pill p-todo">Arrêtée</span>') + '</div>' +
+          '<div class="rl-m">↻ ' + esc(r.texte) + '</div>' +
+          '<div class="rl-m">' + (r.actif ? (r.prochaine ? 'Prochaine : ' + esc(dLong(r.prochaine)) + ' à ' + esc(hm(r.prochaine.slice(11, 16))) : 'Plus d’occurrence à venir') : 'Plus aucune nouvelle occurrence') + ' · créée par ' + esc(r.creePar === S.me.id ? 'moi' : r.creeParNom) + '</div>' +
+          (r.peutModifier ? '<div class="rl-a"><button class="btn sm" data-ra="mod">Modifier le rythme</button>' + (r.actif ? '<button class="btn sm ko" data-ra="stop">Arrêter</button>' : '<button class="btn sm" data-ra="go">Reprendre</button>') + '</div>' : '') + '</div>';
+      }).join('') : '<div class="empty">Aucune tâche récurrente. Cochez « Tâche récurrente » en créant une tâche.</div>');
+    $$('#drb [data-ra]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.closest('[data-rid]').getAttribute('data-rid'), r = l.filter(function (x) { return x.id === id; })[0], a = b.getAttribute('data-ra');
+        if (a === 'stop') { if (!confirm('Arrêter cette récurrence ? Les tâches déjà créées restent.')) return; api('arreterRecurrence', id).then(function (x) { dessiner(x); toast('Récurrence arrêtée'); recharger(true); }).catch(echec); return; }
+        if (a === 'go') { api('modifierRecurrence', id, { reprendre: true }).then(function (x) { dessiner(x); toast('Récurrence reprise'); recharger(true); }).catch(echec); return; }
+        tiroir('Rythme de « ' + esc(r.titre) + ' »', '<div class="rec-box" id="rmB"></div><div class="err" id="rmE"></div>', '<button class="btn" id="rmA">Retour</button><button class="btn pri" id="rmO">Enregistrer</button>');
+        var bloc = blocRecurrence($('#rmB'), r);
+        $('#rmA').onclick = ouvrirRecurrences;
+        $('#rmO').onclick = function () {
+          var e = bloc.erreur(); if (e) { $('#rmE').textContent = e; return; }
+          this.disabled = true;
+          api('modifierRecurrence', id, { recurrence: bloc.lire() }).then(function () { toast('Récurrence modifiée : les prochaines occurrences suivront ce rythme'); recharger(true); ouvrirRecurrences(); })
+            .catch(function (x) { $('#rmO').disabled = false; $('#rmE').textContent = msgErr(x); });
+        };
+      };
+    });
+  };
+  api('getRecurrences').then(dessiner).catch(function (e) { fermer(); echec(e); });
+}
+
 function formTache(t) {
   var ed = !!t;
+  S.detail = null; S.comEdit = null; // une mise à jour de la tâche arrivée après coup ne remplace pas le formulaire
   t = t || { titre: '', description: '', categorie: '', priorite: 'Normale', concernes: [], lien: '', confidentiel: false };
   // anciens groupes (« groupe:… ») conservés tels quels ; les personnes viennent de l'annuaire
   var groupesAnciens = t.concernes.filter(function (c) { return c.indexOf('groupe:') === 0; });
@@ -3158,12 +3350,29 @@ function formTache(t) {
     (groupesAnciens.length ? '<div class="hint">Également : groupe' + (groupesAnciens.length > 1 ? 's' : '') + ' ' + esc(groupesAnciens.map(function (g) { return g.slice(7); }).join(', ')) + ' (ancienne sélection).</div>' : '') +
     '<div class="hint">Chaque personne reçoit une notification et valide sa propre partie. Sans sélection, la tâche est pour vous seul.</div></div>' +
     '<label class="chk2" style="margin:-4px 0 14px"><input type="checkbox" id="fConf"' + (t.confidentiel ? ' checked' : '') + '> Confidentielle : ne pas afficher le titre dans les notifications</label>' +
+    (ed && t.recurrence ? '<div class="rec-info">' + ICONE_REC + '<span><b>Tâche récurrente</b><br>' + esc(t.recurrenceInfo ? t.recurrenceInfo.texte + (t.recurrenceInfo.actif ? '' : ' · arrêtée') : '') + '</span></div>' +
+        (t.recurrenceInfo && t.recurrenceInfo.peutModifier ? '<label class="chk2" style="margin:0 0 10px"><input type="checkbox" id="fSuiv" checked> Appliquer aussi ces modifications aux prochaines occurrences</label>' +
+          '<div class="rec-r" style="margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm" id="fRecMod">Modifier le rythme</button>' +
+          (t.recurrenceInfo.actif ? '<button type="button" class="btn sm ko" id="fRecStop">Arrêter la récurrence</button>' : '<button type="button" class="btn sm" id="fRecGo">Reprendre la récurrence</button>') + '</div>' : '') +
+        '<div class="rec-box hidden" id="fRecB"></div>'
+      : '<label class="chk2" style="margin:-4px 0 10px"><input type="checkbox" id="fRec"> ' + (ed ? 'Rendre cette tâche récurrente' : 'Tâche récurrente (se répète automatiquement)') + '</label><div class="rec-box hidden" id="fRecB"></div>') +
     '<div class="fld"><label for="fL">Lien (matériel à commander, documentation…)</label><input type="url" id="fL" placeholder="https://…" value="' + esc(t.lien) + '"></div>' +
     (ed ? '' : '<div class="fld"><label for="fF">Photo ou pièce jointe</label><input type="file" id="fF" multiple accept="image/*,application/pdf"><div class="hint">Jusqu’à 5 fichiers. Les photos sont allégées automatiquement.</div></div>') +
     (ed ? '' : '<div class="hint">La date et l’heure de création sont enregistrées automatiquement.</div>') +
     '<div class="err" id="fErr"></div>';
   tiroir(ed ? 'Modifier la tâche' : 'Nouvelle tâche', corps, '<button class="btn" id="fAnn">Annuler</button><button class="btn pri" id="fOk">' + (ed ? 'Enregistrer' : 'Créer la tâche') + '</button>');
   selecteurPersonnes($("#fConc"), { personnes: S.users, choisis: choisis, moi: true });
+  var blocRec = null;
+  var ouvrirBlocRec = function (g) { $('#fRecB').classList.remove('hidden'); blocRec = blocRecurrence($('#fRecB'), g); };
+  if ($('#fRec')) $('#fRec').onchange = function () { if (this.checked) ouvrirBlocRec(); else { $('#fRecB').classList.add('hidden'); blocRec = null; } };
+  if ($('#fRecMod')) $('#fRecMod').onclick = function () { if (blocRec) { $('#fRecB').classList.add('hidden'); blocRec = null; } else ouvrirBlocRec(t.recurrenceInfo.reglage); };
+  if ($('#fRecStop')) $('#fRecStop').onclick = function () {
+    if (!confirm('Arrêter la récurrence ? Cette tâche et celles déjà créées restent ; aucune nouvelle ne sera créée.')) return;
+    api('arreterRecurrence', t.recurrence).then(function () { toast('Récurrence arrêtée'); return api('getTache', t.id); }).then(function (r) { afficherTache(r); }).catch(echec);
+  };
+  if ($('#fRecGo')) $('#fRecGo').onclick = function () {
+    api('modifierRecurrence', t.recurrence, { reprendre: true }).then(function () { toast('Récurrence reprise'); return api('getTache', t.id); }).then(function (r) { afficherTache(r); }).catch(echec);
+  };
   $$('#fP button').forEach(function (b) { b.onclick = function () { priorite = b.getAttribute('data-p'); $$('#fP button').forEach(function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); }; });
   $('#fAnn').onclick = function () { if (ed) ouvrirTache(t.id); else fermer(); };
   ['#fT', '#fC'].forEach(function (s) { $(s).addEventListener('input', function () { $('#fErr').textContent = ''; }); });
@@ -3174,6 +3383,8 @@ function formTache(t) {
     };
     if (!d.titre) { $('#fErr').textContent = 'Indiquez un titre.'; $('#fT').focus(); return; }
     if (!d.categorie) { $('#fErr').textContent = 'Choisissez une catégorie.'; $('#fC').focus(); return; }
+    if (blocRec) { var er = blocRec.erreur(); if (er) { $('#fErr').textContent = er; return; } d.recurrence = blocRec.lire(); }
+    if ($('#fSuiv')) d.memePourSuivantes = $('#fSuiv').checked;
     var bouton = this; bouton.disabled = true; bouton.textContent = 'Envoi…';
     var fin = function (e) { bouton.disabled = false; bouton.textContent = ed ? 'Enregistrer' : 'Créer la tâche'; $('#fErr').textContent = msgErr(e); };
     if (ed) { api('modifierTache', t.id, d).then(function (r) { afficherTache(r); toast('Modifications enregistrées'); }).catch(fin); return; }
@@ -3182,6 +3393,13 @@ function formTache(t) {
       d.fichiers = l;
       return api('creerTache', d);
     }).then(function (r) {
+      if (r && r.recurrenceCreee) {
+        var rc = r.recurrenceCreee; fermer();
+        if (r.tache) majLocale(r.tache);
+        toast('Tâche récurrente créée · ' + (r.tache ? 'première occurrence ajoutée' : rc.prochaine ? 'première le ' + dCourt(rc.prochaine) + ' à ' + hm(rc.prochaine.slice(11, 16)) : 'aucune occurrence à venir'));
+        if (S.vue !== 'taches') aller('taches');
+        return;
+      }
       // retour à la liste : la nouvelle tâche apparaît en haut, brièvement mise en évidence
       majLocale(r); fermer();
       var n = (r.participations || []).filter(function (p) { return p.id !== S.me.id; }).length;
@@ -3405,8 +3623,10 @@ function rendreMoi() {
     if ((assistante || S.cible.secretaire) && p) {
       var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
       var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
-      hor = cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
-        '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + ' – ' + hm(c.pauseFin) : '') + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>';
+      var dm = demiJour(cg, j);
+      if (dm) cg = null;
+      hor = (dm ? '<div class="meta"><b>Congé ' + libDemi(dm) + '</b></div>' : '') + (cg ? '<div class="meta"><b>Congé</b></div>' : !c ? '' : c.statut === 'Repos' ? '<div class="meta"><b>Repos</b></div>' :
+        '<div class="meta">Horaires : ' + hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + ' – ' + hm(c.pauseFin) : '') + (c.heuresSup ? ' · <span style="color:var(--amb)">+' + esc(c.heuresSup) + ' sup</span>' : '') + (c.note ? ' · <i>' + esc(c.note) + '</i>' : '') + '</div>');
     }
     h += '<div class="day' + (j === S.today ? ' td' : '') + (lst.length ? ' occ' : '') + '"><div class="d"><span class="d-n" aria-hidden="true">' + Number(j.slice(8, 10)) + '</span><span class="d-t"><b>' + JOURS[i] + '</b><small>' + dCourt(j) + (j === S.today ? ' · aujourd’hui' : '') + '</small></span></div><div class="c">' + hor +
       (lst.length ? lst.map(ligne).join('') : S.cible.secretaire ? (hor ? '' : '<div class="meta">—</div>') : '<div class="meta">' + (assistante ? 'Aucun praticien affecté' : 'Pas d’affectation') + '</div>') + '</div></div>';
@@ -3436,7 +3656,9 @@ function htmlMoiMobile(r, p, moi, assistante, perso, jours, mes) {
     if (!((assistante || S.cible.secretaire) && p)) return null;
     var cg = p.conges.filter(function (c) { return c.email === moi && c.debut <= j && c.fin >= j; })[0];
     var c = p.creneaux.filter(function (x) { return x.email === moi && x.jour === i; })[0];
-    if (cg) return { t: 'Congé', k: 'cg' };
+    var dm = demiJour(cg, j);
+    if (cg && !dm) return { t: 'Congé', k: 'cg' };
+    if (dm) return { t: (c && c.statut !== 'Repos' ? hm(c.debut) + ' – ' + hm(c.fin) + ' · ' : '') + 'congé ' + libDemi(dm), k: 'cg' };
     if (!c) return null;
     if (c.statut === 'Repos') return { t: 'Repos', k: 'rep' };
     return { t: hm(c.debut) + ' – ' + hm(c.fin) + (c.pauseDebut && c.pauseFin ? ' · pause ' + hm(c.pauseDebut) + '–' + hm(c.pauseFin) : ''), k: '' };
@@ -3821,7 +4043,8 @@ function infoCase(p, email, i) {
   var j = p.jours[i];
   var cg = p.conges.filter(function (c) { return c.email === email && c.debut <= j && c.fin >= j; })[0];
   var c = p.creneaux.filter(function (x) { return x.email === email && x.jour === i; })[0];
-  return { conge: cg, c: c };
+  var dm = demiJour(cg, j);
+  return { conge: dm ? null : cg, demi: dm, c: c };
 }
 
 function rendrePlanning() {
@@ -3850,6 +4073,7 @@ function rendrePlanning() {
             var x = infoCase(p, pers.id, i), inner, cls = 'cell';
             // seulement ses heures et sa pause (les praticiens et salles sont dans « Par salle »)
             if (x.conge) { cls += ' cg'; inner = 'Congé'; }
+            else if (x.demi && !x.c) { cls += ' cg'; inner = 'Congé ' + libDemi(x.demi); }
             else if (!x.c) inner = ed ? '<span class="plus">+</span>' : '<span style="color:var(--ink3)">—</span>';
             else if (x.c.statut === 'Repos') { cls += ' rep'; inner = 'Repos'; }
             else inner = '<div class="h">' + esc(hm(x.c.debut)) + ' – ' + esc(hm(x.c.fin)) + '</div>' + (x.c.pauseDebut && x.c.pauseFin ? '<div class="pz">Pause ' + esc(hm(x.c.pauseDebut)) + ' – ' + esc(hm(x.c.pauseFin)) + '</div>' : '<div class="pz">Sans pause</div>');
@@ -4305,10 +4529,29 @@ function rafraichirConges(silence) {
 }
 
 function pillConge(s) {
-  var c = { 'En attente': 'p-att', 'Acceptée': 'p-fin', 'Refusée': 'p-late', 'Annulée': 'p-todo' }[s] || '';
-  return '<span class="pill ' + c + '">' + esc(s) + '</span>';
+  var c = { 'En attente': 'p-att', 'Acceptée': 'p-fin', 'Refusée': 'p-late', 'Annulée': 'p-todo', 'Déclarée': 'p-info' }[s] || '';
+  return '<span class="pill ' + c + '">' + esc(s === 'Déclarée' ? 'Absence déclarée' : s) + '</span>';
 }
-function periode(c) { return c.debut === c.fin ? 'Le ' + dLong(c.debut) : 'Du ' + dLong(c.debut) + ' au ' + dLong(c.fin); }
+/** « Le mardi 8 décembre (matin) », « Du lundi 14 (après-midi) au vendredi 18 décembre (matin) ». */
+function periode(c) {
+  var dd = c.demiDebut || '', df = c.demiFin || '';
+  if (c.debut === c.fin) return 'Le ' + dLong(c.debut) + (dd ? ' (' + dd + ')' : '');
+  return 'Du ' + dLong(c.debut) + (dd === 'après-midi' ? ' (à partir de l’après-midi)' : '') + ' au ' + dLong(c.fin) + (df === 'matin' ? ' (jusqu’au matin)' : '');
+}
+/** Partie de la journée concernée par un congé : '' (journée entière), 'matin' ou 'après-midi'. */
+function demiJour(c, j) {
+  if (!c) return '';
+  var dd = c.demiDebut || '', df = c.demiFin || '';
+  if (c.debut === c.fin) return dd;
+  if (j === c.debut && dd === 'après-midi') return dd;
+  if (j === c.fin && df === 'matin') return df;
+  return '';
+}
+function libDemi(d) { return d === 'matin' ? 'le matin' : d ? 'l’après-midi' : ''; }
+function nbJours(c) {
+  var n = c.jours != null ? c.jours : joursOuvrables(c.debut, c.fin) - (demiJour(c, c.debut) ? 0.5 : 0) - (c.debut !== c.fin && demiJour(c, c.fin) ? 0.5 : 0);
+  return String(n).replace('.', ',') + ' jour' + (n > 1 ? 's' : '');
+}
 
 /** Direction : qui a été prévenu, qui a vu, qui a décidé, quand ; et si la personne a vu la réponse. */
 function traceConge(x) {
@@ -4338,35 +4581,48 @@ function signalerVuesConges() {
 
 function rendreConges() {
   var c = S.conges;
-  var h = '<div class="ph"><div class="ph-t"><h1>Congés</h1><p class="ph-g">' + (S.conges && S.conges.peutValider ? 'Les demandes à valider sont en haut. Vos propres demandes et l’historique suivent.' : 'Choisissez vos dates et envoyez la demande. Vous êtes prévenu dès qu’elle est acceptée ou refusée.') + '</p></div><div class="ph-a"><button class="btn pri" id="cgNv">+ Demander un congé</button></div></div>';
-  if (!c) { $('#main').innerHTML = h + sq('cartes'); $('#cgNv').onclick = formConge; return; }
+  var dentiste = !!S.cfg.estDentiste;
+  var h = '<div class="ph"><div class="ph-t"><h1>' + (dentiste ? 'Congés et absences' : 'Congés') + '</h1><p class="ph-g">' +
+    (dentiste ? 'Déclarez vos absences pour informer l’équipe : elles sont enregistrées tout de suite, sans validation.' + (S.conges && S.conges.peutValider ? ' Les demandes de l’équipe à valider sont en haut.' : '')
+      : S.conges && S.conges.peutValider ? 'Les demandes à valider sont en haut. Vos propres demandes et l’historique suivent.' : 'Choisissez vos dates et envoyez la demande. Vous êtes prévenu dès qu’elle est acceptée ou refusée.') +
+    '</p></div><div class="ph-a"><button class="btn pri" id="cgNv">' + (dentiste ? '+ Déclarer une absence' : '+ Demander un congé') + '</button></div></div>';
+  if (!c) { $('#main').innerHTML = h + sq('cartes'); $('#cgNv').onclick = function () { formConge(); }; return; }
   if (c.peutValider) {
     h += '<h2>À valider' + (c.aValider.length ? ' (' + c.aValider.length + ')' : '') + '</h2>' +
       (c.aValider.length ? c.aValider.map(function (x) {
         return '<div class="cg-c" data-id="' + esc(x.id) + '" data-cg="' + esc(x.id) + '"><div class="t">' + esc(x.nom) + (x.fonction ? ' <span class="meta" style="font-weight:400">· ' + esc(x.fonction) + '</span>' : '') + '</div>' +
           '<div class="m" style="color:var(--ink);font-size:14px">' + esc(periode(x)) + (x.debut !== x.fin ? ' (inclus)' : '') + '</div>' +
-          '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + '</div>' +
+          '<div class="m">' + nbJours(x) + ' hors dimanche · demandé le ' + esc(dCourt(x.demandeLe)) + (x.majLe ? ' · modifié le ' + esc(dCourt(x.majLe)) : '') + '</div>' +
           (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') + traceConge(x) +
           '<div class="r"><button class="btn sm ok" data-d="Acceptée">Accepter</button><button class="btn sm ko" data-d="Refusée">Refuser</button>' +
           '<input type="text" class="hidden" placeholder="Motif du refus (envoyé à la personne)" style="flex:1;min-width:200px;border:1px solid var(--line2);border-radius:8px;padding:6px 10px"></div></div>';
       }).join('') : '<div class="empty">Aucune demande en attente.</div>');
   }
-  h += '<h2>Mes demandes</h2>' + (c.miens.length ? c.miens.map(function (x) {
+  // absences des praticiens à venir : visibles de toute l'équipe
+  var autresAbs = (c.absences || []).filter(function (x) { return x.email !== S.me.id; });
+  if (autresAbs.length) h += '<h2>Absences des praticiens à venir</h2>' + autresAbs.map(function (x) {
+    return '<div class="cg-c cg-abs" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
+      '<div class="m">' + nbJours(x) + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + '</div></div>';
+  }).join('');
+  h += '<h2>' + (dentiste ? 'Mes absences' : 'Mes demandes') + '</h2>' + (c.miens.length ? c.miens.map(function (x) {
+    var modifiable = ['En attente', 'Acceptée', 'Déclarée'].indexOf(x.statut) >= 0 && x.fin >= S.today;
+    var trait = x.traitePar && x.traiteLe && x.statut !== 'Déclarée' ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : x.statut === 'Refusée' ? 'refusée' : 'annulée') + ' par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)) : '';
     return '<div class="cg-c" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-      '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s) · demandée le ' + esc(dHeure(x.demandeLe)) + (x.traitePar && x.traiteLe ? ' · ' + (x.statut === 'Acceptée' ? 'acceptée' : x.statut === 'Refusée' ? 'refusée' : 'annulée') + ' par ' + esc(x.traitePar) + ' le ' + esc(dHeure(x.traiteLe)) : '') + '</div>' +
+      '<div class="m">' + nbJours(x) + ' · ' + (x.absence ? 'déclarée' : 'demandée') + ' le ' + esc(dHeure(x.demandeLe)) + (x.majLe ? ' · modifiée le ' + esc(dHeure(x.majLe)) : '') + trait + '</div>' +
       (x.commentaire ? '<div class="m" style="margin-top:4px">« ' + esc(x.commentaire) + ' »</div>' : '') +
       (x.reponse ? '<div class="m" style="margin-top:4px">Réponse : ' + esc(x.reponse) + '</div>' : '') +
-      (x.statut === 'En attente' ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ma demande</button></div>' : '') + '</div>';
-  }).join('') : '<div class="empty">Vous n’avez pas encore fait de demande.</div>');
+      (modifiable ? '<div class="r"><button class="lk" data-mod="' + esc(x.id) + '">Modifier</button><button class="lk" data-ann="' + esc(x.id) + '" data-abs="' + (x.absence ? 1 : '') + '">' + (x.absence ? 'Annuler mon absence' : 'Annuler ma demande') + '</button></div>' : '') + '</div>';
+  }).join('') : '<div class="empty">' + (dentiste ? 'Aucune absence déclarée pour l’instant.' : 'Vous n’avez pas encore fait de demande.') + '</div>');
   if (c.peutValider && c.equipe.length) {
     h += '<h2>Historique de l’équipe</h2>' + c.equipe.slice(0, 60).map(function (x) {
       return '<div class="cg-c" data-cg="' + esc(x.id) + '"><div class="row"><span class="t">' + esc(x.nom) + ' · ' + esc(periode(x)) + '</span><span class="sp"></span>' + pillConge(x.statut) + '</div>' +
-        '<div class="m">' + joursOuvrables(x.debut, x.fin) + ' jour(s)' + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · réponse : ' + esc(x.reponse) : '') + '</div>' + traceConge(x) +
-        (x.statut === 'Acceptée' && x.fin >= S.today ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '">Annuler ce congé</button></div>' : '') + '</div>';
+        '<div class="m">' + nbJours(x) + (x.commentaire ? ' · « ' + esc(x.commentaire) + ' »' : '') + (x.reponse ? ' · réponse : ' + esc(x.reponse) : '') + '</div>' + traceConge(x) +
+        ((x.statut === 'Acceptée' || x.statut === 'Déclarée') && x.fin >= S.today && x.email !== S.me.id ? '<div class="r"><button class="lk" data-ann="' + esc(x.id) + '" data-abs="' + (x.absence ? 1 : '') + '">' + (x.absence ? 'Annuler cette absence' : 'Annuler ce congé') + '</button></div>' : '') + '</div>';
     }).join('');
   }
   $('#main').innerHTML = h;
-  $('#cgNv').onclick = formConge;
+  $('#cgNv').onclick = function () { formConge(); };
+  $$('[data-mod]').forEach(function (b) { b.onclick = function () { formConge(c.miens.filter(function (x) { return x.id === b.getAttribute('data-mod'); })[0]); }; });
   signalerVuesConges();
   if (S.cgCible) {
     var cib = $('.cg-c[data-cg="' + String(S.cgCible.id).replace(/"/g, '') + '"]');
@@ -4393,31 +4649,65 @@ function rendreConges() {
   });
   $$('[data-ann]').forEach(function (b) {
     b.onclick = function () {
-      if (!confirm('Annuler cette demande de congé ?')) return;
-      api('annulerConge', b.getAttribute('data-ann')).then(function (r) { S.conges = r; majCompteurs(); rendreConges(); toast('Demande annulée'); }).catch(echec);
+      var abs = !!b.getAttribute('data-abs');
+      if (!confirm(abs ? 'Annuler cette absence ? Aya, Jessica, Maxime et Hervé seront prévenus.' : 'Annuler cette demande de congé ?')) return;
+      api('annulerConge', b.getAttribute('data-ann')).then(function (r) { S.conges = r; majCompteurs(); rendreConges(); toast(abs ? 'Absence annulée' : 'Demande annulée'); }).catch(echec);
     };
   });
 }
 
-function formConge() {
-  var corps = '<div class="two"><div class="fld"><label for="gD">Du</label><input type="date" id="gD"></div><div class="fld"><label for="gF">Au (inclus)</label><input type="date" id="gF"></div></div>' +
-    '<div class="fld"><label for="gC">Commentaire</label><textarea id="gC" placeholder="Facultatif"></textarea></div>' +
-    '<div class="hint" id="gN"></div><div class="err" id="gErr"></div>';
-  tiroir('Demande de congé', corps, '<button class="btn" id="gAnn">Annuler</button><button class="btn pri" id="gOk">Envoyer la demande</button>');
-  var calc = function () {
-    var a = $('#gD').value, b = $('#gF').value; $('#gErr').textContent = '';
-    if (a && !b) { $('#gF').value = a; b = a; }
-    $('#gN').textContent = a && b && b >= a ? joursOuvrables(a, b) + ' jour(s), dimanches exclus.' : '';
+/**
+ * Demande de congé (assistantes, secrétaires : à valider) ou absence (praticiens : sans validation).
+ * Une journée (entière, matin ou après-midi), ou plusieurs jours avec une demi-journée au début ou à la fin.
+ * c : demande existante à modifier.
+ */
+function formConge(c) {
+  var dentiste = !!S.cfg.estDentiste, ed = !!c;
+  var multi = ed ? c.debut !== c.fin : false;
+  var seg = function (id, l, v) { return '<div class="seg cg-seg" id="' + id + '">' + l.map(function (o) { return '<button type="button" data-v="' + esc(o[0]) + '"' + (o[0] === v ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' + esc(o[1]) + '</button>'; }).join('') + '</div>'; };
+  var corps = seg('gM', [['1', 'Une journée'], ['n', 'Plusieurs jours']], multi ? 'n' : '1') +
+    '<div id="gUn"><div class="fld"><label for="gJ">Date</label><input type="date" id="gJ" value="' + esc(ed && !multi ? c.debut : '') + '"></div>' +
+    '<div class="fld"><label>Durée</label>' + seg('gP', [['', 'Journée entière'], ['matin', 'Matin'], ['après-midi', 'Après-midi']], ed && !multi ? (c.demiDebut || '') : '') + '</div></div>' +
+    '<div id="gPl" class="hidden"><div class="two"><div class="fld"><label for="gD">Du</label><input type="date" id="gD" value="' + esc(ed && multi ? c.debut : '') + '">' +
+    '<select id="gDd" aria-label="Premier jour"><option value="">Journée entière</option><option value="après-midi"' + (ed && multi && c.demiDebut === 'après-midi' ? ' selected' : '') + '>Dès l’après-midi</option></select></div>' +
+    '<div class="fld"><label for="gF">Au (inclus)</label><input type="date" id="gF" value="' + esc(ed && multi ? c.fin : '') + '">' +
+    '<select id="gFd" aria-label="Dernier jour"><option value="">Journée entière</option><option value="matin"' + (ed && multi && c.demiFin === 'matin' ? ' selected' : '') + '>Jusqu’au matin</option></select></div></div></div>' +
+    '<div class="fld"><label for="gC">Commentaire</label><textarea id="gC" placeholder="Facultatif">' + esc(ed ? c.commentaire || '' : '') + '</textarea></div>' +
+    '<div class="hint" id="gN"></div>' +
+    '<div class="hint">' + (dentiste ? 'Absence enregistrée tout de suite, sans validation. Aya, Jessica, Maxime et Hervé sont prévenus.' : 'Votre demande est soumise à validation. Aya, Jessica, Maxime et Hervé sont prévenus.') +
+    (ed && c.statut === 'Acceptée' ? ' Ce congé déjà accepté devra être de nouveau validé.' : '') + '</div><div class="err" id="gErr"></div>';
+  var titre = dentiste ? (ed ? 'Modifier mon absence' : 'Déclarer une absence') : (ed ? 'Modifier ma demande de congé' : 'Demander un congé');
+  var bouton = ed ? 'Enregistrer les modifications' : dentiste ? 'Déclarer l’absence' : 'Envoyer la demande';
+  tiroir(titre, corps, '<button class="btn" id="gAnn">Annuler</button><button class="btn pri" id="gOk">' + bouton + '</button>');
+  var valeurSeg = function (id) { var b = $('#' + id + ' button.on'); return b ? b.getAttribute('data-v') : ''; };
+  var lire = function () {
+    if (valeurSeg('gM') !== 'n') { var j = $('#gJ').value; return { debut: j, fin: j, demiDebut: valeurSeg('gP'), demiFin: '' }; }
+    return { debut: $('#gD').value, fin: $('#gF').value, demiDebut: $('#gDd').value, demiFin: $('#gFd').value };
   };
-  $('#gD').onchange = calc; $('#gF').onchange = calc;
+  var calc = function () {
+    $('#gErr').textContent = '';
+    var plus = valeurSeg('gM') === 'n';
+    $('#gUn').classList.toggle('hidden', plus); $('#gPl').classList.toggle('hidden', !plus);
+    if (plus && $('#gD').value && !$('#gF').value) $('#gF').value = $('#gD').value;
+    var d = lire();
+    $('#gN').textContent = d.debut && d.fin && d.fin >= d.debut ? (d.debut === d.fin && plus ? 'Même jour : choisissez plutôt « Une journée ». ' : '') + nbJours(d) + ', dimanches exclus.' : '';
+  };
+  $$('.cg-seg').forEach(function (g) {
+    $$('button', g).forEach(function (b) { b.onclick = function () { $$('button', g).forEach(function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); calc(); }; });
+  });
+  ['#gJ', '#gD', '#gF', '#gDd', '#gFd'].forEach(function (x) { $(x).onchange = calc; });
+  calc();
   $('#gAnn').onclick = fermer;
   $('#gOk').onclick = function () {
-    var d = { debut: $('#gD').value, fin: $('#gF').value, commentaire: $('#gC').value.trim() };
-    if (!d.debut || !d.fin) { $('#gErr').textContent = 'Indiquez les deux dates.'; return; }
+    var d = lire(); d.commentaire = $('#gC').value.trim();
+    if (!d.debut || !d.fin) { $('#gErr').textContent = valeurSeg('gM') === 'n' ? 'Indiquez les deux dates.' : 'Indiquez la date.'; return; }
     if (d.fin < d.debut) { $('#gErr').textContent = 'La date de fin est avant la date de début.'; return; }
+    if (d.debut === d.fin) { d.demiDebut = valeurSeg('gM') === 'n' ? '' : d.demiDebut; d.demiFin = ''; }
     var b = this; b.disabled = true;
-    api('demanderConge', d).then(function (r) { S.conges = r; fermer(); majCompteurs(); rendreConges(); toast('Demande envoyée'); })
-      .catch(function (e) { b.disabled = false; $('#gErr').textContent = msgErr(e); });
+    (ed ? api('modifierConge', c.id, d) : api('demanderConge', d)).then(function (r) {
+      S.conges = r; fermer(); majCompteurs(); rendreConges();
+      toast(ed ? 'Modification enregistrée, les personnes concernées sont prévenues' : dentiste ? 'Absence déclarée, l’équipe est prévenue' : 'Demande envoyée');
+    }).catch(function (e) { b.disabled = false; $('#gErr').textContent = msgErr(e); });
   };
 }
 
