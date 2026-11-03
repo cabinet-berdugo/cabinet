@@ -1106,6 +1106,8 @@ html{scroll-padding-top:20px}
   body{padding-left:var(--lat);transition:padding-left .2s}
   main{max-width:none;padding:0 32px 32px}
   .ph{box-shadow:none;clip-path:none;margin:0 -32px 24px;padding:30px 150px 30px 32px}
+  /* angle arrondi entre le bandeau du haut et le menu latéral */
+  .ph::after{content:"";position:absolute;left:0;top:100%;width:20px;height:20px;background:radial-gradient(circle at 100% 100%,transparent 19.5px,#061C44 20px);pointer-events:none}
   .nvadr{margin-left:32px;margin-right:32px}
   /* menu réduit : les icônes seules */
   html.lat-r header{width:var(--lat-r)}
