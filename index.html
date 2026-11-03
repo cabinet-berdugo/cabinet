@@ -2639,8 +2639,11 @@ function menuPlus() {
   $$('[data-mp]').forEach(function (b) { b.onclick = function () { fermer(); aller(b.getAttribute('data-mp')); }; });
 }
 /** Onglets ouverts à la personne (réglés par rôle dans « Personnel »). */
+// Prothèses (suivi Protheasy) retiré du site pour l'instant : les données déjà relevées sont conservées
+var PROTHESES_MASQUE = true;
 function ongletOuvert(v) {
   var o = (S.cfg && S.cfg.onglets) || { taches: true, planning: true, conges: true, materiel: true };
+  if (v === 'protheses' && PROTHESES_MASQUE) return false;
   if (v === 'personnel') return !!(S.cfg && S.cfg.gererPersonnel);
   if (v === 'compta') return !!(S.cfg && S.cfg.compta);
   if (v === 'impayes' || v === 'relances') return !!(S.cfg && (S.cfg.suivi || (S.cfg.suivi === undefined && S.cfg.compta)));
